@@ -1,11 +1,15 @@
 {
   "entries": [
     {
-      "version": "2.0.0",
-      "date": "2026-06-10",
+      "id": "launcher-0.0.1",
       "target": "launcher",
-      "title": "Refonte du launcher",
-      "changes": ["Développement du nouveau launcher en cours (phase P1 livrée)"]
+      "version": "0.0.1",
+      "date": "2026-06-11",
+      "title": "Première version de test",
+      "changes": [
+        "Refonte complète : comptes Microsoft, modpack, statut serveur, news, contenus",
+        "Désinstallation complète et sans trace depuis les Paramètres"
+      ]
     }
   ]
 }
