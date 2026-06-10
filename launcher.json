@@ -7,7 +7,7 @@
     "blockPlay": true
   },
   "server": {
-    "host": "meytopia.fr",
+    "host": "162.55.90.254",
     "port": 25598,
     "query": { "enabled": true, "port": 25598 }
   },
