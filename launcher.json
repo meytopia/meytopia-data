@@ -1,5 +1,5 @@
 {
-  "minLauncherVersion": "2.0.0",
+  "minLauncherVersion": "0.1.0",
   "maintenance": {
     "active": false,
     "message": "",
@@ -11,11 +11,11 @@
     "port": 25598,
     "query": { "enabled": true, "port": 25598 }
   },
-  "discordInvite": "",
+  "discordInvite": "https://discord.gg/zaXjrpcGat",
   "modpack": {
     "version": "0.0.0",
     "mcVersion": "1.21.1",
-    "loader": { "type": "neoforge", "version": "21.1.0" },
+    "loader": { "type": "neoforge", "version": "21.1.220" },
     "manifestUrl": "https://raw.githubusercontent.com/meytopia/meytopia-data/main/manifest.json"
   }
 }
