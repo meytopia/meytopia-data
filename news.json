@@ -1,0 +1,13 @@
+{
+  "news": [
+    {
+      "id": "2026-06-bienvenue",
+      "title": "Bienvenue sur le nouveau launcher !",
+      "date": "2026-06-10T18:00:00+02:00",
+      "body": "Le launcher Meytopia fait peau neuve. Les annonces du serveur s'afficheront ici.",
+      "author": "Alexis",
+      "tags": ["launcher"],
+      "pinned": true
+    }
+  ]
+}

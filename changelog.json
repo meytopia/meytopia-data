@@ -1,0 +1,11 @@
+{
+  "entries": [
+    {
+      "version": "2.0.0",
+      "date": "2026-06-10",
+      "target": "launcher",
+      "title": "Refonte du launcher",
+      "changes": ["Développement du nouveau launcher en cours (phase P1 livrée)"]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "version": "0.0.0",
+  "mcVersion": "1.21.1",
+  "loader": { "type": "neoforge", "version": "21.1.0" },
+  "files": []
+}

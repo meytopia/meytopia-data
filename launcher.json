@@ -1,0 +1,21 @@
+{
+  "minLauncherVersion": "2.0.0",
+  "maintenance": {
+    "active": false,
+    "message": "",
+    "scheduledAt": null,
+    "blockPlay": true
+  },
+  "server": {
+    "host": "meytopia.fr",
+    "port": 25598,
+    "query": { "enabled": true, "port": 25598 }
+  },
+  "discordInvite": "",
+  "modpack": {
+    "version": "0.0.0",
+    "mcVersion": "1.21.1",
+    "loader": { "type": "neoforge", "version": "21.1.0" },
+    "manifestUrl": "https://raw.githubusercontent.com/meytopia/meytopia-data/main/manifest.json"
+  }
+}
