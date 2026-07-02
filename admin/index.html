@@ -459,8 +459,10 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
       </div>
       <div class="field">
         <label for="gf-item-search">Ajouter un cadeau — cherche par nom (mods inclus), clique pour l'ajouter</label>
-        <input type="search" id="gf-item-search" placeholder="Chercher un objet (pomme, diamant, create:…)…" autocomplete="off">
-        <div id="gf-item-results" class="item-results" hidden></div>
+        <div class="item-picker">
+          <input type="search" id="gf-item-search" placeholder="Chercher un objet (pomme, diamant, create:…)…" autocomplete="off">
+          <div id="gf-item-results" class="item-results" hidden></div>
+        </div>
       </div>
       <div id="gf-chips" class="grant-chips"></div>
       <div class="mods-bulk" style="margin-top:8px">
