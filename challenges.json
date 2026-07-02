@@ -1,0 +1,19 @@
+{
+  "challenges": [
+    {
+      "id": "op-test-uniquePlayers",
+      "title": "op test",
+      "metric": "uniquePlayers",
+      "target": 2,
+      "reward": "64 diams",
+      "grant": {
+        "items": [
+          {
+            "id": "minecraft:diamond",
+            "count": 64
+          }
+        ]
+      }
+    }
+  ]
+}
