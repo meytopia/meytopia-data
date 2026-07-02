@@ -1,0 +1,32 @@
+# Meytopia — surveillance du serveur (alerte panne automatique)
+# Toutes les ~10 min : lit live.json (branche stats). Si la sonde est muette > 15 min alors que le
+# dernier état était « en ligne » → issue « 🔴 Serveur injoignable » + message Discord (optionnel).
+# Rétablissement ou arrêt propre → l'issue se ferme toute seule. Historique des pannes = les issues fermées.
+# Discord : ajouter le secret DISCORD_WEBHOOK (Settings → Secrets → Actions) — sans lui, l'issue seule suffit.
+name: Surveillance serveur
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {} # test manuel depuis l'onglet Actions
+
+permissions:
+  issues: write
+  contents: read
+
+concurrency:
+  group: sonde-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/sonde-watch.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}

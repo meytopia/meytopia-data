@@ -1,0 +1,826 @@
+{
+  "version": "1.5.0",
+  "generatedAt": "2026-06-30T14:31:57.943Z",
+  "files": [
+    {
+      "path": "mods/addonslib-neoforge-1.21.1-1.10.jar",
+      "sha1": "16ff192afe3249a4fae754a8fc134bd07a58b8c4",
+      "size": 117921,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_addonslib-neoforge-1.21.1-1.10.jar",
+      "mod": {
+        "id": "addonslib",
+        "name": "Addons Lib"
+      }
+    },
+    {
+      "path": "mods/advancednetherite-neoforge-2.3.1-1.21.1.jar",
+      "sha1": "99003aafa635f316bdcf2db4a70989890a4d944d",
+      "size": 520611,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_advancednetherite-neoforge-2.3.1-1.21.1.jar",
+      "mod": {
+        "id": "advancednetherite",
+        "name": "Advanced Netherite"
+      }
+    },
+    {
+      "path": "mods/AmbientSounds_NEOFORGE_v6.3.8_mc1.21.1.jar",
+      "sha1": "c79ab328b2c46068effebdcb3f26e98dc4404cb0",
+      "size": 84811632,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_AmbientSounds_NEOFORGE_v6.3.8_mc1.21.1.jar",
+      "mod": {
+        "id": "ambientsounds",
+        "name": "AmbientSounds"
+      }
+    },
+    {
+      "path": "mods/Apotheosis-1.21.1-8.5.4.jar",
+      "sha1": "24c28cdf26514148a92f7b8c620ec54a2cd2c9ca",
+      "size": 6949410,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_Apotheosis-1.21.1-8.5.4.jar",
+      "mod": {
+        "id": "apotheosis",
+        "name": "Apotheosis"
+      }
+    },
+    {
+      "path": "mods/ApothicAttributes-1.21.1-2.9.1.jar",
+      "sha1": "e7f669e1b45d75076200436f37c40a6dd3b6a6ff",
+      "size": 314269,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_ApothicAttributes-1.21.1-2.9.1.jar",
+      "mod": {
+        "id": "apothic_attributes",
+        "name": "Apothic Attributes"
+      }
+    },
+    {
+      "path": "mods/ApothicEnchanting-1.21.1-1.5.3.jar",
+      "sha1": "751276a13db49a5f2202e50715b8864f5ae40cb6",
+      "size": 5354706,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_ApothicEnchanting-1.21.1-1.5.3.jar",
+      "mod": {
+        "id": "apothic_enchanting",
+        "name": "Apothic Enchanting"
+      }
+    },
+    {
+      "path": "mods/ApothicSpawners-1.21.1-1.3.4.jar",
+      "sha1": "26d701238bdb76a497a64f588409419ad067e557",
+      "size": 125015,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_ApothicSpawners-1.21.1-1.3.4.jar",
+      "mod": {
+        "id": "apothic_spawners",
+        "name": "Apothic Spawners"
+      }
+    },
+    {
+      "path": "mods/appleskin-neoforge-mc1.21-3.0.9.jar",
+      "sha1": "81cf0e668f991f83ac8820c386fbd6c9c3602246",
+      "size": 75804,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_appleskin-neoforge-mc1.21-3.0.9.jar",
+      "mod": {
+        "id": "appleskin",
+        "name": "AppleSkin"
+      }
+    },
+    {
+      "path": "mods/architectury-13.0.8-neoforge.jar",
+      "sha1": "6ca11d3cc136bf69bb8f4d56982481eb85b5100b",
+      "size": 584004,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_architectury-13.0.8-neoforge.jar",
+      "mod": {
+        "id": "architectury",
+        "name": "Architectury"
+      }
+    },
+    {
+      "path": "mods/BadOptimizations-2.4.1-1.21.1.jar",
+      "sha1": "1461d8e46391efd32a3085150e86094c9f6f5c9d",
+      "size": 283566,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_BadOptimizations-2.4.1-1.21.1.jar",
+      "mod": {
+        "id": "badoptimizations",
+        "name": "BadOptimizations"
+      }
+    },
+    {
+      "path": "mods/balm-neoforge-1.21.1-21.0.59.jar",
+      "sha1": "b0bf4bed336237bfbe35879c33f30357b53e8664",
+      "size": 735066,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_balm-neoforge-1.21.1-21.0.59.jar",
+      "mod": {
+        "id": "balm",
+        "name": "Balm"
+      }
+    },
+    {
+      "path": "mods/BiomesOPlenty-neoforge-1.21.1-21.1.0.13.jar",
+      "sha1": "a0dec78a9c1bb7e0167e5326aaf3c58a94f3aa86",
+      "size": 22338081,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_BiomesOPlenty-neoforge-1.21.1-21.1.0.13.jar",
+      "mod": {
+        "id": "biomesoplenty",
+        "name": "Biomes O' Plenty"
+      }
+    },
+    {
+      "path": "mods/chat_heads-0.15.2-neoforge-1.21.jar",
+      "sha1": "86abc08fbfa8eb3e2a41aa4403a6bd52543ea665",
+      "size": 89325,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_chat_heads-0.15.2-neoforge-1.21.jar",
+      "mod": {
+        "id": "chat_heads",
+        "name": "Chat Heads"
+      }
+    },
+    {
+      "path": "mods/Chunky-NeoForge-1.4.23.jar",
+      "sha1": "ab0c74743a653020fe2dfc4986b43e893947f3e9",
+      "size": 340572,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_Chunky-NeoForge-1.4.23.jar",
+      "mod": {
+        "id": "chunky",
+        "name": "Chunky"
+      }
+    },
+    {
+      "path": "mods/cloth-config-15.0.140-neoforge.jar",
+      "sha1": "c3e5733ba4503b102589a026000fd5ce0212f6f2",
+      "size": 1163890,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_cloth-config-15.0.140-neoforge.jar",
+      "mod": {
+        "id": "cloth_config",
+        "name": "Cloth Config v15 API"
+      }
+    },
+    {
+      "path": "mods/Corgilib-NeoForge-1.21.1-5.0.0.9.jar",
+      "sha1": "6699f876f9e10f936910055f7fe1a283d8bb9e0f",
+      "size": 309763,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_Corgilib-NeoForge-1.21.1-5.0.0.9.jar",
+      "mod": {
+        "id": "corgilib",
+        "name": "CorgiLib"
+      }
+    },
+    {
+      "path": "mods/coroutil-neoforge-1.21.0-1.3.9.jar",
+      "sha1": "0f5a6309ce8394721b97740e6f3e45665f13b8de",
+      "size": 65716,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_coroutil-neoforge-1.21.0-1.3.9.jar",
+      "mod": {
+        "id": "coroutil",
+        "name": "CoroUtil"
+      }
+    },
+    {
+      "path": "mods/CreativeCore_NEOFORGE_v2.13.41_mc1.21.1.jar",
+      "sha1": "4b666b4668b77fdc1ac34a183aae58a432999970",
+      "size": 1218640,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_CreativeCore_NEOFORGE_v2.13.41_mc1.21.1.jar",
+      "mod": {
+        "id": "creativecore",
+        "name": "CreativeCore"
+      }
+    },
+    {
+      "path": "mods/curios-neoforge-9.5.1+1.21.1.jar",
+      "sha1": "418fcd42e3a7844c9bdc71c9b6401fdb3894e0c4",
+      "size": 410690,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_curios-neoforge-9.5.1+1.21.1.jar",
+      "mod": {
+        "id": "curios",
+        "name": "Curios API"
+      }
+    },
+    {
+      "path": "mods/easy-villagers-neoforge-1.21.1-1.1.42.jar",
+      "sha1": "bde2278d0c216916ff5a780c9f3acfb50ebee9e5",
+      "size": 456700,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_easy-villagers-neoforge-1.21.1-1.1.42.jar",
+      "mod": {
+        "id": "easy_villagers",
+        "name": "Easy Villagers"
+      }
+    },
+    {
+      "path": "mods/easy_npc-neoforge-1.21.1-6.21.0.jar",
+      "sha1": "bfa1feff63efa2f30ae6cd1adbca624966763261",
+      "size": 2123994,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_easy_npc-neoforge-1.21.1-6.21.0.jar",
+      "mod": {
+        "id": "easy_npc",
+        "name": "Easy NPC"
+      }
+    },
+    {
+      "path": "mods/easy_npc_bundle-neoforge-1.21.1-6.21.0.jar",
+      "sha1": "0ebe884b99a124e7f08584919bb762e100fd2dfc",
+      "size": 25212,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_easy_npc_bundle-neoforge-1.21.1-6.21.0.jar",
+      "mod": {
+        "id": "easy_npc_bundle",
+        "name": "Easy NPC: Bundle"
+      }
+    },
+    {
+      "path": "mods/easy_npc_config_ui-neoforge-1.21.1-6.21.0.jar",
+      "sha1": "1b5c9efb6c3b4662d2aba1633fcd90f4b287678e",
+      "size": 915980,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_easy_npc_config_ui-neoforge-1.21.1-6.21.0.jar",
+      "mod": {
+        "id": "easy_npc_config_ui",
+        "name": "Easy NPC: Config UI"
+      }
+    },
+    {
+      "path": "mods/effortlessbuilding-4.1+1.21.1.jar",
+      "sha1": "10188c088c3e32d21275fd02d1aa31ffb6dd9f86",
+      "size": 810119,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_effortlessbuilding-4.1+1.21.1.jar",
+      "mod": {
+        "id": "effortlessbuilding",
+        "name": "Effortless Building"
+      }
+    },
+    {
+      "path": "mods/elevatorid-neoforge-1.21.1-1.11.4.jar",
+      "sha1": "87a5504efcd51de55cd4215a103cbfcf717fa022",
+      "size": 191190,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_elevatorid-neoforge-1.21.1-1.11.4.jar",
+      "mod": {
+        "id": "elevatorid",
+        "name": "ElevatorMod"
+      }
+    },
+    {
+      "path": "mods/entityculling-neoforge-1.10.4-mc1.21.1.jar",
+      "sha1": "36b5cfbc67226cdee6776a566d0fab8844059221",
+      "size": 1585350,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_entityculling-neoforge-1.10.4-mc1.21.1.jar",
+      "mod": {
+        "id": "entityculling",
+        "name": "EntityCulling"
+      }
+    },
+    {
+      "path": "mods/entity_model_features-3.2.4-1.21-neoforge.jar",
+      "sha1": "fcc0d7cfee5ace4dba159225edd151d90dd924b9",
+      "size": 567827,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_entity_model_features-3.2.4-1.21-neoforge.jar",
+      "mod": {
+        "id": "entity_model_features",
+        "name": "Entity Model Features"
+      }
+    },
+    {
+      "path": "mods/entity_texture_features_1.21-neoforge-7.1.jar",
+      "sha1": "56de40b237ff44dbf1bb68844e0f118607902684",
+      "size": 752334,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_entity_texture_features_1.21-neoforge-7.1.jar",
+      "mod": {
+        "id": "entity_texture_features",
+        "name": "Entity Texture Features"
+      }
+    },
+    {
+      "path": "mods/fallingleaves-1.21.1-2.5.1.jar",
+      "sha1": "93f479691d5a88775d90e9fa19e814b7301a363b",
+      "size": 153343,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_fallingleaves-1.21.1-2.5.1.jar",
+      "mod": {
+        "id": "fallingleaves",
+        "name": "Fallingleaves"
+      }
+    },
+    {
+      "path": "mods/FarmersDelight-1.21.1-1.3.2.jar",
+      "sha1": "bf7e7dede99e832de20e191b1f6c11f7a9b9a622",
+      "size": 3163042,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_FarmersDelight-1.21.1-1.3.2.jar",
+      "mod": {
+        "id": "farmersdelight",
+        "name": "Farmer's Delight"
+      }
+    },
+    {
+      "path": "mods/FramedBlocks-10.6.0.jar",
+      "sha1": "eb96e6983845daee8d6ac84544ba1df55d4a6fae",
+      "size": 4306442,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_FramedBlocks-10.6.0.jar",
+      "mod": {
+        "id": "framedblocks",
+        "name": "FramedBlocks"
+      }
+    },
+    {
+      "path": "mods/ftb-chunks-neoforge-2101.1.19.jar",
+      "sha1": "2fd5eeaff04af5096ff1ad6f8df15053c10269ca",
+      "size": 655918,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_ftb-chunks-neoforge-2101.1.19.jar",
+      "mod": {
+        "id": "ftbchunks",
+        "name": "FTB Chunks"
+      }
+    },
+    {
+      "path": "mods/ftb-library-neoforge-2101.1.32.jar",
+      "sha1": "836411988409e166020db2914cab5d4f93466fc4",
+      "size": 1416263,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_ftb-library-neoforge-2101.1.32.jar",
+      "mod": {
+        "id": "ftblibrary",
+        "name": "FTB Library"
+      }
+    },
+    {
+      "path": "mods/ftb-teams-neoforge-2101.1.10.jar",
+      "sha1": "363376ae0fb22cb0527170fdf6a066d1da9b0225",
+      "size": 302712,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_ftb-teams-neoforge-2101.1.10.jar",
+      "mod": {
+        "id": "ftbteams",
+        "name": "FTB Teams"
+      }
+    },
+    {
+      "path": "mods/ftb-ultimine-neoforge-2101.1.15.jar",
+      "sha1": "c96a7cc0b52bf919660ea61c1536cebd9d5773b3",
+      "size": 177109,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_ftb-ultimine-neoforge-2101.1.15.jar",
+      "mod": {
+        "id": "ftbultimine",
+        "name": "FTB Ultimine"
+      }
+    },
+    {
+      "path": "mods/geckolib-neoforge-1.21.1-4.8.4.jar",
+      "sha1": "eb854c8ec53ef922a5f3877a1aa4c1ce1352e0ce",
+      "size": 622582,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_geckolib-neoforge-1.21.1-4.8.4.jar",
+      "mod": {
+        "id": "geckolib",
+        "name": "GeckoLib 4"
+      }
+    },
+    {
+      "path": "mods/GlitchCore-neoforge-1.21.1-2.1.0.2.jar",
+      "sha1": "a31c3f36330f19aa538add3d727782a62c9c30ad",
+      "size": 90717,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_GlitchCore-neoforge-1.21.1-2.1.0.2.jar",
+      "mod": {
+        "id": "glitchcore",
+        "name": "GlitchCore"
+      }
+    },
+    {
+      "path": "mods/HammerLib-1.21-21.0.14.jar",
+      "sha1": "d82d3118dbe523b1ea46934583db38e158aeee8b",
+      "size": 2209084,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_HammerLib-1.21-21.0.14.jar",
+      "mod": {
+        "id": "hammerlib",
+        "name": "HammerLib"
+      }
+    },
+    {
+      "path": "mods/HellishTrials-neoforge-1.0.5.jar",
+      "sha1": "0c03bf04e99b3e8a310c9f5b6f3e7613e3b69528",
+      "size": 581988,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_HellishTrials-neoforge-1.0.5.jar",
+      "mod": {
+        "id": "hellish_trials",
+        "name": "Hellish Trials"
+      }
+    },
+    {
+      "path": "mods/iris-neoforge-1.8.12+mc1.21.1.jar",
+      "sha1": "a3e6355915c7d3b2bc392724795113e51d289378",
+      "size": 2438548,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_iris-neoforge-1.8.12+mc1.21.1.jar",
+      "mod": {
+        "id": "iris",
+        "name": "Iris"
+      }
+    },
+    {
+      "path": "mods/Jade-1.21.1-NeoForge-15.10.5.jar",
+      "sha1": "d5bf134b3dbde9f5258666823900e21341dc0a50",
+      "size": 725742,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_Jade-1.21.1-NeoForge-15.10.5.jar",
+      "mod": {
+        "id": "jade",
+        "name": "Jade"
+      }
+    },
+    {
+      "path": "mods/jei-1.21.1-neoforge-19.27.0.336.jar",
+      "sha1": "d02c849e4e321e7b056a48e0242ec641560c2ab8",
+      "size": 1529192,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_jei-1.21.1-neoforge-19.27.0.336.jar",
+      "mod": {
+        "id": "jei",
+        "name": "Just Enough Items"
+      }
+    },
+    {
+      "path": "mods/lithostitched-1.7.9-neoforge-21.1.jar",
+      "sha1": "2e0ad9125b0e19caa6c264e4512219bd022acb0d",
+      "size": 824695,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_lithostitched-1.7.9-neoforge-21.1.jar",
+      "mod": {
+        "id": "lithostitched",
+        "name": "Lithostitched"
+      }
+    },
+    {
+      "path": "mods/lootr-neoforge-1.21.1-1.11.37.120.jar",
+      "sha1": "a8acaf64fb3991526bfe7456189ccde247334265",
+      "size": 976023,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_lootr-neoforge-1.21.1-1.11.37.120.jar",
+      "mod": {
+        "id": "lootr",
+        "name": "Lootr"
+      }
+    },
+    {
+      "path": "mods/mcw-bridges-3.1.2-mc1.21.1neoforge.jar",
+      "sha1": "71ece28129789a2123cf07e79938f488d8675bb2",
+      "size": 661387,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-bridges-3.1.2-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwbridges",
+        "name": "Macaw's Bridges"
+      }
+    },
+    {
+      "path": "mods/mcw-doors-1.1.5-mc1.21.1neoforge.jar",
+      "sha1": "c127904f23db1a641dd9e065ec51c5c177cb4cd7",
+      "size": 1190404,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-doors-1.1.5-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwdoors",
+        "name": "Macaw's Doors"
+      }
+    },
+    {
+      "path": "mods/mcw-furniture-3.4.1-mc1.21.1neoforge.jar",
+      "sha1": "3dccc819f14bcc60b3683edd82ca8c5e64964229",
+      "size": 2080436,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-furniture-3.4.1-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwfurnitures",
+        "name": "Macaw's Furniture"
+      }
+    },
+    {
+      "path": "mods/mcw-lights-1.1.5-mc1.21.1neoforge.jar",
+      "sha1": "13c1107caf26b2c60d8626b3658b26cc7f634b38",
+      "size": 525744,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-lights-1.1.5-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwlights",
+        "name": "Macaw's Lights and Lamps"
+      }
+    },
+    {
+      "path": "mods/mcw-mcwfences-1.2.1-mc1.21.1neoforge.jar",
+      "sha1": "b5580c3fc521ed8bf4db3e407bd590efc317f74d",
+      "size": 673871,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-mcwfences-1.2.1-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwfences",
+        "name": "Macaw's Fences and Walls"
+      }
+    },
+    {
+      "path": "mods/mcw-mcwpaths-1.1.1-mc1.21.1neoforge.jar",
+      "sha1": "4bb7e1d28eef19f87438881b0f582a15297b95ae",
+      "size": 777742,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-mcwpaths-1.1.1-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwpaths",
+        "name": "Macaw's Paths and Pavings"
+      }
+    },
+    {
+      "path": "mods/mcw-mcwstairs-1.0.2-mc1.21.1neoforge.jar",
+      "sha1": "1ee43d693c821efc955a74e551f94372af90a140",
+      "size": 529082,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-mcwstairs-1.0.2-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwstairs",
+        "name": "Macaw's Stairs and Balconies"
+      }
+    },
+    {
+      "path": "mods/mcw-mcwwindows-2.4.2-mc1.21.1neoforge.jar",
+      "sha1": "eb1d3c118acb450cc2fe14c2ce7ce247a1bca60c",
+      "size": 1261268,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-mcwwindows-2.4.2-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwwindows",
+        "name": "Macaw's Windows"
+      }
+    },
+    {
+      "path": "mods/mcw-paintings-1.1.0-mc1.21.1neoforge.jar",
+      "sha1": "7e637b44624da6a3b7cd6cfd26324c3f116d4da6",
+      "size": 179058,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-paintings-1.1.0-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwpaintings",
+        "name": "Macaw's Paintings"
+      }
+    },
+    {
+      "path": "mods/mcw-roofs-2.3.2-mc1.21.1neoforge.jar",
+      "sha1": "05806ff152fab56f7c1b4b215d772ea73611283d",
+      "size": 1784829,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-roofs-2.3.2-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwroofs",
+        "name": "Macaw's Roofs"
+      }
+    },
+    {
+      "path": "mods/mcw-trapdoors-1.1.5-mc1.21.1neoforge.jar",
+      "sha1": "1f8b59e31f889f53b6296b42ee09d447e7e56620",
+      "size": 572870,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcw-trapdoors-1.1.5-mc1.21.1neoforge.jar",
+      "mod": {
+        "id": "mcwtrpdoors",
+        "name": "Macaw's Trapdoors"
+      }
+    },
+    {
+      "path": "mods/mcwbiomesoplenty-neoforge-1.21.1-1.5.jar",
+      "sha1": "1b7f0817715f1370935c8926051b4826e0210ad2",
+      "size": 7014337,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcwbiomesoplenty-neoforge-1.21.1-1.5.jar",
+      "mod": {
+        "id": "mcwbiomesoplenty",
+        "name": "Macaw's Biomes O' Plenty"
+      }
+    },
+    {
+      "path": "mods/mcwfurnituresbop-neoforged-1.21.1-1.0.jar",
+      "sha1": "35239f4481d331ef351f80805c4501a41e63f35d",
+      "size": 3436809,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcwfurnituresbop-neoforged-1.21.1-1.0.jar",
+      "mod": {
+        "id": "mcwfurnituresbop",
+        "name": "Macaw's Furnitures - BOP"
+      }
+    },
+    {
+      "path": "mods/mcwquark-neoforge-1.21.1-1.6.jar",
+      "sha1": "5273c9f04391561c5c80fd2c3139d167b6ca81d2",
+      "size": 2660631,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_mcwquark-neoforge-1.21.1-1.6.jar",
+      "mod": {
+        "id": "mcwquark",
+        "name": "Macaw's Quark"
+      }
+    },
+    {
+      "path": "mods/naturalist-1.0.2-neoforge-1.21.1.jar",
+      "sha1": "d026c2c4ac66a9bc656e9b894683d1131054a80a",
+      "size": 5028168,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_naturalist-1.0.2-neoforge-1.21.1.jar",
+      "mod": {
+        "id": "naturalist",
+        "name": "Naturalist"
+      }
+    },
+    {
+      "path": "mods/notenoughanimations-neoforge-1.12.4-mc1.21.1.jar",
+      "sha1": "b509863deaa27890f8db600f612966a07490a6cd",
+      "size": 1939625,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_notenoughanimations-neoforge-1.12.4-mc1.21.1.jar",
+      "mod": {
+        "id": "notenoughanimations",
+        "name": "NotEnoughAnimations"
+      }
+    },
+    {
+      "path": "mods/OctoLib-NEOFORGE-0.6.2+1.21.jar",
+      "sha1": "f4f66d677b104c6af7f5c0f7e3c08d8e4370ecad",
+      "size": 544378,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_OctoLib-NEOFORGE-0.6.2+1.21.jar",
+      "mod": {
+        "id": "octolib",
+        "name": "OctoLib"
+      }
+    },
+    {
+      "path": "mods/particular-1.21.1-NeoForge-1.5.5.jar",
+      "sha1": "ae12a64a5763c701325b8ca5bf6729f645a427e7",
+      "size": 314940,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_particular-1.21.1-NeoForge-1.5.5.jar",
+      "mod": {
+        "id": "particular",
+        "name": "Particular Reforged"
+      }
+    },
+    {
+      "path": "mods/Patchouli-1.21.1-93-NEOFORGE.jar",
+      "sha1": "5413bb9b8fc35ebe46b06b48bf9afafbd8471140",
+      "size": 646777,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_Patchouli-1.21.1-93-NEOFORGE.jar",
+      "mod": {
+        "id": "patchouli",
+        "name": "Patchouli"
+      }
+    },
+    {
+      "path": "mods/Placebo-1.21.1-9.9.1.jar",
+      "sha1": "1c2b8c38066d6f36209c5dadee25c184ef65202e",
+      "size": 324056,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_Placebo-1.21.1-9.9.1.jar",
+      "mod": {
+        "id": "placebo",
+        "name": "Placebo"
+      }
+    },
+    {
+      "path": "mods/PresenceFootsteps-1.21.1-1.12.0-beta.1-1.21NeoForge.jar",
+      "sha1": "71bd6de2b01441d92be1e109879b76b7750bd787",
+      "size": 7096988,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_PresenceFootsteps-1.21.1-1.12.0-beta.1-1.21NeoForge.jar",
+      "mod": {
+        "id": "presencefootsteps",
+        "name": "Presence Footsteps (NeoForge)"
+      }
+    },
+    {
+      "path": "mods/Quark-4.1-480.jar",
+      "sha1": "a17e252b74b28045602478cb3ada804239c15c2c",
+      "size": 15542634,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_Quark-4.1-480.jar",
+      "mod": {
+        "id": "quark",
+        "name": "Quark"
+      }
+    },
+    {
+      "path": "mods/rhino-2101.2.7-build.85.jar",
+      "sha1": "370598a1d2321c8a705ce539eb970375f20150c3",
+      "size": 882075,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_rhino-2101.2.7-build.85.jar",
+      "mod": {
+        "id": "rhino",
+        "name": "Rhino"
+      }
+    },
+    {
+      "path": "mods/sit-1.21.1-1.4.jar",
+      "sha1": "5e9b0c4ee084770f8757bf53c2ecae19d382f7ed",
+      "size": 14031,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_sit-1.21.1-1.4.jar",
+      "mod": {
+        "id": "sit",
+        "name": "Sit"
+      }
+    },
+    {
+      "path": "mods/sodium-neoforge-0.6.13+mc1.21.1.jar",
+      "sha1": "38af70fa4dc4b2aaac636e92fdba3bedd5a025e1",
+      "size": 1162994,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_sodium-neoforge-0.6.13+mc1.21.1.jar",
+      "mod": {
+        "id": "sodium",
+        "name": "Sodium"
+      }
+    },
+    {
+      "path": "mods/sophisticatedbackpacks-1.21.1-3.25.64.1919.jar",
+      "sha1": "ed4abd48cbf727a6c463040101402cb47fba86fb",
+      "size": 1141225,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_sophisticatedbackpacks-1.21.1-3.25.64.1919.jar",
+      "mod": {
+        "id": "sophisticatedbackpacks",
+        "name": "Sophisticated Backpacks"
+      }
+    },
+    {
+      "path": "mods/sophisticatedcore-1.21.1-1.4.59.2032.jar",
+      "sha1": "b3fdd73b2fef70afa45d9354f8a1dc095027466c",
+      "size": 1648637,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_sophisticatedcore-1.21.1-1.4.59.2032.jar",
+      "mod": {
+        "id": "sophisticatedcore",
+        "name": "Sophisticated Core"
+      }
+    },
+    {
+      "path": "mods/sophisticatedstorage-1.21.1-1.5.60.1851.jar",
+      "sha1": "f57483944090eb847d8e9af00f6dd4dae72dc276",
+      "size": 1716175,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_sophisticatedstorage-1.21.1-1.5.60.1851.jar",
+      "mod": {
+        "id": "sophisticatedstorage",
+        "name": "Sophisticated Storage"
+      }
+    },
+    {
+      "path": "mods/sound-physics-remastered-neoforge-1.21.1-1.5.1.jar",
+      "sha1": "31cf754f9e5f62d1ca257f297e5dce394024696c",
+      "size": 202454,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_sound-physics-remastered-neoforge-1.21.1-1.5.1.jar",
+      "mod": {
+        "id": "sound_physics_remastered",
+        "name": "Sound Physics Remastered"
+      }
+    },
+    {
+      "path": "mods/spear-backport-neoforge-1.8.0-1.21.1.jar",
+      "sha1": "944b22a7fa34c1e87e70f4558c9164d950646dd6",
+      "size": 421287,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_spear-backport-neoforge-1.8.0-1.21.1.jar",
+      "mod": {
+        "id": "spears",
+        "name": "Backported Spears"
+      }
+    },
+    {
+      "path": "mods/tectonic-3.0.22-neoforge-21.1.jar",
+      "sha1": "12b0f4af2a2eaae3d9e9cb1a8a3fd1ca7e610314",
+      "size": 337253,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_tectonic-3.0.22-neoforge-21.1.jar",
+      "mod": {
+        "id": "lithostitched",
+        "name": "Tectonic"
+      }
+    },
+    {
+      "path": "mods/TerraBlender-neoforge-1.21.1-4.1.0.8.jar",
+      "sha1": "2016eed89eac0eb0510d2190c3b0b80bf4346191",
+      "size": 120364,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_TerraBlender-neoforge-1.21.1-4.1.0.8.jar",
+      "mod": {
+        "id": "terrablender",
+        "name": "TerraBlender"
+      }
+    },
+    {
+      "path": "mods/textformattingeverywhere-neoforge-2.0.4.jar",
+      "sha1": "96042607c68202ef7d9c225992c379561606fb71",
+      "size": 19693,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_textformattingeverywhere-neoforge-2.0.4.jar",
+      "mod": {
+        "id": "textformattingeverywhere",
+        "name": "Text Formatting Everywhere"
+      }
+    },
+    {
+      "path": "mods/toms_storage-1.21-2.3.2.jar",
+      "sha1": "f850f0718ed1c97d8050c790a4b4592f6bb99b21",
+      "size": 848335,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_toms_storage-1.21-2.3.2.jar",
+      "mod": {
+        "id": "toms_storage",
+        "name": "Tom's Simple Storage Mod"
+      }
+    },
+    {
+      "path": "mods/voicechat-neoforge-1.21.1-2.6.20.jar",
+      "sha1": "e320dab1795ec1193a57ea709f23f49b662ef2a1",
+      "size": 4910868,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_voicechat-neoforge-1.21.1-2.6.20.jar",
+      "mod": {
+        "id": "voicechat",
+        "name": "Simple Voice Chat"
+      }
+    },
+    {
+      "path": "mods/watut-neoforge-1.21.0-1.2.7.jar",
+      "sha1": "07cfb8fb1269f1eae1056492912e3544be979f62",
+      "size": 432269,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_watut-neoforge-1.21.0-1.2.7.jar",
+      "mod": {
+        "id": "watut",
+        "name": "What Are They Up To"
+      }
+    },
+    {
+      "path": "mods/waystones-neoforge-1.21.1-21.1.34.jar",
+      "sha1": "6261985211f6484e0427e2de1a10e2f6f8dda1fa",
+      "size": 878801,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_waystones-neoforge-1.21.1-21.1.34.jar",
+      "mod": {
+        "id": "waystones",
+        "name": "Waystones"
+      }
+    },
+    {
+      "path": "mods/Zeta-1.1-40.jar",
+      "sha1": "72f6efe421cfc0547c774ae8241d727b7d996754",
+      "size": 763725,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_Zeta-1.1-40.jar",
+      "mod": {
+        "id": "zeta",
+        "name": "Zeta"
+      }
+    }
+  ]
+}

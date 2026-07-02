@@ -1,0 +1,715 @@
+{
+  "items": [
+    {
+      "id": "ferrite-core",
+      "name": "FerriteCore",
+      "type": "mod",
+      "deps": [],
+      "description": "Réduit fortement la mémoire (RAM) utilisée par le jeu, sans rien changer au gameplay.",
+      "file": {
+        "path": "mods/ferritecore-7.0.3-neoforge.jar",
+        "url": "https://cdn.modrinth.com/data/uXXizFIs/versions/x7kQWVju/ferritecore-7.0.3-neoforge.jar",
+        "sha1": "9563692efb708b6b568df27a01ec52f6311928ef",
+        "size": 121559
+      }
+    },
+    {
+      "id": "modernfix",
+      "name": "ModernFix",
+      "type": "mod",
+      "deps": [],
+      "description": "Optimisation générale : démarrage plus rapide, moins de RAM et corrige des ralentissements.",
+      "file": {
+        "path": "mods/modernfix-neoforge-5.27.14+mc1.21.1.jar",
+        "url": "https://cdn.modrinth.com/data/nmDcB62a/versions/KcU1Mn0I/modernfix-neoforge-5.27.14%2Bmc1.21.1.jar",
+        "sha1": "b8cebae6ea55ed472d5fa55e428a894e296523f1",
+        "size": 589839
+      }
+    },
+    {
+      "id": "clumps",
+      "name": "Clumps",
+      "type": "mod",
+      "deps": [],
+      "description": "Regroupe les boules d'expérience pour éviter les chutes de FPS après un gros combat.",
+      "file": {
+        "path": "mods/Clumps-neoforge-1.21.1-19.0.0.1.jar",
+        "url": "https://cdn.modrinth.com/data/Wnxd13zP/versions/jo7lDoK4/Clumps-neoforge-1.21.1-19.0.0.1.jar",
+        "sha1": "fa2576297c7bd12b28aa7070e8141792bd66da4c",
+        "size": 18382
+      }
+    },
+    {
+      "id": "spark",
+      "name": "spark",
+      "type": "mod",
+      "deps": [],
+      "description": "Outil pour mesurer et diagnostiquer les performances (commande /spark).",
+      "file": {
+        "path": "mods/spark-1.10.124-neoforge.jar",
+        "url": "https://cdn.modrinth.com/data/l6YH9Als/versions/v5qtqRQi/spark-1.10.124-neoforge.jar",
+        "sha1": "9430cc2ab64ff89d698be593769fb9f9ee4efae6",
+        "size": 3642581
+      }
+    },
+    {
+      "id": "dynamic-fps",
+      "name": "Dynamic FPS",
+      "type": "mod",
+      "deps": [],
+      "description": "Réduit les FPS quand le jeu est en arrière-plan : économise CPU, GPU et batterie.",
+      "file": {
+        "path": "mods/dynamic-fps-3.11.4+minecraft-1.21.0-neoforge.jar",
+        "url": "https://cdn.modrinth.com/data/LQ3K71Q1/versions/T238FZpQ/dynamic-fps-3.11.4%2Bminecraft-1.21.0-neoforge.jar",
+        "sha1": "35b17e95b2b65930116ccc83e0cc358ac1bfcf9e",
+        "size": 220193
+      }
+    },
+    {
+      "id": "xaeros-minimap",
+      "name": "Xaero's Minimap",
+      "type": "mod",
+      "deps": [],
+      "description": "Minimap dans un coin de l'écran avec points de repère (le mode « fair-play » désactive le radar si le serveur l'impose).",
+      "file": {
+        "path": "mods/xaerominimap-neoforge-1.21.1-26.1.0.jar",
+        "url": "https://cdn.modrinth.com/data/1bokaNcj/versions/w8HSmbC3/xaerominimap-neoforge-1.21.1-26.1.0.jar",
+        "sha1": "8def3c4be129420700d6fe325abe3a6b6fbe3e18",
+        "size": 2138254
+      }
+    },
+    {
+      "id": "xaeros-world-map",
+      "name": "Xaero's World Map",
+      "type": "mod",
+      "deps": [],
+      "description": "Carte du monde plein écran qui se dévoile à l'exploration, avec waypoints partagés.",
+      "file": {
+        "path": "mods/xaeroworldmap-neoforge-1.21.1-1.41.2.jar",
+        "url": "https://cdn.modrinth.com/data/NcUtCpym/versions/fHsLkLT4/xaeroworldmap-neoforge-1.21.1-1.41.2.jar",
+        "sha1": "87be8ca51b531ac76e125a76fa05b2ba88823499",
+        "size": 1387921
+      }
+    },
+    {
+      "id": "journeymap",
+      "name": "JourneyMap",
+      "type": "mod",
+      "deps": [],
+      "description": "Autre choix de carte : minimap + carte du monde complète, en jeu et dans le navigateur.",
+      "file": {
+        "path": "mods/journeymap-neoforge-1.21.1-6.0.0.jar",
+        "url": "https://cdn.modrinth.com/data/lfHFW1mp/versions/edtgHsxe/journeymap-neoforge-1.21.1-6.0.0.jar",
+        "sha1": "40f8124b68c778b53d4037e604e9a29b8fe1be6d",
+        "size": 4135013
+      }
+    },
+    {
+      "id": "distanthorizons",
+      "name": "Distant Horizons",
+      "type": "mod",
+      "deps": [],
+      "description": "Affiche le paysage très loin en version simplifiée (LOD) sans charger le serveur : horizon superbe même avec peu de distance d'affichage.",
+      "file": {
+        "path": "mods/DistantHorizons-3.1.2-b-1.21.1-fabric-neoforge.jar",
+        "url": "https://cdn.modrinth.com/data/uCdwusMi/versions/g68FsgfE/DistantHorizons-3.1.2-b-1.21.1-fabric-neoforge.jar",
+        "sha1": "7508bb82597db391ce9657054e6fee62d4d0ea80",
+        "size": 30140037
+      }
+    },
+    {
+      "id": "3dskinlayers",
+      "name": "3D Skin Layers",
+      "type": "mod",
+      "deps": [],
+      "description": "Affiche en relief la 2e couche de peau (chapeau, veste…) de tous les joueurs.",
+      "file": {
+        "path": "mods/skinlayers3d-neoforge-1.11.2-mc1.21.1.jar",
+        "url": "https://cdn.modrinth.com/data/zV5r3pPn/versions/xPYbAPfz/skinlayers3d-neoforge-1.11.2-mc1.21.1.jar",
+        "sha1": "d688d428ba72a5bd57b44d8954793c59d8576838",
+        "size": 1979027
+      }
+    },
+    {
+      "id": "ears",
+      "name": "Ears (+ Snouts/Muzzles, Tails, Horns, Wings, and More)",
+      "type": "mod",
+      "deps": [],
+      "description": "Affiche les oreilles, queues et détails de peau personnalisés (format Ears).",
+      "file": {
+        "path": "mods/ears-neoforge-1.21-1.4.7.jar",
+        "url": "https://cdn.modrinth.com/data/mfzaZK3Z/versions/Dxc2NR3x/ears-neoforge-1.21-1.4.7.jar",
+        "sha1": "d0a3ffe1cdfcf9dcd8d639fb929ffee1f7e140bf",
+        "size": 162004
+      }
+    },
+    {
+      "id": "cameraoverhaul",
+      "name": "Camera Overhaul",
+      "type": "mod",
+      "deps": [],
+      "description": "Incline légèrement la caméra selon les mouvements pour un rendu plus cinématique.",
+      "file": {
+        "path": "mods/CameraOverhaul-v2.1.1-neoforge+mc[1.21-1.21.1].jar",
+        "url": "https://cdn.modrinth.com/data/m0oRwcZx/versions/VJYAujQV/CameraOverhaul-v2.1.1-neoforge%2Bmc%5B1.21-1.21.1%5D.jar",
+        "sha1": "4b30a0b3f5fa8290fa7fad94dab2b9419f54215f",
+        "size": 139527
+      }
+    },
+    {
+      "id": "first-person-model",
+      "name": "First-person Model",
+      "type": "mod",
+      "deps": [],
+      "description": "Affiche ton propre corps quand tu regardes vers le bas (vue à la première personne).",
+      "file": {
+        "path": "mods/firstperson-neoforge-2.7.2-mc1.21.1.jar",
+        "url": "https://cdn.modrinth.com/data/H5XMjpHi/versions/wcETD2Bu/firstperson-neoforge-2.7.2-mc1.21.1.jar",
+        "sha1": "8faf96d7c3c12eaec819b4e273e58c048e8de125",
+        "size": 1612095
+      }
+    },
+    {
+      "id": "mouse-tweaks",
+      "name": "Mouse Tweaks",
+      "type": "mod",
+      "deps": [],
+      "description": "Gestion d'inventaire améliorée : clic droit pour répartir, molette pour déplacer, glisser pour tout ramasser.",
+      "file": {
+        "path": "mods/MouseTweaks-neoforge-mc1.21-2.26.1.jar",
+        "url": "https://cdn.modrinth.com/data/aC3cM3Vq/versions/9I21YYxf/MouseTweaks-neoforge-mc1.21-2.26.1.jar",
+        "sha1": "6dae57f4f50f7808d2ed9a18f6cd1c0d4640c6bc",
+        "size": 73938
+      }
+    },
+    {
+      "id": "controlling",
+      "name": "Controlling",
+      "type": "mod",
+      "deps": [
+        "searchables"
+      ],
+      "description": "Barre de recherche dans l'écran des touches pour trouver et régler tes raccourcis.",
+      "file": {
+        "path": "mods/Controlling-neoforge-1.21.1-19.0.5.jar",
+        "url": "https://cdn.modrinth.com/data/xv94TkTM/versions/FaNppCJJ/Controlling-neoforge-1.21.1-19.0.5.jar",
+        "sha1": "8a34424fc1428778be2fdbfa4da67b21b70bcbfe",
+        "size": 77555
+      }
+    },
+    {
+      "id": "betterf3",
+      "name": "BetterF3",
+      "type": "mod",
+      "deps": [],
+      "description": "Écran de débogage (F3) plus propre et personnalisable.",
+      "file": {
+        "path": "mods/BetterF3-11.0.3-NeoForge-1.21.1.jar",
+        "url": "https://cdn.modrinth.com/data/8shC1gFX/versions/maXNB1dn/BetterF3-11.0.3-NeoForge-1.21.1.jar",
+        "sha1": "8fa17df26d3650416bc124be7a264bc1566a3b26",
+        "size": 481646
+      }
+    },
+    {
+      "id": "better-advancements",
+      "name": "Better Advancements",
+      "type": "mod",
+      "deps": [],
+      "description": "Écran des succès plus lisible, avec recherche et zoom.",
+      "file": {
+        "path": "mods/BetterAdvancements-NeoForge-1.21.1-0.4.3.21.jar",
+        "url": "https://cdn.modrinth.com/data/Q2OqKxDG/versions/FjTYILOi/BetterAdvancements-NeoForge-1.21.1-0.4.3.21.jar",
+        "sha1": "870521cfaa1a4cb6c830e2409e8b9e4cf179aff2",
+        "size": 98641
+      }
+    },
+    {
+      "id": "toast-control",
+      "name": "Toast Control",
+      "type": "mod",
+      "deps": [],
+      "description": "Choisis quelles notifications (toasts) s'affichent à l'écran.",
+      "file": {
+        "path": "mods/ToastControl-1.21.1-9.0.1.jar",
+        "url": "https://cdn.modrinth.com/data/CnOG2wlS/versions/jXHDAUrd/ToastControl-1.21.1-9.0.1.jar",
+        "sha1": "47f9b3eb9e499996c77a7567c85e6bb9d3d51be8",
+        "size": 21072
+      }
+    },
+    {
+      "id": "just-zoom",
+      "name": "Just Zoom",
+      "type": "mod",
+      "deps": [
+        "konkrete"
+      ],
+      "description": "Touche de zoom façon OptiFine pour regarder au loin.",
+      "file": {
+        "path": "mods/justzoom_neoforge_2.1.0_MC_1.21.1.jar",
+        "url": "https://cdn.modrinth.com/data/iAiqcykM/versions/mnCUZfmm/justzoom_neoforge_2.1.0_MC_1.21.1.jar",
+        "sha1": "328da50972fa693b8e6f337d4a9560d4a6170ac3",
+        "size": 43798
+      }
+    },
+    {
+      "id": "shulkerboxtooltip",
+      "name": "Shulker Box Tooltip",
+      "type": "mod",
+      "deps": [],
+      "description": "Survole une shulker box pour voir son contenu sans la poser.",
+      "file": {
+        "path": "mods/shulkerboxtooltip-neoforge-5.1.9+1.21.1.jar",
+        "url": "https://cdn.modrinth.com/data/2M01OLQq/versions/IuqNIoAi/shulkerboxtooltip-neoforge-5.1.9%2B1.21.1.jar",
+        "sha1": "bddbccd689529f7f7ab04479e62c5e09b0be6be5",
+        "size": 381204
+      }
+    },
+    {
+      "id": "legendary-tooltips",
+      "name": "Legendary Tooltips",
+      "type": "mod",
+      "deps": [
+        "iceberg",
+        "prism-lib"
+      ],
+      "description": "Encadre joliment les infobulles et met en valeur les objets rares.",
+      "file": {
+        "path": "mods/LegendaryTooltips-1.21.1-neoforge-1.5.5.jar",
+        "url": "https://cdn.modrinth.com/data/atHH8NyV/versions/BabRJO04/LegendaryTooltips-1.21.1-neoforge-1.5.5.jar",
+        "sha1": "e7d3b66f3afe115c709749739f26f807ca8e827b",
+        "size": 81808
+      }
+    },
+    {
+      "id": "advancement-plaques",
+      "name": "Advancement Plaques",
+      "type": "mod",
+      "deps": [
+        "iceberg"
+      ],
+      "description": "Transforme la notification de succès en une belle plaque animée.",
+      "file": {
+        "path": "mods/AdvancementPlaques-1.21.1-neoforge-1.6.8.jar",
+        "url": "https://cdn.modrinth.com/data/9NM0dXub/versions/OWylG33I/AdvancementPlaques-1.21.1-neoforge-1.6.8.jar",
+        "sha1": "829d33e71b30e9158d772f5963bb6020f6026d78",
+        "size": 195730
+      }
+    },
+    {
+      "id": "item-borders",
+      "name": "Item Borders",
+      "type": "mod",
+      "deps": [
+        "prism-lib",
+        "iceberg"
+      ],
+      "description": "Colore le contour des objets selon leur rareté dans l'inventaire.",
+      "file": {
+        "path": "mods/ItemBorders-1.21-neoforge-1.2.5.jar",
+        "url": "https://cdn.modrinth.com/data/b1fMg6sH/versions/WjErgKWV/ItemBorders-1.21-neoforge-1.2.5.jar",
+        "sha1": "b5ae56007c0bbb86b9a05f9f12b522ed485d7884",
+        "size": 23511
+      }
+    },
+    {
+      "id": "enchantment-descriptions",
+      "name": "Enchantment Descriptions",
+      "type": "mod",
+      "deps": [
+        "bookshelf-lib",
+        "prickle"
+      ],
+      "description": "Affiche ce que font les enchantements directement dans l'infobulle.",
+      "file": {
+        "path": "mods/enchdesc-neoforge-1.21.1-21.1.10.jar",
+        "url": "https://cdn.modrinth.com/data/UVtY3ZAC/versions/OuJDPGSM/enchdesc-neoforge-1.21.1-21.1.10.jar",
+        "sha1": "9a06a20881c5feb730aa249666cac2871ca99fda",
+        "size": 82629
+      }
+    },
+    {
+      "id": "crafting-tweaks",
+      "name": "Crafting Tweaks",
+      "type": "mod",
+      "deps": [],
+      "description": "Boutons pour vider ou équilibrer la grille de craft en un clic.",
+      "file": {
+        "path": "mods/craftingtweaks-neoforge-1.21.1-21.1.10.jar",
+        "url": "https://cdn.modrinth.com/data/DMu0oBKf/versions/9CqWhYyd/craftingtweaks-neoforge-1.21.1-21.1.10.jar",
+        "sha1": "8092536ab219b2adaa454b3311a0143d836b3922",
+        "size": 256064
+      }
+    },
+    {
+      "id": "raised",
+      "name": "Raised",
+      "type": "mod",
+      "deps": [],
+      "description": "Remonte la barre d'action au-dessus de la barre d'objets pour mieux la lire.",
+      "file": {
+        "path": "mods/raised-neoforge-1.21.1-5.1.2.jar",
+        "url": "https://cdn.modrinth.com/data/nCQRBEiR/versions/i6O64Eyw/raised-neoforge-1.21.1-5.1.2.jar",
+        "sha1": "43505377657a80ed2279571d473f5d9487ff50d7",
+        "size": 92243
+      }
+    },
+    {
+      "id": "resourcify",
+      "name": "Resourcify",
+      "type": "mod",
+      "deps": [
+        "kotlin-for-forge"
+      ],
+      "description": "Gère et installe packs de ressources et shaders directement en jeu (depuis Modrinth).",
+      "file": {
+        "path": "mods/Resourcify (1.21.1-neoforge)-1.8.3.jar",
+        "url": "https://cdn.modrinth.com/data/RLzHAoZe/versions/SgqYYRyl/Resourcify%20%281.21.1-neoforge%29-1.8.3.jar",
+        "sha1": "4e8c7b73828e9f464e1ea4dada99c3ca761a0f48",
+        "size": 2624797
+      }
+    },
+    {
+      "id": "no-chat-reports",
+      "name": "No Chat Reports",
+      "type": "mod",
+      "deps": [],
+      "description": "Renforce la confidentialité du chat (retire la signature des messages).",
+      "file": {
+        "path": "mods/NoChatReports-NEOFORGE-1.21.1-v2.9.1.jar",
+        "url": "https://cdn.modrinth.com/data/qQyHxfxd/versions/ZV8eL55E/NoChatReports-NEOFORGE-1.21.1-v2.9.1.jar",
+        "sha1": "9edfc7861277ff661141304dc8216f83eacdd9af",
+        "size": 306668
+      }
+    },
+    {
+      "id": "neat",
+      "name": "Neat",
+      "type": "mod",
+      "deps": [],
+      "description": "Barre de vie au-dessus des monstres et créatures.",
+      "file": {
+        "path": "mods/Neat-1.21-47-NEOFORGE.jar",
+        "url": "https://cdn.modrinth.com/data/Ins7SzzR/versions/kALoScYM/Neat-1.21-47-NEOFORGE.jar",
+        "sha1": "7744c5b02427572f7154d6f851507544fd9404d2",
+        "size": 110834
+      }
+    },
+    {
+      "id": "shoulder-surfing-reloaded",
+      "name": "Shoulder Surfing Reloaded",
+      "type": "mod",
+      "deps": [],
+      "description": "Vue à la 3e personne améliorée : caméra par-dessus l’épaule, réglable.",
+      "file": {
+        "path": "mods/ShoulderSurfing-NeoForge-1.21.1-5.0.4.jar",
+        "url": "https://cdn.modrinth.com/data/kepjj2sy/versions/f1fOiww4/ShoulderSurfing-NeoForge-1.21.1-5.0.4.jar",
+        "sha1": "50ee132deaad3fd963a6e28bae7b3ca30bfecd1b",
+        "size": 399974
+      }
+    },
+    {
+      "id": "overflowing-bars",
+      "name": "Overflowing Bars",
+      "type": "mod",
+      "deps": [
+        "puzzles-lib"
+      ],
+      "description": "Barres de vie/faim/air qui se superposent proprement quand les valeurs sont élevées.",
+      "file": {
+        "path": "mods/OverflowingBars-v21.1.1-1.21.1-NeoForge.jar",
+        "url": "https://cdn.modrinth.com/data/XD7XOrAF/versions/PYRrjTaY/OverflowingBars-v21.1.1-1.21.1-NeoForge.jar",
+        "sha1": "a9dea4b9ef893fc955512ff2dee75c9c82e09a52",
+        "size": 78482
+      }
+    },
+    {
+      "id": "just-enough-resources-jer",
+      "name": "Just Enough Resources (JER)",
+      "type": "mod",
+      "deps": [],
+      "description": "Ajoute dans JEI où trouver les minerais, les butins de mobs, etc.",
+      "file": {
+        "path": "mods/JustEnoughResources-NeoForge-1.21.1-1.6.0.17.jar",
+        "url": "https://cdn.modrinth.com/data/uEfK2CXF/versions/TgNFki8j/JustEnoughResources-NeoForge-1.21.1-1.6.0.17.jar",
+        "sha1": "e739d69b2de31ca8c0cb4691ab08e823f153bc44",
+        "size": 292088
+      }
+    },
+    {
+      "id": "just-enough-professions-jep",
+      "name": "Just Enough Professions (JEP)",
+      "type": "mod",
+      "deps": [],
+      "description": "Ajoute dans JEI les métiers des villageois et leurs échanges.",
+      "file": {
+        "path": "mods/JustEnoughProfessions-neoforge-1.21.1-4.0.5.jar",
+        "url": "https://cdn.modrinth.com/data/kB56GtWA/versions/Avs9oGLn/JustEnoughProfessions-neoforge-1.21.1-4.0.5.jar",
+        "sha1": "b97a7420738c2ac020ad15e8f6ac472aad288af2",
+        "size": 24879
+      }
+    },
+    {
+      "id": "better-third-person",
+      "name": "Better Third Person",
+      "type": "mod",
+      "deps": [],
+      "description": "Vue à la 3e personne libre : oriente la caméra indépendamment de ton regard.",
+      "file": {
+        "path": "mods/BetterThirdPerson-neoforge-1.9.0.jar",
+        "url": "https://cdn.modrinth.com/data/G1s2WpNo/versions/aG5y4JUQ/BetterThirdPerson-neoforge-1.9.0.jar",
+        "sha1": "e91af996b413bb498e276bf410d0deff52a34a74",
+        "size": 60941
+      }
+    },
+    {
+      "id": "no-telemetry",
+      "name": "No Telemetry",
+      "type": "mod",
+      "deps": [],
+      "description": "Désactive la collecte de données (télémétrie) de Minecraft.",
+      "file": {
+        "path": "mods/no-telemetry-1.10.0.jar",
+        "url": "https://cdn.modrinth.com/data/hg77g4Pw/versions/cBEkQM9c/no-telemetry-1.10.0.jar",
+        "sha1": "3d52342f5825d01dda6661ef7116cdbacbe49746",
+        "size": 96316
+      }
+    },
+    {
+      "id": "auth-me",
+      "name": "Auth Me",
+      "type": "mod",
+      "deps": [],
+      "description": "Reconnecte ta session Microsoft sans relancer le jeu si elle expire.",
+      "file": {
+        "path": "mods/authme-neoforge-9.0.1+1.21.1.jar",
+        "url": "https://cdn.modrinth.com/data/yjgIrBjZ/versions/NinhKHNO/authme-neoforge-9.0.1%2B1.21.1.jar",
+        "sha1": "13d12989930705e645f82c625d25ac26bce589e5",
+        "size": 364895
+      }
+    },
+    {
+      "id": "immediatelyfast",
+      "name": "ImmediatelyFast",
+      "type": "mod",
+      "deps": [],
+      "description": "Accélère le rendu (texte, objets, HUD) pour gagner des FPS.",
+      "file": {
+        "path": "mods/ImmediatelyFast-NeoForge-1.6.11+1.21.1.jar",
+        "url": "https://cdn.modrinth.com/data/5ZwdcRci/versions/zxT50PTW/ImmediatelyFast-NeoForge-1.6.11%2B1.21.1.jar",
+        "sha1": "6594ea2759455f4e135b9479f807bacf4b4b0b43",
+        "size": 361795
+      }
+    },
+    {
+      "id": "modelfix",
+      "name": "Model Gap Fix",
+      "type": "mod",
+      "deps": [],
+      "description": "Corrige les petits trous visibles dans les modèles de blocs et d’objets.",
+      "file": {
+        "path": "mods/modelfix-1.21-1.10.jar",
+        "url": "https://cdn.modrinth.com/data/QdG47OkI/versions/X2U8ceG9/modelfix-1.21-1.10.jar",
+        "sha1": "9608b1bff92e075ad8c2feb07f7ef095f6887117",
+        "size": 47035
+      }
+    },
+    {
+      "id": "cubes-without-borders",
+      "name": "Cubes Without Borders",
+      "type": "mod",
+      "deps": [],
+      "description": "Ajoute un vrai plein écran fenêtré sans bordure.",
+      "file": {
+        "path": "mods/cwb-neoforge-3.0.0+mc1.21.jar",
+        "url": "https://cdn.modrinth.com/data/ETlrkaYF/versions/epixUL1j/cwb-neoforge-3.0.0%2Bmc1.21.jar",
+        "sha1": "6fe849c4a488107572c9af9d7d8329d93376f343",
+        "size": 81843
+      }
+    },
+    {
+      "id": "rrls",
+      "name": "Remove Reloading Screen",
+      "type": "mod",
+      "deps": [],
+      "description": "Charge les packs de ressources en arrière-plan : fini l'écran de rechargement qui bloque.",
+      "file": {
+        "path": "mods/rrls-5.0.11+mc1.21.1-forge.jar",
+        "url": "https://cdn.modrinth.com/data/ZP7xHXtw/versions/1W53KOea/rrls-5.0.11%2Bmc1.21.1-forge.jar",
+        "sha1": "acc4b6deca5c9cc87c33f114daf5d8f75081ed85",
+        "size": 180458
+      }
+    },
+    {
+      "id": "customskinloader",
+      "name": "CustomSkinLoader",
+      "type": "mod",
+      "deps": [],
+      "description": "Charge skins et capes depuis plusieurs sources externes.",
+      "file": {
+        "path": "mods/CustomSkinLoader_Universal-15.0.1.jar",
+        "url": "https://cdn.modrinth.com/data/idMHQ4n2/versions/OLaesh5y/CustomSkinLoader_Universal-15.0.1.jar",
+        "sha1": "ab8dd841cafc3b4ecbf0250d3f5aee8a1fdb506a",
+        "size": 218215
+      }
+    },
+    {
+      "id": "inventory-profiles-next",
+      "name": "Inventory Profiles Next",
+      "type": "mod",
+      "deps": [
+        "kotlin-for-forge",
+        "libipn"
+      ],
+      "description": "Gestion d'inventaire avancée : tri, verrouillage de cases, tout jeter ou ranger d'un clic.",
+      "file": {
+        "path": "mods/InventoryProfilesNext-neoforge-1.21.1-2.2.5.jar",
+        "url": "https://cdn.modrinth.com/data/O7RBXm3n/versions/vjuNnHLv/InventoryProfilesNext-neoforge-1.21.1-2.2.5.jar",
+        "sha1": "b09d7c0820c233ea34af54d0a3ab7ed510b32dcc",
+        "size": 1295466
+      }
+    },
+    {
+      "id": "screenshot-to-clipboard",
+      "name": "Screenshot to Clipboard",
+      "type": "mod",
+      "deps": [],
+      "description": "Copie automatiquement tes captures d’écran dans le presse-papiers.",
+      "file": {
+        "path": "mods/screenshot-to-clipboard-neoforge-1.0.10.jar",
+        "url": "https://cdn.modrinth.com/data/1KiJRrTg/versions/tnP4eg1K/screenshot-to-clipboard-neoforge-1.0.10.jar",
+        "sha1": "0ead4d47c48afc4525efd9bf7c949eb7d1e15f0e",
+        "size": 14146
+      }
+    },
+    {
+      "id": "searchables",
+      "name": "Searchables",
+      "type": "mod",
+      "lib": true,
+      "description": "Bibliothèque technique requise par un ou plusieurs mods du catalogue (à installer avec eux).",
+      "file": {
+        "path": "mods/Searchables-neoforge-1.21.1-1.0.2.jar",
+        "url": "https://cdn.modrinth.com/data/fuuu3xnx/versions/iEE85X0w/Searchables-neoforge-1.21.1-1.0.2.jar",
+        "sha1": "5b8a0b43a474c066371b2e16f9bfb88622552a74",
+        "size": 77326
+      }
+    },
+    {
+      "id": "konkrete",
+      "name": "Konkrete",
+      "type": "mod",
+      "lib": true,
+      "description": "Bibliothèque technique requise par un ou plusieurs mods du catalogue (à installer avec eux).",
+      "file": {
+        "path": "mods/konkrete_neoforge_1.9.9_MC_1.21.jar",
+        "url": "https://cdn.modrinth.com/data/J81TRJWm/versions/stJDU839/konkrete_neoforge_1.9.9_MC_1.21.jar",
+        "sha1": "97771eb287d5ac7fe667d1df9493d5e54c8ca1fa",
+        "size": 618842
+      }
+    },
+    {
+      "id": "iceberg",
+      "name": "Iceberg",
+      "type": "mod",
+      "lib": true,
+      "description": "Bibliothèque technique requise par un ou plusieurs mods du catalogue (à installer avec eux).",
+      "file": {
+        "path": "mods/Iceberg-1.21.1-neoforge-1.3.2.jar",
+        "url": "https://cdn.modrinth.com/data/5faXoLqX/versions/IMssx9du/Iceberg-1.21.1-neoforge-1.3.2.jar",
+        "sha1": "f6014d198be9503573cd9cb41cc789d282768ad8",
+        "size": 213853
+      }
+    },
+    {
+      "id": "prism-lib",
+      "name": "Prism",
+      "type": "mod",
+      "lib": true,
+      "description": "Bibliothèque technique requise par un ou plusieurs mods du catalogue (à installer avec eux).",
+      "file": {
+        "path": "mods/Prism-1.21.1-neoforge-1.0.11.jar",
+        "url": "https://cdn.modrinth.com/data/1OE8wbN0/versions/kMcz2lDj/Prism-1.21.1-neoforge-1.0.11.jar",
+        "sha1": "1ae6f7be2ba8f963344dbf27e552920a7bc7a35f",
+        "size": 62031
+      }
+    },
+    {
+      "id": "prickle",
+      "name": "Prickle",
+      "type": "mod",
+      "lib": true,
+      "description": "Bibliothèque technique requise par un ou plusieurs mods du catalogue (à installer avec eux).",
+      "file": {
+        "path": "mods/prickle-neoforge-1.21.1-21.1.11.jar",
+        "url": "https://cdn.modrinth.com/data/aaRl8GiW/versions/EE1FHDyD/prickle-neoforge-1.21.1-21.1.11.jar",
+        "sha1": "5174059ecf97340a0de5ef211b938de26c4eaa36",
+        "size": 84812
+      }
+    },
+    {
+      "id": "bookshelf-lib",
+      "name": "Bookshelf",
+      "type": "mod",
+      "lib": true,
+      "description": "Bibliothèque technique requise par un ou plusieurs mods du catalogue (à installer avec eux).",
+      "file": {
+        "path": "mods/bookshelf-neoforge-1.21.1-21.1.81.jar",
+        "url": "https://cdn.modrinth.com/data/uy4Cnpcm/versions/1sdJl7J1/bookshelf-neoforge-1.21.1-21.1.81.jar",
+        "sha1": "efc4cda6da4dd879f24d057ed0a6413764c9ba40",
+        "size": 328813
+      }
+    },
+    {
+      "id": "kotlin-for-forge",
+      "name": "Kotlin for Forge",
+      "type": "mod",
+      "lib": true,
+      "description": "Bibliothèque technique requise par un ou plusieurs mods du catalogue (à installer avec eux).",
+      "file": {
+        "path": "mods/kotlinforforge-5.12.0-all.jar",
+        "url": "https://cdn.modrinth.com/data/ordsPcFz/versions/uhJhCT7X/kotlinforforge-5.12.0-all.jar",
+        "sha1": "d10d062caf1aad9aec82d7852f2fee1781735c1f",
+        "size": 7279264
+      }
+    },
+    {
+      "id": "puzzles-lib",
+      "name": "Puzzles Lib",
+      "type": "mod",
+      "lib": true,
+      "description": "Bibliothèque technique requise par un ou plusieurs mods du catalogue (à installer avec eux).",
+      "file": {
+        "path": "mods/PuzzlesLib-v21.1.52-1.21.1-NeoForge.jar",
+        "url": "https://cdn.modrinth.com/data/QAGBst4M/versions/5A6wiMVf/PuzzlesLib-v21.1.52-1.21.1-NeoForge.jar",
+        "sha1": "66182c3affb9f99624d1d770ca168d2a63af83f6",
+        "size": 1425176
+      }
+    },
+    {
+      "id": "libipn",
+      "name": "libIPN",
+      "type": "mod",
+      "lib": true,
+      "description": "Bibliothèque technique requise par un ou plusieurs mods du catalogue (à installer avec eux).",
+      "file": {
+        "path": "mods/libIPN-neoforge-1.21.1-6.6.3.jar",
+        "url": "https://cdn.modrinth.com/data/onSQdWhM/versions/BGe4KMlE/libIPN-neoforge-1.21.1-6.6.3.jar",
+        "sha1": "baab9e8cae3d2b77b5e172b5694e465ee9f30d4a",
+        "size": 626146
+      }
+    },
+    {
+      "id": "keybindsearch-1-0-0-mod",
+      "name": "keybindsearch-1.0.0",
+      "type": "mod",
+      "deps": [],
+      "description": "",
+      "file": {
+        "path": "mods/keybindsearch-1.0.0.jar",
+        "url": "https://raw.githubusercontent.com/meytopia/meytopia-data/catalog-assets/optional/keybindsearch-1.0.0.jar",
+        "sha1": "9c4c026e63b9be8cd82e2e5791cd658fbe876604",
+        "size": 18383
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "betaCodeHash": "fa3e13ace9f8e030091c308daad14a4f913713f1499e6db3e7d556db203bc461",
+  "maintenance": {
+    "active": false,
+    "message": "",
+    "scheduledAt": null,
+    "blockPlay": true
+  },
+  "server": {
+    "host": "meytopia.fr",
+    "port": 25598,
+    "query": {
+      "enabled": true,
+      "port": 25598
+    }
+  },
+  "discordInvite": "https://discord.gg/zaXjrpcGat",
+  "modpack": {
+    "version": "1.5.0",
+    "mcVersion": "1.21.1",
+    "loader": {
+      "type": "neoforge",
+      "version": "21.1.233"
+    },
+    "manifestUrl": "https://raw.githubusercontent.com/meytopia/meytopia-data/main/manifest.json"
+  },
+  "theme": {
+    "accent": "#ae9afe"
+  },
+  "minLauncherVersion": "0.24.0"
+}

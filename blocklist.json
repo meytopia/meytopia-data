@@ -1,0 +1,40 @@
+{
+  "entries": [
+    {
+      "match": {
+        "contains": "xray"
+      },
+      "scope": [
+        "mods"
+      ],
+      "reason": "Interdit (régie)"
+    },
+    {
+      "match": {
+        "contains": "cheat"
+      },
+      "scope": [
+        "mods"
+      ],
+      "reason": "Interdit (régie)"
+    },
+    {
+      "match": {
+        "contains": "advancedxray"
+      },
+      "scope": [
+        "mods"
+      ],
+      "reason": "Interdit (régie)"
+    },
+    {
+      "match": {
+        "contains": "x-ray"
+      },
+      "scope": [
+        "mods"
+      ],
+      "reason": "Interdit (régie)"
+    }
+  ]
+}
