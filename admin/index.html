@@ -129,6 +129,8 @@ tr.total td{border-top:2px solid var(--line-2)}
 .faint{color:var(--faint)}
 .grant-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .grant-chip{display:inline-flex;align-items:center;gap:4px;background:var(--card-2);border:1px solid var(--line-2);border-radius:999px;padding:3px 6px 3px 10px;font-size:12px}
+/* cadeau doré (rare) : puce distinguée */
+.gf-gold-chip{border-color:#fbbf24;background:rgba(251,191,36,.12)}
 .grant-chip>b{min-width:16px;text-align:center}
 .grant-chip button{border:none;background:var(--bg-2);color:var(--text);width:20px;height:20px;border-radius:50%;cursor:pointer;line-height:1;font-size:13px}
 .grant-chip button:hover{background:var(--violet);color:#fff}
@@ -455,12 +457,19 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
         <label for="gf-golden" class="hint" style="margin:0">Chance du cadeau doré :</label>
         <input type="number" id="gf-golden" min="0" max="100" style="max-width:70px"> <span class="hint">%</span>
       </div>
-      <div id="gf-items"></div>
+      <div class="field">
+        <label for="gf-item-search">Ajouter un cadeau — cherche par nom (mods inclus), clique pour l'ajouter</label>
+        <input type="search" id="gf-item-search" placeholder="Chercher un objet (pomme, diamant, create:…)…" autocomplete="off">
+        <div id="gf-item-results" class="item-results" hidden></div>
+      </div>
+      <div id="gf-chips" class="grant-chips"></div>
       <div class="mods-bulk" style="margin-top:8px">
-        <button class="btn ghost btn-sm" id="gf-add">+ Ajouter un cadeau</button>
+        <input type="text" id="gf-item-manual" placeholder="namespace:objet (si absent du catalogue)" class="mono" style="flex:1;min-width:200px">
+        <button class="btn ghost btn-sm" id="gf-item-manual-add" type="button">Ajouter par identifiant</button>
         <button class="btn primary btn-sm" id="gf-save">Publier les cadeaux</button>
         <span class="hint" id="gf-status"></span>
       </div>
+      <p class="hint" style="margin-top:6px">Sur chaque cadeau : − / + pour la quantité, ✨ pour le passer en doré (rare), ✕ pour le retirer.</p>
     </div>
     <div class="card">
       <h2>Défis communautaires</h2>
@@ -1357,56 +1366,109 @@ async function loadGiftsEditor() {
   catch (e) { state.files['gifts.json'] = { data: { enabled: false, goldenChance: 0.05, items: [] }, sha: undefined }; }
   renderGifts();
 }
+// Cadeaux en PUCES VISUELLES (même modèle que les récompenses de défis) : recherche dans le
+// catalogue items.json (icône + nom lisible), puis puces avec quantité, doré ✨ et retrait —
+// plus besoin de taper des identifiants « minecraft:… » à la main.
+let gfItems = []; // état d'édition : [{id, count, golden, label}]
+function gfLabelFor(id) {
+  // Nom lisible auto (celui affiché au joueur en jeu) : celui du catalogue, borné et filtré
+  // par la même règle que la validation — si le nom dérivé ne passe pas, on n'en met pas
+  // (la sonde retombe alors sur l'identifiant, jamais bloquant).
+  const l = String(prettyItem(id) || '').slice(0, 40).trim();
+  return /^[\p{L}\p{N} '\-]{1,40}$/u.test(l) ? l : '';
+}
 function renderGifts() {
-  const f = state.files['gifts.json']; const box = $('#gf-items'); if (!box || !f) return;
+  const f = state.files['gifts.json']; if (!f || !$('#gf-chips')) return;
   if (dirty.has('form-gifts')) return; // dirty-guard : ne pas écraser une saisie non publiée
   const g = f.data || {};
   $('#gf-enabled').checked = g.enabled === true;
   $('#gf-golden').value = String(Math.round((typeof g.goldenChance === 'number' ? g.goldenChance : 0.05) * 100));
-  const items = Array.isArray(g.items) ? g.items : [];
-  box.innerHTML = items.length ? items.map((it, i) => `<div class="mods-bulk gf-row" data-i="${i}" style="margin-bottom:6px">
-      <input type="text" class="gf-id" value="${esc(it && it.id || '')}" placeholder="minecraft:apple" style="max-width:230px" title="Identifiant exact de l'objet (comme dans /give)">
-      <input type="number" class="gf-count" value="${Math.max(1, Math.min(64, Number(it && it.count) || 1))}" min="1" max="64" style="max-width:70px" title="Quantité (1 à 64)">
-      <input type="text" class="gf-label" value="${esc(it && it.label || '')}" placeholder="Nom en français (optionnel)" maxlength="40" style="max-width:200px" title="Affiché au joueur — sinon l'identifiant est utilisé">
-      <label class="checkline" style="margin:0" title="Cadeau rare, tiré avec la « chance dorée »"><input type="checkbox" class="gf-gold" ${it && it.golden === true ? 'checked' : ''}> doré ✨</label>
-      <button class="btn ghost btn-sm gf-del" title="Retirer cette ligne">✕</button>
-    </div>`).join('')
-    : '<div class="hint">Aucun cadeau pour l\'instant — « + Ajouter un cadeau », puis publie.</div>';
+  gfItems = (Array.isArray(g.items) ? g.items : []).map((it) => ({
+    id: String((it && it.id) || ''),
+    count: Math.max(1, Math.min(64, Number(it && it.count) || 1)),
+    golden: !!(it && it.golden === true),
+    label: (it && typeof it.label === 'string') ? it.label : '',
+  }));
+  renderGfChips();
+}
+function renderGfChips() {
+  const box = $('#gf-chips'); if (!box) return;
+  box.innerHTML = gfItems.length ? gfItems.map((it, i) =>
+    `<span class="grant-chip${it.golden ? ' gf-gold-chip' : ''}" title="${esc(it.id)}${it.golden ? ' — cadeau DORÉ (rare)' : ''}">${itemIcoHtml(it.id)} ${esc(it.label || prettyItem(it.id))}${it.golden ? ' ✨' : ''} ` +
+    `<button type="button" data-gf-dec="${i}" title="Moins">−</button><b>${it.count}</b><button type="button" data-gf-inc="${i}" title="Plus">+</button>` +
+    `<button type="button" data-gf-gold="${i}" title="${it.golden ? 'Repasser en cadeau normal' : 'Passer en cadeau doré (rare)'}">✨</button>` +
+    `<button type="button" data-gf-rm="${i}" class="x" title="Retirer">✕</button></span>`).join('')
+    : '<div class="hint">Aucun cadeau pour l\'instant — cherche un objet ci-dessus et clique pour l\'ajouter.</div>';
+}
+function gfAdd(id, n) {
+  id = String(id || '').trim().toLowerCase();
+  if (!GF_ID.test(id)) { toast('Identifiant invalide : ' + id + ' (attendu mod:objet, ex. minecraft:apple)', true); return; }
+  const ex = gfItems.find((x) => x.id === id && !x.golden);
+  if (ex) ex.count = Math.min(64, ex.count + Math.max(1, n || 1));
+  else gfItems.push({ id, count: Math.max(1, Math.min(64, n || 1)), golden: false, label: gfLabelFor(id) });
+  dirty.add('form-gifts');
+  renderGfChips();
 }
 function gfCollect() {
-  // Reconstruit la liste depuis les champs — et VALIDE tout (les erreurs bloquent la publication).
+  // Construit gifts.json depuis les puces — et VALIDE tout (les erreurs bloquent la publication).
   const errs = []; const items = [];
-  document.querySelectorAll('#gf-items .gf-row').forEach((row, i) => {
-    const id = row.querySelector('.gf-id').value.trim().toLowerCase();
-    const count = parseInt(row.querySelector('.gf-count').value, 10);
-    const label = row.querySelector('.gf-label').value.trim();
-    const golden = row.querySelector('.gf-gold').checked;
-    if (!GF_ID.test(id)) errs.push(`cadeau ${i + 1} : identifiant invalide (attendu : mod:objet, ex. minecraft:apple)`);
-    if (!(Number.isInteger(count) && count >= 1 && count <= 64)) errs.push(`cadeau ${i + 1} : quantité entre 1 et 64`);
-    if (label && !/^[\p{L}\p{N} '\-]{1,40}$/u.test(label)) errs.push(`cadeau ${i + 1} : nom français invalide (lettres/chiffres/espaces, 40 max)`);
-    const it = { id, count };
-    if (label) it.label = label;
-    if (golden) it.golden = true;
+  gfItems.forEach((x, i) => {
+    if (!GF_ID.test(x.id)) errs.push(`cadeau ${i + 1} : identifiant invalide (${x.id || 'vide'})`);
+    if (!(Number.isInteger(x.count) && x.count >= 1 && x.count <= 64)) errs.push(`cadeau ${i + 1} : quantité entre 1 et 64`);
+    const it = { id: x.id, count: x.count };
+    const label = (x.label || '').trim();
+    if (label && /^[\p{L}\p{N} '\-]{1,40}$/u.test(label)) it.label = label; // label invalide → omis (repli sonde)
+    if (x.golden) it.golden = true;
     items.push(it);
   });
   const pct = parseInt($('#gf-golden').value, 10);
   if (!(Number.isInteger(pct) && pct >= 0 && pct <= 100)) errs.push('chance dorée : entre 0 et 100 %');
   return { errs, data: { enabled: $('#gf-enabled').checked, goldenChance: (Number.isInteger(pct) ? pct : 5) / 100, items } };
 }
-if ($('#gf-add')) $('#gf-add').addEventListener('click', () => {
-  const f = state.files['gifts.json']; if (!f) return;
-  dirty.delete('form-gifts'); // on repart du rendu : intègre d'abord la saisie en cours
-  const cur = gfCollect(); f.data = cur.data; f.data.items.push({ id: '', count: 1 });
-  renderGifts();
-  dirty.add('form-gifts');
-});
-if ($('#gf-items')) {
-  $('#gf-items').addEventListener('input', () => dirty.add('form-gifts'));
-  $('#gf-items').addEventListener('click', (e) => {
-    const b = e.target.closest('.gf-del'); if (!b) return;
-    b.closest('.gf-row').remove(); dirty.add('form-gifts');
-  });
+if ($('#gf-item-search')) {
+  $('#gf-item-search').addEventListener('input', (e) => gfRenderResults(e.target.value));
+  $('#gf-item-search').addEventListener('focus', (e) => { loadItemsCatalog().then(() => gfRenderResults(e.target.value)); });
 }
+function gfRenderResults(q) {
+  // Même rendu que la recherche des défis (icône + nom + identifiant), dans SA boîte à elle.
+  const box = $('#gf-item-results'); if (!box) return;
+  q = (q || '').trim().toLowerCase();
+  if (!q) { box.hidden = true; box.innerHTML = ''; return; }
+  const res = [];
+  for (const it of ITEMS) { if (it.id.toLowerCase().includes(q) || it.label.toLowerCase().includes(q)) { res.push(it); if (res.length >= 40) break; } }
+  box.hidden = false;
+  box.innerHTML = res.length
+    ? res.map((it) => `<div class="item-row" data-gf-item-id="${esc(it.id)}">${itemIcoHtml(it.id)}<span class="lbl">${esc(it.label)}</span><span class="mono faint">${esc(it.id)}</span></div>`).join('')
+    : '<div class="item-row muted">Aucun objet — vérifie l\'orthographe ou « ajouter par identifiant ».</div>';
+}
+if ($('#gf-item-results')) $('#gf-item-results').addEventListener('click', (ev) => {
+  const row = ev.target.closest ? ev.target.closest('[data-gf-item-id]') : null;
+  if (!row) return;
+  gfAdd(row.dataset.gfItemId, 1);
+  const s = $('#gf-item-search'); if (s) s.value = '';
+  $('#gf-item-results').hidden = true;
+});
+document.addEventListener('click', (ev) => {
+  const p = $('#gf-item-results'); if (!p || p.hidden) return;
+  if (ev.target.closest && (ev.target.closest('#gf-item-results') || ev.target.closest('#gf-item-search'))) return;
+  p.hidden = true;
+});
+if ($('#gf-item-manual-add')) $('#gf-item-manual-add').addEventListener('click', () => {
+  const id = $('#gf-item-manual').value.trim();
+  if (!id) return;
+  gfAdd(id, 1);
+  $('#gf-item-manual').value = '';
+});
+if ($('#gf-chips')) $('#gf-chips').addEventListener('click', (ev) => {
+  const t = ev.target; if (!t || !t.dataset) return;
+  let touched = true;
+  if (t.dataset.gfInc != null) gfItems[+t.dataset.gfInc].count = Math.min(64, gfItems[+t.dataset.gfInc].count + 1);
+  else if (t.dataset.gfDec != null) gfItems[+t.dataset.gfDec].count = Math.max(1, gfItems[+t.dataset.gfDec].count - 1);
+  else if (t.dataset.gfGold != null) gfItems[+t.dataset.gfGold].golden = !gfItems[+t.dataset.gfGold].golden;
+  else if (t.dataset.gfRm != null) gfItems.splice(+t.dataset.gfRm, 1);
+  else touched = false;
+  if (touched) { dirty.add('form-gifts'); renderGfChips(); }
+});
 if ($('#gf-enabled')) $('#gf-enabled').addEventListener('change', () => dirty.add('form-gifts'));
 if ($('#gf-golden')) $('#gf-golden').addEventListener('input', () => dirty.add('form-gifts'));
 if ($('#gf-save')) $('#gf-save').addEventListener('click', async () => {
