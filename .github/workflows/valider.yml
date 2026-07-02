@@ -1,0 +1,23 @@
+# Meytopia — garde-fou JSON (Lot 3, K3)
+# À chaque push : si un des 6 JSON est cassé, croix rouge + e-mail,
+# AVANT que les launchers des joueurs ne le téléchargent.
+name: Garde-fou JSON
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  valider:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node valider.js
+      - run: node tools/stats-core-test.js

@@ -1,0 +1,356 @@
+{
+  "entries": [
+    {
+      "id": "launcher-0.18.0",
+      "target": "launcher",
+      "version": "0.18.0",
+      "date": "2026-06-30",
+      "title": "Blocage des mods interdits renforcé",
+      "changes": [
+        "Les mods interdits sont bloqués même s’ils sont renommés (détection par identifiant interne du mod)",
+        "Le blocage couvre aussi les resource packs et les shaders"
+      ]
+    },
+    {
+      "id": "launcher-0.17.0",
+      "target": "launcher",
+      "version": "0.17.0",
+      "date": "2026-06-30",
+      "title": "Stats plus fiables & correctifs",
+      "changes": [
+        "Nouveau : « temps de jeu total » dans Mes stats",
+        "Séries de connexion, binômes et top-partenaire de nouveau affichés",
+        "Barres de défis basées sur le total communautaire exact (joueurs privés inclus, anonymes)",
+        "Corrections de stabilité : lancement, en-tête du pack, état du serveur"
+      ]
+    },
+    {
+      "id": "modpack-1.2.0",
+      "target": "modpack",
+      "version": "1.2.0",
+      "date": "2026-06-30",
+      "title": "Modpack 1.2.0",
+      "changes": [
+        "Pack reconstruit : Addons Lib, Advanced Netherite, AmbientSounds, Apotheosis, Apothic Attributes, Apothic Enchanting, Apothic Spawners, AppleSkin, Architectury, BadOptimizations, Balm, Biomes O' Plenty, Chat Heads, Chunky, Cloth Config v15 API, CorgiLib, CoroUtil, CreativeCore, Curios API, Easy Villagers, Easy NPC, Easy NPC: Bundle, Easy NPC: Config UI, Effortless Building, ElevatorMod, EntityCulling, Entity Model Features, Entity Texture Features, Fallingleaves, Farmer's Delight, FramedBlocks, FTB Chunks, FTB Library, FTB Teams, FTB Ultimine, GeckoLib 4, GlitchCore, HammerLib, Hellish Trials, Iris, Jade, Just Enough Items, Lithostitched, Lootr, Macaw's Bridges, Macaw's Doors, Macaw's Furniture, Macaw's Lights and Lamps, Macaw's Fences and Walls, Macaw's Paths and Pavings, Macaw's Stairs and Balconies, Macaw's Windows, Macaw's Paintings, Macaw's Roofs, Macaw's Trapdoors, Macaw's Biomes O' Plenty, Macaw's Furnitures - BOP, Macaw's Quark, Naturalist, NotEnoughAnimations, OctoLib, Particular Reforged, Patchouli, Placebo, Presence Footsteps (NeoForge), Quark, Rhino, Sit, Sodium, Sophisticated Backpacks, Sophisticated Core, Sophisticated Storage, Sound Physics Remastered, Backported Spears, Tectonic, TerraBlender, Text Formatting Everywhere, Tom's Simple Storage Mod, Simple Voice Chat, What Are They Up To, Waystones, Zeta"
+      ]
+    },
+    {
+      "id": "launcher-0.16.0",
+      "target": "launcher",
+      "version": "0.16.0",
+      "date": "2026-06-30",
+      "title": "Compte à rebours d'ouverture",
+      "changes": [
+        "Avant l'ouverture du serveur, le launcher affiche la date et un compte à rebours, et se déverrouille tout seul le jour J"
+      ]
+    },
+    {
+      "id": "launcher-0.15.0",
+      "target": "launcher",
+      "version": "0.15.0",
+      "date": "2026-06-30",
+      "title": "Contenus plus simples + aide intégrée",
+      "changes": [
+        "Glisse-dépose tes mods (.jar) et packs (.zip) directement sur l'onglet Contenus",
+        "Nouvelle aide rapide (Paramètres) : les pannes courantes résolues en un clic",
+        "Prise en charge des mods désactivés à distance par l'équipe (sans réinstallation)"
+      ]
+    },
+    {
+      "id": "launcher-0.14.0",
+      "target": "launcher",
+      "version": "0.14.0",
+      "date": "2026-06-29",
+      "title": "Petite mise à jour de test",
+      "changes": [
+        "Mise à jour de test pour vérifier le bouton « Plus tard » et l'installation différée — aucun changement de fonctionnement"
+      ]
+    },
+    {
+      "id": "launcher-0.13.0",
+      "target": "launcher",
+      "version": "0.13.0",
+      "date": "2026-06-29",
+      "title": "Mises à jour : tu choisis quand",
+      "changes": [
+        "Quand une mise à jour n'est PAS obligatoire, tu peux cliquer « Plus tard » pour fermer le rappel — il ne revient plus pour cette version",
+        "Tu pourras l'installer quand tu veux depuis Paramètres → bouton « Redémarrer pour installer »",
+        "Les mises à jour rendues obligatoires (sécurité) restent imposées avant de jouer, comme avant"
+      ]
+    },
+    {
+      "id": "launcher-0.12.0",
+      "target": "launcher",
+      "version": "0.12.0",
+      "date": "2026-06-29",
+      "title": "La communauté en chiffres",
+      "changes": [
+        "Le serveur en chiffres : un récap collectif (temps de jeu, monstres, distance, diamants) avec des jalons franchis ensemble",
+        "Le mur des champions : le n°1 de chaque catégorie (assiduité, mobs, distance, diamants, pêche, succès)",
+        "Séries de connexion : qui enchaîne le plus de jours d'affilée — et ta propre série dans Mes stats",
+        "Meilleurs binômes : les duos qui jouent le plus ensemble, et avec qui TU joues le plus",
+        "Mes stats : ton rang en pourcentage (« top X% ») sur chaque stat en jeu",
+        "Tout respecte la confidentialité : les joueurs en /meyprivacy restent exclus"
+      ]
+    },
+    {
+      "id": "launcher-0.11.0",
+      "target": "launcher",
+      "version": "0.11.0",
+      "date": "2026-06-29",
+      "title": "Tes stats, ta vie privée",
+      "changes": [
+        "Confidentialité : rends tes stats privées quand tu veux avec /meyprivacy cacher (et /meyprivacy montrer pour les réafficher) — tu es alors retiré des pages publiques, classements et temps réel",
+        "Mes stats affiche désormais si tes stats sont publiques ou privées, et comment changer",
+        "Fiabilité : le statut du serveur ne reste plus bloqué sur « inactif » après un simple incident réseau"
+      ]
+    },
+    {
+      "id": "launcher-0.10.1",
+      "target": "launcher",
+      "version": "0.10.1",
+      "date": "2026-06-29",
+      "title": "Sécurité et robustesse",
+      "changes": [
+        "Renforcement de la sécurité : vérification stricte des chemins de fichiers du modpack (anti-écriture hors dossier de jeu)",
+        "Affichage des annonces durci contre les contenus malformés"
+      ]
+    },
+    {
+      "id": "launcher-0.10.0",
+      "target": "launcher",
+      "version": "0.10.0",
+      "date": "2026-06-29",
+      "title": "Défis, records datés et face-à-face",
+      "changes": [
+        "Défis communautaires : des objectifs collectifs avec barre de progression dans la Communauté",
+        "Records du serveur datés (record de joueurs, plus longue session) et numéro de saison",
+        "Mes stats : compare-toi à un ami en face-à-face",
+        "Nouveaux classements et stats en jeu mis en avant"
+      ]
+    },
+    {
+      "id": "launcher-0.9.0",
+      "target": "launcher",
+      "version": "0.9.0",
+      "date": "2026-06-29",
+      "title": "Stats vivantes + profil partageable",
+      "changes": [
+        "Tes stats et la Communauté se rafraîchissent toutes seules (fini les chiffres figés tant qu'on n'a pas cliqué Actualiser)",
+        "Nouveau bouton « Partager mon profil » : une page web partageable par lien avec ta fiche",
+        "Nouveaux classements en jeu avec avatars : diamants minés, pêche, distance totale, plus longue série sans mourir",
+        "Mes stats : nouvelles cartes (diamants, poissons, série sans mourir, distance totale)",
+        "Bouton « Actualiser » corrigé et affichage plus fluide"
+      ]
+    },
+    {
+      "id": "launcher-0.8.0",
+      "target": "launcher",
+      "version": "0.8.0",
+      "date": "2026-06-28",
+      "title": "Page Communauté plus claire",
+      "changes": [
+        "Page Communauté entièrement remise au propre : records, classements et « qui joue maintenant » enfin lisibles (nom et valeur bien séparés)",
+        "Classements en jeu avec médailles 1·2·3 et valeurs alignées à droite",
+        "Statistiques serveur : les redémarrages courts (moins de 5 min) ne sont plus comptés comme des coupures"
+      ]
+    },
+    {
+      "id": "launcher-0.7.0",
+      "target": "launcher",
+      "version": "0.7.0",
+      "date": "2026-06-28",
+      "title": "Records du serveur",
+      "changes": [
+        "Nouvelle carte « Records du serveur » dans la Communauté : record de joueurs en simultané, joueurs uniques, temps de jeu cumulé",
+        "Mise en avant automatique quand un nouveau record de joueurs simultanés est battu"
+      ]
+    },
+    {
+      "id": "launcher-0.6.0",
+      "target": "launcher",
+      "version": "0.6.0",
+      "date": "2026-06-28",
+      "title": "Classements en jeu pour tous",
+      "changes": [
+        "Onglet Communauté : classements en jeu (top tueurs de monstres, temps en jeu, marcheurs, succès) visibles par tout le monde"
+      ]
+    },
+    {
+      "id": "launcher-0.5.0",
+      "target": "launcher",
+      "version": "0.5.0",
+      "date": "2026-06-28",
+      "title": "Tes exploits en jeu",
+      "changes": [
+        "Nouvelle section « En jeu » dans Mes stats : mobs tués, morts, distance parcourue, succès, duels…",
+        "Classements en jeu visibles sur le serveur"
+      ]
+    },
+    {
+      "id": "launcher-0.4.0",
+      "target": "launcher",
+      "version": "0.4.0",
+      "date": "2026-06-28",
+      "title": "Statistiques nouvelle génération",
+      "changes": [
+        "Statistiques serveur plus légères et plus rapides à charger",
+        "Compatibilité avec le nouveau format de relevés (sessions précises à la seconde)"
+      ]
+    },
+    {
+      "id": "launcher-0.3.0",
+      "target": "launcher",
+      "version": "0.3.0",
+      "date": "2026-06-28",
+      "title": "Qui joue maintenant + mises à jour à ton rythme",
+      "changes": [
+        "Onglet Communauté : découvre en direct qui est en train de jouer, et depuis combien de temps",
+        "Mises à jour optionnelles : tu joues quand tu veux et tu installes la mise à jour quand ça t'arrange (elle s'installe toute seule à la fermeture du launcher)",
+        "Statut du serveur plus précis et plus fiable"
+      ]
+    },
+    {
+      "id": "launcher-0.1.6",
+      "target": "launcher",
+      "version": "0.1.6",
+      "date": "2026-06-18",
+      "title": "Mes stats et fiabilité renforcée",
+      "changes": [
+        "Nouvelle page Mes stats : ton temps de jeu, tes jours de connexion et ta première venue sur le serveur",
+        "Des badges à débloquer selon ton assiduité et tes heures de jeu",
+        "Classement public des joueurs les plus assidus de la saison",
+        "Notifications du serveur fiabilisées : fini les fausses alertes de redémarrage",
+        "Les notifications restent désormais affichées plus longtemps",
+        "Stabilité renforcée : tes réglages sont protégés et le launcher résiste mieux aux imprévus"
+      ]
+    },
+    {
+      "id": "launcher-0.0.9",
+      "target": "launcher",
+      "version": "0.0.9",
+      "date": "2026-06-12",
+      "title": "Version de consolidation",
+      "changes": [
+        "Republication technique pour fiabiliser la chaîne de mise à jour — rien ne change en jeu"
+      ]
+    },
+    {
+      "id": "launcher-0.0.8",
+      "target": "launcher",
+      "version": "0.0.8",
+      "date": "2026-06-12",
+      "title": "Page Amis et canal bêta protégé",
+      "changes": [
+        "Nouvelle page Amis : présence en direct, notifications par ami, badge d'amis en ligne",
+        "Le canal bêta est désormais protégé par un code d'accès",
+        "Mode arrière-plan réparé : cliquer le raccourci rouvre toujours la fenêtre",
+        "Réglages reformulés pour être plus clairs"
+      ]
+    },
+    {
+      "id": "launcher-0.0.7",
+      "target": "launcher",
+      "version": "0.0.7",
+      "date": "2026-06-11",
+      "title": "Canal bêta et publication cloud",
+      "changes": [
+        "Nouveau réglage « Canal bêta » pour recevoir les versions de test en avant-première",
+        "Le launcher est désormais construit et publié automatiquement dans le cloud",
+        "Mises à jour plus fiables grâce aux vérifications automatiques avant chaque publication"
+      ]
+    },
+    {
+      "id": "launcher-0.0.6",
+      "target": "launcher",
+      "version": "0.0.6",
+      "date": "2026-06-11",
+      "title": "Mises à jour nouvelle génération",
+      "changes": [
+        "Nouvelle popup de mise à jour avec anneau de progression animé, vitesse et temps restant",
+        "Les mises à jour sont détectées automatiquement en moins d'une minute",
+        "Icône dans la zone de notification : Ouvrir, Jouer, Quitter — et option pour y réduire le launcher",
+        "Notification quand un ami de ta liste se connecte au serveur",
+        "La fenêtre retrouve sa taille et sa position au lancement",
+        "Compte à rebours sur les bannières d'événement",
+        "La page Contenus affiche la version, le nombre de fichiers et la taille du modpack",
+        "Un secret se cache quelque part… ↑↑↓↓←→←→BA"
+      ]
+    },
+    {
+      "id": "launcher-0.0.5",
+      "target": "launcher",
+      "version": "0.0.5",
+      "date": "2026-06-11",
+      "title": "Mises à jour invisibles",
+      "changes": [
+        "Tes réglages, comptes et contenus sont préservés à chaque mise à jour",
+        "Installation silencieuse : la mise à jour se pose toute seule, sans assistant ni clics"
+      ]
+    },
+    {
+      "id": "launcher-0.0.4",
+      "target": "launcher",
+      "version": "0.0.4",
+      "date": "2026-06-11",
+      "title": "Pack confort",
+      "changes": [
+        "État des mises à jour dans À propos : à jour, téléchargement en cours, hors ligne",
+        "Notification Windows quand le serveur revient en ligne (option)",
+        "Le launcher peut se réduire pendant le jeu et revenir à la fin (option)",
+        "Quoi de neuf affiché après chaque mise à jour",
+        "Progression des téléchargements dans la barre des tâches Windows",
+        "Bouton Captures d'écran dans la page Contenus",
+        "Copie des infos de débogage en un clic pour le support",
+        "Bannières d'événement à distance, garde-fou d'espace disque et verrou de version"
+      ]
+    },
+    {
+      "id": "launcher-0.0.3",
+      "target": "launcher",
+      "version": "0.0.3",
+      "date": "2026-06-11",
+      "title": "Direct au serveur",
+      "changes": [
+        "Le bouton Jouer t'amène directement sur Meytopia, sans passer par le menu multijoueur",
+        "Le serveur est pré-enregistré dans le jeu : impossible de le perdre de ta liste",
+        "Corrections de stabilité au lancement"
+      ]
+    },
+    {
+      "id": "launcher-0.0.2",
+      "target": "launcher",
+      "version": "0.0.2",
+      "date": "2026-06-11",
+      "title": "Design v2",
+      "changes": [
+        "Nouvelle identité visuelle : thème sombre, couleurs et animations signées Meytopia",
+        "Mode plein écran",
+        "Lien direct vers le Discord officiel"
+      ]
+    },
+    {
+      "id": "modpack-1.0.0",
+      "target": "modpack",
+      "version": "1.0.0",
+      "date": "2026-06-11",
+      "title": "Le pack fondateur",
+      "changes": [
+        "Premier modpack officiel de Meytopia — NeoForge 1.21.1",
+        "Installé et tenu à jour automatiquement par le launcher",
+        "Vérifié fichier par fichier à chaque lancement du jeu"
+      ]
+    },
+    {
+      "id": "launcher-0.0.1",
+      "target": "launcher",
+      "version": "0.0.1",
+      "date": "2026-06-11",
+      "title": "Première version de test",
+      "changes": [
+        "Refonte complète : comptes Microsoft, modpack, statut serveur, news, contenus",
+        "Désinstallation complète et sans trace depuis les Paramètres"
+      ]
+    }
+  ]
+}

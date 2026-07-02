@@ -1,0 +1,60 @@
+name: Publier le pack
+
+# Déclenché par la régie (workflow_dispatch) ou à la main depuis l'onglet Actions.
+# Assemble le modpack depuis des liens (direct / CurseForge) sans toucher au PC.
+# Sûr par défaut : dry_run=true simule tout sans rien publier.
+
+on:
+  workflow_dispatch:
+    inputs:
+      request:
+        description: 'Requête JSON : {"mode":"add|replace|update","items":[{"source":"url","url":"https://….jar"}]}'
+        required: true
+        type: string
+      dry_run:
+        description: 'Simulation (ne publie rien)'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publier-pack
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Dépendances
+        run: npm install adm-zip@0.5.16 --no-save
+      - name: Assembler le pack
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PACK_REQUEST: ${{ inputs.request }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+        run: node tools/packtool.js
+      - name: Vérifier les JSON
+        if: ${{ inputs.dry_run == false }}
+        run: node valider.js
+      - name: Publier les métadonnées (commit)
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          git config user.name "meytopia-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add manifest.json launcher.json changelog.json blocklist.json optional.json pack-status.json
+          if git diff --cached --quiet; then
+            echo "Rien à committer."
+          else
+            git commit -m "régie : publication du pack (Actions)"
+            git pull --rebase origin main
+            git push
+          fi

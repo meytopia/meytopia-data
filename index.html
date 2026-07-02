@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; img-src https://mc-heads.net https://crafatar.com data:; connect-src https://raw.githubusercontent.com; base-uri 'none'">
+<meta name="robots" content="index,follow">
+<title>Meytopia — profil joueur</title>
+<style>
+  :root{
+    --bg:#120D1F;--surface:#1B1430;--surface-high:#241A40;--accent:#8B5CF6;--accent-hover:#A78BFA;
+    --text:#F1EDFB;--text-dim:#A89FC4;--border:rgba(167,139,250,.16);--border-strong:rgba(167,139,250,.30);
+    --accent-soft:rgba(139,92,246,.14);--font:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased;padding:20px}
+  a{color:var(--accent-hover);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .brand{font-size:22px;font-weight:800;color:var(--accent-hover)}
+  .sub{color:var(--text-dim);font-size:13px}
+  .loading,.empty{color:var(--text-dim);padding:40px 0;text-align:center}
+  .muted{color:var(--text-dim)}
+  footer{margin-top:28px;color:var(--text-dim);font-size:12px;text-align:center}
+  /* profil */
+  .pcard{background:var(--surface);border:1px solid var(--border-strong);border-radius:16px;padding:20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .pcard img{width:64px;height:64px;border-radius:10px;image-rendering:pixelated;flex:none}
+  .pname{font-size:28px;font-weight:800;color:var(--accent-hover)}
+  .ptitle{color:var(--text-dim);font-size:14px;margin-top:2px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 12px;text-align:center}
+  .stat-val{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+  .stat-lab{color:var(--text-dim);font-size:12px;margin-top:4px}
+  .section{font-weight:700;font-size:16px;margin:22px 0 10px}
+  .row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
+  .row-emoji{font-size:18px;flex:none;width:22px;text-align:center}
+  .row-lab{flex:1;min-width:0}
+  .row-val{font-weight:700;color:var(--accent-hover);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .badge{flex:none;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-high);color:var(--text-dim)}
+  .badge.b1{background:rgba(251,191,36,.18);color:#FBBF24}
+  .badge.b2{background:rgba(203,213,225,.16);color:#CBD5E1}
+  .badge.b3{background:rgba(217,119,6,.18);color:#D97706}
+  /* annuaire */
+  .dir{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  .dir a{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+  .dir img{width:32px;height:32px;border-radius:7px;image-rendering:pixelated;flex:none}
+  .dir .n{font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dir .t{color:var(--text-dim);font-size:12px}
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#34D399;margin-right:6px;vertical-align:middle}
+  .share{margin-top:14px}
+  .share button{font:inherit;cursor:pointer;background:var(--accent-soft);border:1px solid var(--border-strong);color:var(--text);border-radius:10px;padding:8px 14px}
+  .share button:hover{border-color:var(--accent)}
+  .chal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+  .chal.done{border-color:rgba(52,211,153,.45)}
+  .chal-head{display:flex;justify-content:space-between;gap:10px;font-weight:600;font-size:14px;margin-bottom:8px}
+  .chal-head span:last-child{color:var(--accent-hover);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .chal.done .chal-head span:last-child{color:#34D399}
+  .chal-bar{height:8px;background:var(--surface-high);border-radius:999px;overflow:hidden}
+  .chal-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-hover));border-radius:999px}
+  .chal.done .chal-fill{background:#34D399}
+  /* Le serveur en chiffres + jalons */
+  .dir-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .dstat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center}
+  .dstat-v{font-size:18px;font-weight:800;color:var(--accent-hover);font-variant-numeric:tabular-nums}
+  .dstat-l{color:var(--text-dim);font-size:12px;margin-top:4px}
+  .milestones{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .ms{background:var(--accent-soft);border:1px solid var(--border-strong);color:var(--accent-hover);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600}
+  /* Mur des champions */
+  .hof{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+  .hof-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+  .hof-cat{font-size:12px;color:var(--text-dim);font-weight:700}
+  .hof-name{display:flex;align-items:center;gap:8px;font-weight:700;margin:8px 0 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .hof-name img{width:24px;height:24px;border-radius:6px;image-rendering:pixelated;flex:none}
+  .hof-val{font-size:15px;font-weight:800;color:var(--accent-hover);font-variant-numeric:tabular-nums}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="?">Meytopia</a>
+    <span class="sub" id="live">—</span>
+  </header>
+  <main id="app"><div class="loading">Chargement…</div></main>
+  <footer>Statistiques publiques du serveur Meytopia · relevées en continu par la sonde</footer>
+</div>
+<script src="stats-core.js"></script>
+<script src="profile.js"></script>
+</body></html>

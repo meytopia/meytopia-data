@@ -1,0 +1,106 @@
+name: Pack depuis une archive .zip
+
+# Reconstruit TOUT le modpack à partir d'un mods.zip (qui contient tous les .jar).
+# Trois sources possibles :
+#   - "pack-src" (défaut) : l'archive a été déposée DANS LA RÉGIE → poussée (en 1+ morceaux) sur la
+#     branche pack-src ; le workflow réassemble les morceaux (pas de limite de taille navigateur).
+#   - "release" : un asset mods.zip déposé sur une release GitHub.
+#   - URL directe fournie.
+# Les releases d'assets du pack (tag "pack-*") sont ignorées → pas de boucle.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      from:
+        description: 'Source : pack-src (déposé via la régie) ou release'
+        required: false
+        default: 'pack-src'
+        type: string
+      zip_url:
+        description: 'URL directe du .zip (prioritaire si fournie)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Simulation (ne publie rien)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pack-from-zip
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: ${{ github.event_name == 'workflow_dispatch' || !startsWith(github.event.release.tag_name, 'pack-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Dépendances
+        run: npm install adm-zip@0.5.16 --no-save
+      - name: Assembler l'archive (pack-input.zip)
+        id: zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          INPUT_URL: ${{ inputs.zip_url }}
+          FROM: ${{ inputs.from }}
+          EVENT: ${{ github.event_name }}
+          REL_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -e
+          notfound() { echo "::notice::$1"; echo "found=false" >> "$GITHUB_OUTPUT"; exit 0; }
+          if [ -n "$INPUT_URL" ]; then
+            echo "Source : URL fournie"
+            case "$INPUT_URL" in https://*) : ;; *) notfound "URL fournie invalide";; esac
+            curl -fL --retry 5 --retry-delay 4 "$INPUT_URL" -o pack-input.zip
+          elif [ "$EVENT" = "release" ] || [ "$FROM" = "release" ]; then
+            echo "Source : asset mods.zip d'une release"
+            if [ "$EVENT" = "release" ]; then TAG="$REL_TAG"; else TAG=$(gh api "repos/$REPO/releases" --jq 'map(select(any(.assets[]?; .name=="mods.zip")))[0].tag_name // empty'); fi
+            [ -n "$TAG" ] || notfound "Aucune release ne contient mods.zip"
+            URL=$(gh api "repos/$REPO/releases/tags/$TAG" --jq '[.assets[] | select(.name=="mods.zip") | .browser_download_url][0] // empty')
+            case "$URL" in https://*) : ;; *) notfound "Aucun mods.zip valide sur la release";; esac
+            curl -fL --retry 5 --retry-delay 4 "$URL" -o pack-input.zip
+          else
+            echo "Source : branche pack-src (déposé via la régie)"
+            git fetch origin pack-src 2>/dev/null || notfound "Branche pack-src absente"
+            PARTS=$(git ls-tree --name-only FETCH_HEAD 2>/dev/null | grep -E '^mods\.zip(\.part[0-9]+)?$' | sort -V || true)
+            [ -n "$PARTS" ] || notfound "Aucun mods.zip sur pack-src"
+            : > pack-input.zip
+            for p in $PARTS; do echo "  + $p"; git cat-file -p "FETCH_HEAD:$p" >> pack-input.zip; done
+          fi
+          [ -s pack-input.zip ] || notfound "Archive vide"
+          echo "Taille assemblée : $(du -h pack-input.zip | cut -f1)"
+          echo "found=true" >> "$GITHUB_OUTPUT"
+      - name: Reconstruire le pack
+        if: ${{ steps.zip.outputs.found == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PACK_REQUEST: '{"mode":"replace","items":[{"source":"zip","url":"pack-input.zip"}]}'
+          DRY_RUN: ${{ inputs.dry_run || false }}
+        run: node tools/packtool.js
+      - name: Vérifier les JSON
+        if: ${{ steps.zip.outputs.found == 'true' && (inputs.dry_run || false) != true }}
+        run: node valider.js
+      - name: Publier les métadonnées (commit)
+        if: ${{ steps.zip.outputs.found == 'true' && (inputs.dry_run || false) != true }}
+        run: |
+          git config user.name "meytopia-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add manifest.json launcher.json changelog.json blocklist.json pack-status.json
+          if git diff --cached --quiet; then
+            echo "Rien à committer."
+          else
+            git commit -m "pack : reconstruit depuis archive (Actions)"
+            git pull --rebase origin main
+            git push
+          fi
