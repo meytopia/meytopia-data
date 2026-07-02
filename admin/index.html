@@ -446,6 +446,23 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
     </div>
     <div class="actions"><button class="btn ghost" data-preview="settings">👁 Aperçu</button><button class="btn primary" data-save="settings">Publier les réglages</button></div>
     <div class="card">
+      <h2>🎁 Cadeau du jour</h2>
+      <p class="hint" style="margin-bottom:8px">À sa <b>première connexion de la journée</b>, chaque joueur reçoit UN objet au hasard dans cette
+        liste (donné en jeu par la sonde, rechargé ~1×/h). Coche « doré ✨ » pour les cadeaux rares — la chance dorée s'applique quand la liste mélange
+        dorés et normaux (s'il n'y a QUE des dorés, tout le monde en reçoit un à chaque fois). Comme pour les défis : les joueurs en mode privé n'en reçoivent pas. Décoche « Activé » pour tout couper.</p>
+      <div class="mods-bulk" style="margin-bottom:8px">
+        <label class="checkline" style="margin:0"><input type="checkbox" id="gf-enabled"> Activé</label>
+        <label for="gf-golden" class="hint" style="margin:0">Chance du cadeau doré :</label>
+        <input type="number" id="gf-golden" min="0" max="100" style="max-width:70px"> <span class="hint">%</span>
+      </div>
+      <div id="gf-items"></div>
+      <div class="mods-bulk" style="margin-top:8px">
+        <button class="btn ghost btn-sm" id="gf-add">+ Ajouter un cadeau</button>
+        <button class="btn primary btn-sm" id="gf-save">Publier les cadeaux</button>
+        <span class="hint" id="gf-status"></span>
+      </div>
+    </div>
+    <div class="card">
       <h2>Défis communautaires</h2>
       <p class="hint" style="margin-bottom:8px">Objectifs collectifs affichés dans le launcher et sur la page publique. Toutes les métriques sont <b>de la saison en cours</b> (remises à zéro au reset / à la nouvelle saison). La <b>récompense en jeu</b> (optionnelle) est donnée automatiquement <b>1×/joueur/saison</b> quand l'objectif est atteint.</p>
       <div id="ch-draft" class="draft-banner" hidden></div>
@@ -1090,6 +1107,24 @@ const isSemver = (v) => isStr(v) && /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(v);
 const isStrictSemver = (v) => isStr(v) && /^\d+\.\d+\.\d+$/.test(v);
 function validate(name, d) {
   const errs = [];
+  if (name === 'gifts.json') {
+    // Cadeau du jour : mêmes règles que la sonde (id anti-injection, quantité 1-64, label filtré).
+    // PAS de retour anticipé ici (ni ce littéral en commentaire) : l'extraction des tests
+    // s'ancre sur la PREMIÈRE instruction de retour de la fonction.
+    if (!d || typeof d !== 'object' || Array.isArray(d) || !Array.isArray(d.items)) {
+      errs.push('structure cadeaux invalide (« items » doit être une liste)');
+    } else {
+      if (typeof d.enabled !== 'boolean') errs.push('cadeaux : « enabled » doit être vrai ou faux');
+      if (!(typeof d.goldenChance === 'number' && d.goldenChance >= 0 && d.goldenChance <= 1)) errs.push('cadeaux : « goldenChance » doit être entre 0 et 1');
+      d.items.forEach((it, i) => {
+        if (!it || typeof it !== 'object') { errs.push(`cadeau ${i + 1} : entrée invalide`); return; }
+        if (!(typeof it.id === 'string' && /^[a-z0-9_.-]+:[a-z0-9_.\/-]+$/.test(it.id))) errs.push(`cadeau ${i + 1} : identifiant invalide (attendu mod:objet, ex. minecraft:apple)`);
+        if (!(Number.isInteger(it.count) && it.count >= 1 && it.count <= 64)) errs.push(`cadeau ${i + 1} : quantité entre 1 et 64`);
+        if (it.label !== undefined && !(typeof it.label === 'string' && /^[\p{L}\p{N} '\-]{1,40}$/u.test(it.label))) errs.push(`cadeau ${i + 1} : nom français invalide (lettres/chiffres/espaces, 40 max)`);
+        if (it.golden !== undefined && typeof it.golden !== 'boolean') errs.push(`cadeau ${i + 1} : « golden » doit être vrai ou faux`);
+      });
+    }
+  }
   if (name === 'challenges.json') {
     if (!d || !Array.isArray(d.challenges)) {
       errs.push('structure défis invalide (« challenges » doit être une liste)');
@@ -1312,7 +1347,84 @@ async function loadChallengesEditor() {
   cfUpdateMetricDesc();
   loadItemsCatalog();
   showDraftBanner('challenges');
+  loadGiftsEditor();
 }
+
+/* ── 🎁 Cadeau du jour (gifts.json) ── */
+const GF_ID = /^[a-z0-9_.-]+:[a-z0-9_.\/-]+$/; // même règle anti-injection que les récompenses (sonde)
+async function loadGiftsEditor() {
+  try { await loadFile('gifts.json'); }
+  catch (e) { state.files['gifts.json'] = { data: { enabled: false, goldenChance: 0.05, items: [] }, sha: undefined }; }
+  renderGifts();
+}
+function renderGifts() {
+  const f = state.files['gifts.json']; const box = $('#gf-items'); if (!box || !f) return;
+  if (dirty.has('form-gifts')) return; // dirty-guard : ne pas écraser une saisie non publiée
+  const g = f.data || {};
+  $('#gf-enabled').checked = g.enabled === true;
+  $('#gf-golden').value = String(Math.round((typeof g.goldenChance === 'number' ? g.goldenChance : 0.05) * 100));
+  const items = Array.isArray(g.items) ? g.items : [];
+  box.innerHTML = items.length ? items.map((it, i) => `<div class="mods-bulk gf-row" data-i="${i}" style="margin-bottom:6px">
+      <input type="text" class="gf-id" value="${esc(it && it.id || '')}" placeholder="minecraft:apple" style="max-width:230px" title="Identifiant exact de l'objet (comme dans /give)">
+      <input type="number" class="gf-count" value="${Math.max(1, Math.min(64, Number(it && it.count) || 1))}" min="1" max="64" style="max-width:70px" title="Quantité (1 à 64)">
+      <input type="text" class="gf-label" value="${esc(it && it.label || '')}" placeholder="Nom en français (optionnel)" maxlength="40" style="max-width:200px" title="Affiché au joueur — sinon l'identifiant est utilisé">
+      <label class="checkline" style="margin:0" title="Cadeau rare, tiré avec la « chance dorée »"><input type="checkbox" class="gf-gold" ${it && it.golden === true ? 'checked' : ''}> doré ✨</label>
+      <button class="btn ghost btn-sm gf-del" title="Retirer cette ligne">✕</button>
+    </div>`).join('')
+    : '<div class="hint">Aucun cadeau pour l\'instant — « + Ajouter un cadeau », puis publie.</div>';
+}
+function gfCollect() {
+  // Reconstruit la liste depuis les champs — et VALIDE tout (les erreurs bloquent la publication).
+  const errs = []; const items = [];
+  document.querySelectorAll('#gf-items .gf-row').forEach((row, i) => {
+    const id = row.querySelector('.gf-id').value.trim().toLowerCase();
+    const count = parseInt(row.querySelector('.gf-count').value, 10);
+    const label = row.querySelector('.gf-label').value.trim();
+    const golden = row.querySelector('.gf-gold').checked;
+    if (!GF_ID.test(id)) errs.push(`cadeau ${i + 1} : identifiant invalide (attendu : mod:objet, ex. minecraft:apple)`);
+    if (!(Number.isInteger(count) && count >= 1 && count <= 64)) errs.push(`cadeau ${i + 1} : quantité entre 1 et 64`);
+    if (label && !/^[\p{L}\p{N} '\-]{1,40}$/u.test(label)) errs.push(`cadeau ${i + 1} : nom français invalide (lettres/chiffres/espaces, 40 max)`);
+    const it = { id, count };
+    if (label) it.label = label;
+    if (golden) it.golden = true;
+    items.push(it);
+  });
+  const pct = parseInt($('#gf-golden').value, 10);
+  if (!(Number.isInteger(pct) && pct >= 0 && pct <= 100)) errs.push('chance dorée : entre 0 et 100 %');
+  return { errs, data: { enabled: $('#gf-enabled').checked, goldenChance: (Number.isInteger(pct) ? pct : 5) / 100, items } };
+}
+if ($('#gf-add')) $('#gf-add').addEventListener('click', () => {
+  const f = state.files['gifts.json']; if (!f) return;
+  dirty.delete('form-gifts'); // on repart du rendu : intègre d'abord la saisie en cours
+  const cur = gfCollect(); f.data = cur.data; f.data.items.push({ id: '', count: 1 });
+  renderGifts();
+  dirty.add('form-gifts');
+});
+if ($('#gf-items')) {
+  $('#gf-items').addEventListener('input', () => dirty.add('form-gifts'));
+  $('#gf-items').addEventListener('click', (e) => {
+    const b = e.target.closest('.gf-del'); if (!b) return;
+    b.closest('.gf-row').remove(); dirty.add('form-gifts');
+  });
+}
+if ($('#gf-enabled')) $('#gf-enabled').addEventListener('change', () => dirty.add('form-gifts'));
+if ($('#gf-golden')) $('#gf-golden').addEventListener('input', () => dirty.add('form-gifts'));
+if ($('#gf-save')) $('#gf-save').addEventListener('click', async () => {
+  const btn = $('#gf-save'); if (btn.disabled) return;
+  const f = state.files['gifts.json']; if (!f) return;
+  const { errs, data } = gfCollect();
+  if (errs.length) { toast('Cadeaux non publiés :\n· ' + errs.join('\n· '), true); return; }
+  if (data.enabled && !data.items.length && !confirm('Activé mais AUCUN cadeau dans la liste : les joueurs ne recevront rien. Publier quand même ?')) return;
+  btn.disabled = true;
+  try {
+    f.data = data;
+    await saveFile('gifts.json', 'admin: cadeaux du jour');
+    dirty.delete('form-gifts');
+    renderGifts();
+    toast('Cadeaux publiés 🎁 — la sonde les prend en compte d\'ici 1 h (ou au prochain redémarrage).');
+  } catch (e) { /* saveFile a déjà affiché l'erreur et annulé la mutation */ }
+  finally { btn.disabled = false; }
+});
 $('#ch-reload').addEventListener('click', () => {
   if (dirty.has('challenges') && !confirm('Recharger depuis GitHub ?\n\nTes modifications non publiées des défis seront perdues.')) return;
   clearDirty('challenges');
@@ -1699,7 +1811,7 @@ document.addEventListener('visibilitychange', () => { if (state.user && document
 
 /* ════════════════ Rendu ════════════════ */
 function L() { return state.files['launcher.json'].data; }
-function renderAll() { renderBoard(); renderMaintenance(); renderGate(); renderEvent(); renderNews(); renderChangelog(); renderSettings(); }
+function renderAll() { renderBoard(); renderMaintenance(); renderGifts(); renderGate(); renderEvent(); renderNews(); renderChangelog(); renderSettings(); }
 
 function tile(k, v, d, go) {
   return `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div>${d ? `<div class="d">${d}</div>` : ''}${go ? `<a class="go" href="#${go}">Modifier →</a>` : ''}</div>`;

@@ -227,10 +227,28 @@ function checkCrossVersions() {
   }
 }
 
+/* ── Cadeau du jour (gifts.json) : mêmes règles que la sonde et la régie ── */
+function checkGifts() {
+  if (!fs.existsSync('gifts.json')) return; // optionnel
+  const g = load('gifts.json');
+  if (!g) return; // JSON illisible : déjà signalé par load()
+  if (typeof g !== 'object' || Array.isArray(g) || !Array.isArray(g.items)) { err('gifts.json', 'structure invalide (« items » doit être une liste)'); return; }
+  if (typeof g.enabled !== 'boolean') err('gifts.json', '« enabled » doit être vrai ou faux');
+  if (!(typeof g.goldenChance === 'number' && g.goldenChance >= 0 && g.goldenChance <= 1)) err('gifts.json', '« goldenChance » doit être entre 0 et 1');
+  g.items.forEach((it, i) => {
+    if (!it || typeof it !== 'object') { err('gifts.json', `cadeau ${i + 1} : entrée invalide`); return; }
+    if (!(typeof it.id === 'string' && /^[a-z0-9_.-]+:[a-z0-9_.\/-]+$/.test(it.id))) err('gifts.json', `cadeau ${i + 1} : identifiant invalide (mod:objet)`);
+    if (!(Number.isInteger(it.count) && it.count >= 1 && it.count <= 64)) err('gifts.json', `cadeau ${i + 1} : quantité entre 1 et 64`);
+    if (it.label !== undefined && !(typeof it.label === 'string' && /^[\p{L}\p{N} '\-]{1,40}$/u.test(it.label))) err('gifts.json', `cadeau ${i + 1} : nom français invalide`);
+    if (it.golden !== undefined && typeof it.golden !== 'boolean') err('gifts.json', `cadeau ${i + 1} : « golden » doit être vrai ou faux`);
+  });
+}
+
 checkLauncher();
 checkNews();
 checkChangelog();
 checkBlocklist();
+checkGifts();
 if (fs.existsSync('optional.json')) checkSimpleList('optional.json', 'items');
 checkManifest();
 checkChallenges();

@@ -59,6 +59,12 @@ check('blocklist contains 1 caractère rejetée', validate('blocklist.json', { e
 check('blocklist deux critères rejetée', validate('blocklist.json', { entries: [{ match: { contains: 'xray', sha1: 'a'.repeat(40) }, scope: ['mods'] }] }).length > 0);
 check('blocklist scope invalide rejetée', validate('blocklist.json', { entries: [{ match: { contains: 'xray' }, scope: ['worlds'] }] }).length > 0);
 check('blocklist règle valide acceptée', validate('blocklist.json', { entries: [{ match: { contains: 'xray' }, scope: ['mods'], reason: 'x' }] }).length === 0);
+const gifts = JSON.parse(fs.readFileSync(path.join(ROOT, 'gifts.json'), 'utf8'));
+check('validate(gifts.json réel) = 0 erreur', validate('gifts.json', gifts).length === 0);
+check('gifts id injection rejeté', validate('gifts.json', { enabled: true, goldenChance: 0.05, items: [{ id: 'minecraft:apple 1; op Hacker', count: 1 }] }).length > 0);
+check('gifts quantité 0 rejetée', validate('gifts.json', { enabled: true, goldenChance: 0.05, items: [{ id: 'minecraft:apple', count: 0 }] }).length > 0);
+check('gifts label dangereux rejeté', validate('gifts.json', { enabled: true, goldenChance: 0.05, items: [{ id: 'minecraft:apple', count: 1, label: '<img src=x>' }] }).length > 0);
+check('gifts goldenChance 2 rejetée', validate('gifts.json', { enabled: true, goldenChance: 2, items: [] }).length > 0);
 
 // 3) normalizeStatsData : filtre anti-injection des clés de date (les clés finissent en innerHTML)
 function extractNormalize() {
