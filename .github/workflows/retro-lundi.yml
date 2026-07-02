@@ -1,0 +1,42 @@
+# Meytopia — « La rétro du lundi » : chaque lundi matin, publie dans news.json un résumé
+# automatique de la semaine écoulée (heures jouées, joueurs, nouveaux, record éventuel).
+# Données 100 % publiques et anonymes (le fichier de stats ne contient pas les joueurs privés).
+# Semaine vide => aucune publication. Relançable à la main (workflow_dispatch), sans doublon.
+name: La rétro du lundi
+
+on:
+  schedule:
+    - cron: '15 5 * * 1' # lundi 05:15 UTC = 06:15/07:15 à Paris selon la saison
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  retro:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Récupérer les stats publiées (branche stats)
+        run: |
+          curl -fsS "https://raw.githubusercontent.com/${{ github.repository }}/stats/stats-serveur.json" -o /tmp/stats.json || echo "pas de stats (serveur jamais lancé ?)"
+
+      - name: Composer la rétro
+        run: node tools/retro-lundi.js /tmp/stats.json
+
+      - name: Publier si news.json a changé
+        run: |
+          if git diff --quiet -- news.json; then
+            echo "Rien à publier."
+            exit 0
+          fi
+          git config user.name "retro-lundi[bot]"
+          git config user.email "actions@github.com"
+          git add news.json
+          git commit -m "actu: la rétro du lundi (automatique)"
+          git push
