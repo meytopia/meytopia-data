@@ -778,17 +778,17 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
       <div style="font-weight:600;margin-bottom:4px">🗑️ Retirer un joueur des archives (droit à l'effacement)</div>
       <div style="color:var(--faint);font-size:12px;margin-bottom:10px">
         Si un joueur demande à disparaître (RGPD), ce bouton efface son pseudo, son identifiant (UUID),
-        ses horaires et ses récompenses de <b>toutes les archives publiques</b> : « L'histoire des saisons »
-        (<span class="mono">seasons/</span>) et les sauvegardes quotidiennes de la sonde
-        (<span class="mono">backups/</span>) — en <b>une seule publication</b>, tout ou rien.
+        ses horaires et ses récompenses de <b>toutes les archives</b> : « L'histoire des saisons »
+        (<span class="mono">seasons/</span>, publique) ET les sauvegardes quotidiennes de la sonde
+        (dépôt <b>privé</b> <span class="mono">meytopia-backups</span>, visible de toi seul) —
+        un commit tout-ou-rien par dépôt.
         Les totaux communautaires anonymes (barres de défis, cumuls) et les stats des autres joueurs sont
         <b>conservés</b> : rien ne casse pour le reste de la communauté.
         ⚠️ Pour la <b>saison en cours</b>, c'est au joueur de taper <span class="mono">/meyprivacy cacher</span>
         en jeu (effet immédiat sur les pages publiques) — ce bouton ne touche pas au fichier vivant de la sonde,
         qui le réécrirait par-dessus. <b>Ordre conseillé si le joueur joue encore</b> : d'abord
         <span class="mono">/meyprivacy cacher</span>, PUIS ce bouton — sinon, tant qu'il reste public,
-        la sauvegarde quotidienne suivante de la sonde le mentionnera à nouveau dans
-        <span class="mono">backups/</span>.
+        la sauvegarde quotidienne suivante de la sonde le mentionnera à nouveau (dans le dépôt privé).
       </div>
       <div class="mods-bulk">
         <label for="rgpd-name" class="hint" style="margin:0">Pseudo exact (majuscules comprises) :</label>
@@ -854,6 +854,7 @@ if (window.top !== window.self) { try { window.top.location = window.location; }
 /* ════════════════ Configuration ════════════════ */
 const OWNER = 'meytopia';
 const DATA_REPO = OWNER + '/meytopia-data';
+const BACKUP_REPO = OWNER + '/meytopia-backups'; // dépôt PRIVÉ des sauvegardes quotidiennes (RGPD)
 const LAUNCHER_REPO = OWNER + '/meytopia-launcher';
 const SERVER_HOST = 'meytopia.fr';
 const API = 'https://api.github.com';
@@ -3290,11 +3291,21 @@ async function startNewSeason() {
 }
 if ($('#sn-go')) $('#sn-go').addEventListener('click', startNewSeason);
 
-/* ── 🗑️ RGPD : retirer un joueur de TOUTES les archives publiques (seasons/ + backups/) ──
+/* ── 🗑️ RGPD : retirer un joueur de TOUTES les archives — seasons/ (dépôt public) + sauvegardes
+   quotidiennes (dépôt PRIVÉ meytopia-backups) ──
    Droit à l'effacement. On efface les données NOMINATIVES (seen[pseudo], sessions days[].ses,
    record de session, sessionLog, claimed/baseline/priv par UUID) mais on GARDE les totaux
    communautaires anonymes (agg) et les jours (uptime/perf) : les stats des autres joueurs et
-   l'histoire des défis ne bougent pas. Publication en UN SEUL commit (tout ou rien). */
+   l'histoire des défis ne bougent pas. UN commit tout-ou-rien PAR dépôt (public d'abord) ; si le
+   privé échoue ensuite, l'opération est REPRENABLE : les UUID découverts sont mémorisés
+   (localStorage) jusqu'à la réussite complète — voir rgpdPending*. */
+// Mémoire de reprise : si le retrait échoue à mi-chemin (2 dépôts = 2 commits), le re-clic doit
+// retrouver le joueur MÊME si le commit réussi a effacé la seule archive qui liait son pseudo
+// actuel à son UUID (joueur renommé). Effacée seulement à la réussite complète.
+function rgpdPendingKey(n) { return 'meytopia.regie.rgpdPending.' + n; }
+function rgpdPendingLoad(n) { try { return JSON.parse(localStorage.getItem(rgpdPendingKey(n)) || '[]'); } catch (_) { return []; } }
+function rgpdPendingSave(n, uuids) { try { localStorage.setItem(rgpdPendingKey(n), JSON.stringify(Array.from(uuids))); } catch (_) { /* stockage plein : la reprise par ANCIEN pseudo reste possible */ } }
+function rgpdPendingClear(n) { try { localStorage.removeItem(rgpdPendingKey(n)); } catch (_) { /* rien */ } }
 // Pass 1 — collecte les UUID portés par ce pseudo dans une archive (un même joueur garde son UUID
 // même renommé) : indispensable pour purger claimed/baseline, indexés par UUID et non par pseudo.
 function rgpdCollectUuids(d, name, uuids) {
@@ -3347,6 +3358,23 @@ function rgpdScrub(d, name, uuids) {
   }
   return touched;
 }
+// Variante de saveFilesAtomic pour un AUTRE dépôt (le dépôt privé des sauvegardes) : autonome —
+// pas de state.files ni de validate() (fichiers de sauvegarde bruts, pas des fichiers pilotés) —
+// mais même garantie tout-ou-rien (un seul commit) et mêmes préconditions sha par fichier.
+async function saveFilesAtomicIn(repoFull, entries, message) {
+  const tree = entries.map(({ name, data }) => ({ path: name, mode: '100644', type: 'blob', content: JSON.stringify(data, null, 2) + '\n' }));
+  const ref = await gh(`/repos/${repoFull}/git/ref/heads/main?t=${Date.now()}`);
+  const headSha = ref.object.sha;
+  for (const { name, sha } of entries) {
+    let cur = null;
+    try { cur = await gh(`/repos/${repoFull}/contents/${name}?ref=${headSha}`); } catch (err) { if (err.status !== 404) throw err; }
+    if (sha ? (cur && cur.sha !== sha) : !!cur) throw Object.assign(new Error('conflit sur ' + name), { status: 409 });
+  }
+  const baseCommit = await gh(`/repos/${repoFull}/git/commits/${headSha}`);
+  const newTree = await gh(`/repos/${repoFull}/git/trees`, { method: 'POST', body: JSON.stringify({ base_tree: baseCommit.tree.sha, tree }) });
+  const commit = await gh(`/repos/${repoFull}/git/commits`, { method: 'POST', body: JSON.stringify({ message, tree: newTree.sha, parents: [headSha] }) });
+  await gh(`/repos/${repoFull}/git/refs/heads/main`, { method: 'PATCH', body: JSON.stringify({ sha: commit.sha, force: false }) });
+}
 async function rgpdRemovePlayer() {
   const btn = $('#rgpd-go'); if (!btn || btn.disabled) return;
   const st = $('#rgpd-status');
@@ -3356,33 +3384,83 @@ async function rgpdRemovePlayer() {
   try {
     st.textContent = 'Inventaire des archives…';
     // Inventaire par l'API Git Trees (récursif) et PAS par /contents/{dossier} : Contents plafonne à
-    // 1000 fichiers par dossier SANS le dire (backups/ gagne 1 fichier/jour → troncature silencieuse
-    // à terme = effacement incomplet affiché « fait »). Trees, lui, POSE un drapeau `truncated` qu'on
-    // vérifie : dans le doute, on REFUSE (fail-closed) plutôt que de promettre un retrait partiel.
+    // 1000 fichiers par dossier SANS le dire (troncature silencieuse = effacement incomplet affiché
+    // « fait »). Trees, lui, POSE un drapeau `truncated` qu'on vérifie : dans le doute, on REFUSE
+    // (fail-closed) plutôt que de promettre un retrait partiel.
     const ref = await gh(`/repos/${DATA_REPO}/git/ref/heads/main?t=${Date.now()}`);
     const tree = await gh(`/repos/${DATA_REPO}/git/trees/${ref.object.sha}?recursive=1`);
     if (tree.truncated) { toast('Inventaire du dépôt incomplet (réponse GitHub tronquée) — retrait annulé pour ne rien rater. Réessaie ou contacte le support.', true); return; }
     const paths = (Array.isArray(tree.tree) ? tree.tree : [])
       .filter((e) => e && e.type === 'blob' && /^(seasons|backups)\/[^/]+\.json$/i.test(e.path))
       .map((e) => e.path);
-    if (!paths.length) { toast('Aucune archive sur le dépôt — rien à nettoyer.'); return; }
-    st.textContent = `Lecture de ${paths.length} archive(s)…`;
+    // Dépôt PRIVÉ des sauvegardes quotidiennes : à nettoyer AUSSI (droit à l'effacement complet).
+    let privPaths = [];
+    try {
+      const pref = await gh(`/repos/${BACKUP_REPO}/git/ref/heads/main?t=${Date.now()}`);
+      const ptree = await gh(`/repos/${BACKUP_REPO}/git/trees/${pref.object.sha}?recursive=1`);
+      if (ptree.truncated) { toast('Inventaire du dépôt privé incomplet (réponse tronquée) — retrait annulé pour ne rien rater.', true); return; }
+      privPaths = (Array.isArray(ptree.tree) ? ptree.tree : [])
+        .filter((e) => e && e.type === 'blob' && /^backups\/[^/]+\.json$/i.test(e.path))
+        .map((e) => e.path);
+    } catch (err) {
+      if (err.status !== 404) throw err;
+      // 404 = dépôt privé vide… ou INVISIBLE pour ce jeton (GitHub cache l'existence des dépôts privés
+      // non autorisés — impossible de distinguer). On ne continue qu'avec l'accord EXPLICITE de l'admin.
+      if (!confirm(`Impossible de voir le dépôt privé des sauvegardes (${BACKUP_REPO}) avec ton jeton.\n\nSi ce dépôt existe, ton jeton n'y a pas accès : ajoute-le dans GitHub → Settings → Developer settings → Fine-grained tokens → Repository access, puis reviens — sinon le retrait serait INCOMPLET.\n\nContinuer quand même en ne nettoyant QUE le dépôt public ?`)) return;
+    }
+    if (!paths.length && !privPaths.length) { toast('Aucune archive (publique ou privée) — rien à nettoyer.'); return; }
+    st.textContent = `Lecture de ${paths.length + privPaths.length} archive(s)…`;
     // loadFile pose aussi le sha en mémoire → précondition anti-écrasement de saveFilesAtomic.
     const files = await Promise.all(paths.map(async (p) => ({ name: p, data: (await loadFile(p)).data })));
+    const privFiles = await Promise.all(privPaths.map(async (p) => {
+      const doc = await gh(`/repos/${BACKUP_REPO}/contents/${p}?ref=main&t=${Date.now()}`);
+      return { name: p, sha: doc.sha, data: JSON.parse(b64decode(doc.content)) };
+    }));
+    // Collecte des UUID sur TOUTES les archives (publiques ET privées) AVANT tout scrub :
+    // un joueur renommé peut n'être identifiable que par une seule d'entre elles.
     const uuids = new Set();
     for (const f of files) rgpdCollectUuids(f.data, name, uuids);
+    for (const f of privFiles) rgpdCollectUuids(f.data, name, uuids);
+    // + les UUID mémorisés par une tentative interrompue (voir rgpdPending*) : sans eux, un re-clic
+    // après un demi-succès ne retrouverait plus un joueur renommé (mapping effacé par le 1er commit).
+    for (const u of rgpdPendingLoad(name)) uuids.add(u);
     const entries = files.filter((f) => rgpdScrub(f.data, name, uuids));
-    if (!entries.length) { toast(`« ${name} » n'apparaît dans aucune des ${paths.length} archive(s) — vérifie l'orthographe exacte du pseudo (et s'il s'est renommé, essaie aussi son ANCIEN pseudo).`); return; }
-    if (!confirm(`Retirer « ${name} » de ${entries.length} archive(s) sur ${paths.length} ?\n\n· Effacé : son pseudo, son UUID, son temps de jeu, ses horaires, son record et ses récompenses\n· Conservé : totaux communautaires anonymes + stats des autres joueurs\n\nCette action est définitive (droit à l'effacement).`)) {
-      // Refus : les objets en mémoire ont déjà été nettoyés par rgpdScrub → on les recharge pour annuler.
+    const privEntries = privFiles.filter((f) => rgpdScrub(f.data, name, uuids));
+    const total = entries.length + privEntries.length;
+    if (!total) {
+      if (rgpdPendingLoad(name).length) {
+        // Reprise d'une tentative interrompue : plus rien à nettoyer nulle part = c'est terminé.
+        rgpdPendingClear(name);
+        toast(`Reprise : « ${name} » n'apparaît plus dans aucune archive (publique ou privée) — le retrait est bien TERMINÉ ✅.`);
+      } else {
+        toast(`« ${name} » n'apparaît dans aucune des ${paths.length + privPaths.length} archive(s) — vérifie l'orthographe exacte du pseudo (et s'il s'est renommé, essaie aussi son ANCIEN pseudo).`);
+      }
+      return;
+    }
+    if (!confirm(`Retirer « ${name} » de ${total} archive(s) (${entries.length} publique(s) + ${privEntries.length} sauvegarde(s) privée(s)) ?\n\n· Effacé : son pseudo, son UUID, son temps de jeu, ses horaires, son record et ses récompenses\n· Conservé : totaux communautaires anonymes + stats des autres joueurs\n\nCette action est définitive (droit à l'effacement).`)) {
+      // Refus : les objets en mémoire ont déjà été nettoyés par rgpdScrub → on recharge les publics
+      // pour annuler (les privés ne vivent que dans des variables locales, jetées ici).
       st.textContent = 'Annulation…';
       for (const f of entries) { try { await loadFile(f.name); } catch (_) { /* rechargé à la demande */ } }
       return;
     }
-    st.textContent = `Publication du retrait (${entries.length} fichier(s), un seul commit)…`;
-    try { await saveFilesAtomic(entries, `régie : droit à l'effacement — retrait de ${name} des archives (${entries.length} fichier(s))`); }
-    catch (_) { return; /* saveFilesAtomic a déjà tout annulé et affiché l'erreur */ }
-    toast(`« ${name} » retiré de ${entries.length} archive(s) ✅ (effet ≤ 5 min sur les pages d'archives). Rappel : s'il apparaît encore dans la SAISON EN COURS, il y reste visible tant qu'il n'a pas tapé /meyprivacy cacher — et s'il rejoue en restant public, la sauvegarde quotidienne suivante le mentionnera à nouveau.`);
+    // Mémorise les UUID AVANT le premier commit : effacé seulement quand TOUT a réussi.
+    rgpdPendingSave(name, uuids);
+    // 1) Dépôt PUBLIC d'abord (c'est l'exposition qui compte) — un seul commit.
+    if (entries.length) {
+      st.textContent = `Publication du retrait public (${entries.length} fichier(s), un seul commit)…`;
+      try { await saveFilesAtomic(entries, `régie : droit à l'effacement — retrait de ${name} des archives (${entries.length} fichier(s))`); }
+      catch (_) { return; /* saveFilesAtomic a déjà tout annulé et affiché l'erreur */ }
+    }
+    // 2) Dépôt PRIVÉ ensuite — un commit dédié. En cas d'échec : re-cliquer reprend ici (le public,
+    //    déjà propre, ne produira plus d'entrées) — l'opération est reprenable sans double travail.
+    if (privEntries.length) {
+      st.textContent = `Nettoyage du dépôt privé (${privEntries.length} fichier(s))…`;
+      try { await saveFilesAtomicIn(BACKUP_REPO, privEntries, `régie : droit à l'effacement — retrait de ${name} des sauvegardes (${privEntries.length} fichier(s))`); }
+      catch (e) { toast(`Dépôt public nettoyé ✅ mais échec sur le dépôt PRIVÉ : ${e.message || e} — re-clique « Retirer des archives » pour terminer (le public ne sera pas refait).`, true); return; }
+    }
+    rgpdPendingClear(name); // réussite complète : plus rien à reprendre
+    toast(`« ${name} » retiré de ${total} archive(s) ✅ (${entries.length} publique(s) + ${privEntries.length} privée(s), effet ≤ 5 min sur les pages). Rappel : s'il apparaît encore dans la SAISON EN COURS, il y reste visible tant qu'il n'a pas tapé /meyprivacy cacher.`);
     const inp = $('#rgpd-name'); if (inp) inp.value = '';
   } catch (e) {
     toast('Échec du retrait : ' + (e.message || e), true);

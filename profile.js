@@ -266,7 +266,7 @@
 
       bloc('⏳ Combien de temps',
         'Les compteurs vivent le temps d’une <b>saison</b> : à chaque nouvelle saison, tout repart de zéro. La saison terminée peut être conservée en <b>archive complète</b> (c’est ce qui alimente « L’histoire des saisons »). ' +
-        'En plus, une <b>sauvegarde quotidienne</b> des stats publiques est gardée sur GitHub (anti-perte) : les sauvegardes des jours passés ne sont pas réécrites — elles se retirent sur demande (voir plus bas).') +
+        'En plus, une <b>sauvegarde quotidienne de secours</b> est conservée dans un espace <b>privé</b>, visible du seul administrateur (anti-perte) : elle n’est <b>pas publiée</b>, et elle aussi s’efface sur demande (voir plus bas).') +
 
       bloc('🕶️ Passer en privé — /meyprivacy',
         'Tape <b>/meyprivacy cacher</b> en jeu : tes stats disparaissent <b>immédiatement</b> des pages publiques, du launcher et du temps réel — tu n’es <b>ni listé, ni compté</b>. Tu peux continuer à jouer normalement.<br>' +
@@ -274,8 +274,8 @@
         'Tape <b>/meyprivacy montrer</b> pour redevenir visible : tu recevras la récompense manquée à ta prochaine connexion.') +
 
       bloc('🗑️ Te retirer des archives',
-        'Le mode privé agit sur le présent — mais tout ce qui a été <b>publié avant</b> peut encore mentionner ton pseudo : les archives des saisons passées ET les sauvegardes quotidiennes déjà écrites (y compris celles de la saison en cours, d’avant ton passage en privé). ' +
-        'Si tu veux en être retiré, demande à l’administrateur (en jeu ou là où tu le contactes d’habitude) : il dispose d’un outil qui t’efface de toutes les archives et sauvegardes, sans casser les stats des autres joueurs.') +
+        'Le mode privé agit sur le présent — mais les <b>archives des saisons passées</b> (publiques) peuvent encore mentionner ton pseudo, et les <b>sauvegardes privées de secours</b> gardent les jours déjà enregistrés. ' +
+        'Si tu veux en être retiré, demande à l’administrateur (en jeu ou là où tu le contactes d’habitude) : il dispose d’un outil qui t’efface de toutes les archives publiques ET des sauvegardes privées, sans casser les stats des autres joueurs.') +
 
       '<div style="margin-top:18px"><a href="?">← Tous les joueurs</a></div>';
     app.innerHTML = html;
