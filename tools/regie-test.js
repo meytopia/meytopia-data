@@ -169,5 +169,26 @@ function archiveFixture() {
   check('rgpd : record de session d\'un autre joueur conservé', d.records.longestSession.player === 'Bob');
 }
 
+// 6) Aperçu RGPD (rgpdApercuFichier) : compte ce qui SERAIT effacé, sans rien modifier
+function extractApercu() {
+  const start = html.indexOf('function rgpdCollectUuids');
+  const ridx = html.indexOf('return det;', start);
+  const end = html.indexOf('}', ridx);
+  if (start < 0 || ridx < 0) throw new Error('extraction aperçu impossible — ancres déplacées ?');
+  const mod = { exports: {} };
+  new Function('module', html.slice(start, end + 1) + '\nmodule.exports = rgpdApercuFichier;')(mod);
+  return mod.exports;
+}
+const rgpdApercuFichier = extractApercu();
+{
+  const d = archiveFixture();
+  const avant = JSON.stringify(d);
+  const det = rgpdApercuFichier(d, 'Alex', new Set(['u1']));
+  check('aperçu : compte juste (1 profil, 1 jour, 1 record, 1 journal, 3 marqueurs)',
+    !!det && det.profils === 1 && det.jours === 1 && det.record === 1 && det.journal === 1 && det.marqueurs === 3);
+  check('aperçu : le fichier original est INTACT', JSON.stringify(d) === avant);
+  check('aperçu : joueur inconnu → null', rgpdApercuFichier(archiveFixture(), 'Personne', new Set()) === null);
+}
+
 if (fails === 0) { console.log('\n✔ régie : tous les tests passent.'); process.exit(0); }
 console.error('\n✖ régie : ' + fails + ' test(s) en échec.'); process.exit(1);

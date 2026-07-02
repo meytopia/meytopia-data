@@ -793,9 +793,37 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
       <div class="mods-bulk">
         <label for="rgpd-name" class="hint" style="margin:0">Pseudo exact (majuscules comprises) :</label>
         <input type="text" id="rgpd-name" maxlength="16" style="max-width:180px" placeholder="PseudoDuJoueur">
+        <button class="btn ghost btn-sm" id="rgpd-see">👁️ Voir d'abord (ne touche à rien)</button>
         <button class="btn danger btn-sm" id="rgpd-go">🗑️ Retirer des archives</button>
         <span class="hint" id="rgpd-status"></span>
       </div>
+      <div id="rgpd-report" class="hint" style="margin-top:8px;display:none"></div>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:4px">🔐 Santé vie privée</div>
+      <div style="color:var(--faint);font-size:12px;margin-bottom:10px">
+        Le tableau de bord de ta conformité, en un clic : joueurs cachés, sauvegardes privées bien
+        arrivées, rien d'indiscret côté public, historique court. Aucune de ces vérifications ne
+        modifie quoi que ce soit.
+      </div>
+      <div class="mods-bulk" style="margin-bottom:8px">
+        <button class="btn ghost btn-sm" id="sp-run">🔎 Vérifier maintenant</button>
+        <span class="hint" id="sp-status"></span>
+      </div>
+      <div id="sp-report" class="hint" style="display:none"></div>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:4px">🗺️ Check-list de changement de saison</div>
+      <div style="color:var(--faint);font-size:12px;margin-bottom:10px">
+        Le guide pas-à-pas du jour J, dans l'ordre — il <b>vérifie</b> tout seul ce qu'il peut et te dit
+        où tu en es, mais il ne <b>fait</b> rien à ta place. ⚠️ Utile <b>uniquement le jour du changement
+        de saison</b> : en temps normal, il est normal que des étapes soient « pas encore faites ».
+      </div>
+      <div class="mods-bulk" style="margin-bottom:8px">
+        <button class="btn ghost btn-sm" id="cl-run">🔎 Vérifier où j'en suis</button>
+        <span class="hint" id="cl-status"></span>
+      </div>
+      <div id="cl-steps" class="hint" style="display:none"></div>
     </div>
   </section>
 
@@ -3375,6 +3403,124 @@ async function saveFilesAtomicIn(repoFull, entries, message) {
   const commit = await gh(`/repos/${repoFull}/git/commits`, { method: 'POST', body: JSON.stringify({ message, tree: newTree.sha, parents: [headSha] }) });
   await gh(`/repos/${repoFull}/git/refs/heads/main`, { method: 'PATCH', body: JSON.stringify({ sha: commit.sha, force: false }) });
 }
+// Inventaire COMMUN à l'aperçu et au retrait : liste et charge les archives des DEUX dépôts.
+// Par l'API Git Trees (récursif) et PAS /contents/{dossier} : Contents plafonne à 1000 fichiers par
+// dossier SANS le dire (troncature silencieuse = effacement incomplet affiché « fait »). Trees POSE
+// un drapeau `truncated` qu'on vérifie : dans le doute, on REFUSE (fail-closed).
+// Renvoie null si on doit s'arrêter (messages déjà affichés). mode : 'retrait' ou 'aperçu' —
+// l'aperçu ne demande pas de confirmation si le dépôt privé est invisible (il ne modifie rien),
+// il le signale seulement via privInvisible.
+async function rgpdInventaire(st, mode) {
+  st.textContent = 'Inventaire des archives…';
+  const ref = await gh(`/repos/${DATA_REPO}/git/ref/heads/main?t=${Date.now()}`);
+  const tree = await gh(`/repos/${DATA_REPO}/git/trees/${ref.object.sha}?recursive=1`);
+  if (tree.truncated) { toast(`Inventaire du dépôt incomplet (réponse GitHub tronquée) — ${mode} annulé pour ne rien rater. Réessaie ou contacte le support.`, true); return null; }
+  const paths = (Array.isArray(tree.tree) ? tree.tree : [])
+    .filter((e) => e && e.type === 'blob' && /^(seasons|backups)\/[^/]+\.json$/i.test(e.path))
+    .map((e) => e.path);
+  // Dépôt PRIVÉ des sauvegardes quotidiennes : couvert AUSSI (droit à l'effacement complet).
+  let privPaths = [];
+  let privInvisible = false;
+  try {
+    const pref = await gh(`/repos/${BACKUP_REPO}/git/ref/heads/main?t=${Date.now()}`);
+    const ptree = await gh(`/repos/${BACKUP_REPO}/git/trees/${pref.object.sha}?recursive=1`);
+    if (ptree.truncated) { toast(`Inventaire du dépôt privé incomplet (réponse tronquée) — ${mode} annulé pour ne rien rater.`, true); return null; }
+    privPaths = (Array.isArray(ptree.tree) ? ptree.tree : [])
+      .filter((e) => e && e.type === 'blob' && /^backups\/[^/]+\.json$/i.test(e.path))
+      .map((e) => e.path);
+  } catch (err) {
+    if (err.status !== 404) throw err;
+    // 404 = dépôt privé vide… ou INVISIBLE pour ce jeton (GitHub cache l'existence des dépôts privés
+    // non autorisés — impossible de distinguer). Un RETRAIT ne continue qu'avec l'accord EXPLICITE de
+    // l'admin ; un APERÇU (qui ne modifie rien) continue en le signalant dans son rapport.
+    privInvisible = true;
+    if (mode === 'retrait' && !confirm(`Impossible de voir le dépôt privé des sauvegardes (${BACKUP_REPO}) avec ton jeton.\n\nSi ce dépôt existe, ton jeton n'y a pas accès : ajoute-le dans GitHub → Settings → Developer settings → Fine-grained tokens → Repository access, puis reviens — sinon le retrait serait INCOMPLET.\n\nContinuer quand même en ne nettoyant QUE le dépôt public ?`)) return null;
+  }
+  if (!paths.length && !privPaths.length) {
+    // Si le privé est INVÉRIFIABLE, ne pas laisser croire qu'il est vide : le dire explicitement.
+    toast(privInvisible
+      ? `Aucune archive sur le dépôt public — et le dépôt privé (${BACKUP_REPO}) est INVÉRIFIABLE avec ton jeton : ajoute-le (GitHub → Fine-grained tokens → Repository access) pour tout couvrir.`
+      : 'Aucune archive (publique ou privée) — rien à nettoyer.', privInvisible);
+    return null;
+  }
+  st.textContent = `Lecture de ${paths.length + privPaths.length} archive(s)…`;
+  // loadFile pose aussi le sha en mémoire → précondition anti-écrasement de saveFilesAtomic.
+  const files = await Promise.all(paths.map(async (p) => ({ name: p, data: (await loadFile(p)).data })));
+  const privFiles = await Promise.all(privPaths.map(async (p) => {
+    const doc = await gh(`/repos/${BACKUP_REPO}/contents/${p}?ref=main&t=${Date.now()}`);
+    return { name: p, sha: doc.sha, data: JSON.parse(b64decode(doc.content)) };
+  }));
+  return { paths, privPaths, files, privFiles, privInvisible };
+}
+// Aperçu PUR d'un fichier : clone, applique le scrub au CLONE, compte les différences.
+// Ne modifie NI le fichier chargé, ni le Set d'UUID. Renvoie null si le joueur n'y apparaît pas.
+function rgpdApercuFichier(data, name, uuids) {
+  const clone = JSON.parse(JSON.stringify(data));
+  if (!rgpdScrub(clone, name, new Set(uuids))) return null;
+  const cnt = (o) => (o && typeof o === 'object') ? Object.keys(o).length : 0;
+  const det = { profils: 0, jours: 0, record: 0, journal: 0, marqueurs: 0 };
+  det.profils = cnt(data.seen) - cnt(clone.seen);
+  if (data.days && typeof data.days === 'object') {
+    for (const k of Object.keys(data.days)) {
+      const a = data.days[k] && data.days[k].ses;
+      const b = clone.days && clone.days[k] && clone.days[k].ses;
+      if (cnt(a) > cnt(b)) det.jours++;
+    }
+  }
+  if (data.records && data.records.longestSession && !(clone.records && clone.records.longestSession)) det.record = 1;
+  det.journal = (Array.isArray(data.sessionLog) ? data.sessionLog.length : 0) - (Array.isArray(clone.sessionLog) ? clone.sessionLog.length : 0);
+  det.marqueurs = (cnt(data.baseline) - cnt(clone.baseline)) + (cnt(data.priv) - cnt(clone.priv));
+  if (data.claimed && typeof data.claimed === 'object') {
+    for (const s of Object.keys(data.claimed)) {
+      const pa = data.claimed[s]; if (!pa || typeof pa !== 'object') continue;
+      const pb = (clone.claimed && clone.claimed[s]) || {};
+      for (const c of Object.keys(pa)) det.marqueurs += cnt(pa[c]) - cnt(pb[c]);
+    }
+  }
+  return det;
+}
+// 👁️ « Voir d'abord » : montre exactement ce qu'un retrait effacerait, SANS RIEN modifier
+// (ni GitHub, ni la mémoire de reprise) — l'admin confirme ensuite en connaissance de cause.
+async function rgpdPreview() {
+  const btn = $('#rgpd-see'); if (!btn || btn.disabled) return;
+  const st = $('#rgpd-status');
+  const out = $('#rgpd-report');
+  const name = ($('#rgpd-name').value || '').trim();
+  if (!/^[A-Za-z0-9_]{1,16}$/.test(name)) { toast('Pseudo invalide — lettres, chiffres et _ uniquement (16 max), exactement comme en jeu.', true); return; }
+  btn.disabled = true;
+  if (out) { out.style.display = 'none'; out.innerHTML = ''; }
+  try {
+    const inv = await rgpdInventaire(st, 'aperçu');
+    if (!inv) return;
+    const uuids = new Set();
+    for (const f of inv.files) rgpdCollectUuids(f.data, name, uuids);
+    for (const f of inv.privFiles) rgpdCollectUuids(f.data, name, uuids);
+    for (const u of rgpdPendingLoad(name)) uuids.add(u);
+    const tot = { profils: 0, jours: 0, record: 0, journal: 0, marqueurs: 0 };
+    let nbPub = 0, nbPriv = 0;
+    for (const f of inv.files) { const d = rgpdApercuFichier(f.data, name, uuids); if (d) { nbPub++; for (const k of Object.keys(tot)) tot[k] += d[k]; } }
+    for (const f of inv.privFiles) { const d = rgpdApercuFichier(f.data, name, uuids); if (d) { nbPriv++; for (const k of Object.keys(tot)) tot[k] += d[k]; } }
+    let html;
+    if (!nbPub && !nbPriv) {
+      html = `👁️ Aperçu : « ${esc(name)} » n'apparaît dans aucune des ${inv.paths.length + inv.privPaths.length} archive(s) — vérifie l'orthographe exacte (et s'il s'est renommé, essaie aussi son ANCIEN pseudo).`;
+    } else {
+      html = `👁️ <b>Aperçu pour « ${esc(name)} »</b> — trouvé dans <b>${nbPub}</b> archive(s) publique(s) + <b>${nbPriv}</b> sauvegarde(s) privée(s).<br>` +
+        `Un retrait effacerait : <b>${tot.profils}</b> profil(s) (pseudo, UUID, temps de jeu, stats) · ` +
+        `des horaires sur <b>${tot.jours}</b> jour(s) · <b>${tot.record}</b> record · ` +
+        `<b>${tot.journal}</b> ligne(s) de journal de sessions · <b>${tot.marqueurs}</b> marqueur(s) de récompense/vie privée.<br>` +
+        `Conservé : totaux communautaires anonymes + stats des autres joueurs.`;
+    }
+    if (inv.privInvisible) html += `<br>⚠️ Dépôt privé des sauvegardes invisible pour ton jeton : l'aperçu ne couvre que le public (ajoute ${esc(BACKUP_REPO)} au jeton pour tout voir).`;
+    html += `<br><span style="color:var(--faint)">Rien n'a été modifié — c'est un aperçu.</span>`;
+    if (out) { out.innerHTML = html; out.style.display = ''; }
+  } catch (e) {
+    toast('Aperçu impossible : ' + (e.message || e), true);
+  } finally {
+    const b2 = $('#rgpd-see'); if (b2) b2.disabled = false;
+    const s2 = $('#rgpd-status'); if (s2) s2.textContent = '';
+  }
+}
+if ($('#rgpd-see')) $('#rgpd-see').addEventListener('click', rgpdPreview);
 async function rgpdRemovePlayer() {
   const btn = $('#rgpd-go'); if (!btn || btn.disabled) return;
   const st = $('#rgpd-status');
@@ -3382,40 +3528,9 @@ async function rgpdRemovePlayer() {
   if (!/^[A-Za-z0-9_]{1,16}$/.test(name)) { toast('Pseudo invalide — lettres, chiffres et _ uniquement (16 max), exactement comme en jeu.', true); return; }
   btn.disabled = true;
   try {
-    st.textContent = 'Inventaire des archives…';
-    // Inventaire par l'API Git Trees (récursif) et PAS par /contents/{dossier} : Contents plafonne à
-    // 1000 fichiers par dossier SANS le dire (troncature silencieuse = effacement incomplet affiché
-    // « fait »). Trees, lui, POSE un drapeau `truncated` qu'on vérifie : dans le doute, on REFUSE
-    // (fail-closed) plutôt que de promettre un retrait partiel.
-    const ref = await gh(`/repos/${DATA_REPO}/git/ref/heads/main?t=${Date.now()}`);
-    const tree = await gh(`/repos/${DATA_REPO}/git/trees/${ref.object.sha}?recursive=1`);
-    if (tree.truncated) { toast('Inventaire du dépôt incomplet (réponse GitHub tronquée) — retrait annulé pour ne rien rater. Réessaie ou contacte le support.', true); return; }
-    const paths = (Array.isArray(tree.tree) ? tree.tree : [])
-      .filter((e) => e && e.type === 'blob' && /^(seasons|backups)\/[^/]+\.json$/i.test(e.path))
-      .map((e) => e.path);
-    // Dépôt PRIVÉ des sauvegardes quotidiennes : à nettoyer AUSSI (droit à l'effacement complet).
-    let privPaths = [];
-    try {
-      const pref = await gh(`/repos/${BACKUP_REPO}/git/ref/heads/main?t=${Date.now()}`);
-      const ptree = await gh(`/repos/${BACKUP_REPO}/git/trees/${pref.object.sha}?recursive=1`);
-      if (ptree.truncated) { toast('Inventaire du dépôt privé incomplet (réponse tronquée) — retrait annulé pour ne rien rater.', true); return; }
-      privPaths = (Array.isArray(ptree.tree) ? ptree.tree : [])
-        .filter((e) => e && e.type === 'blob' && /^backups\/[^/]+\.json$/i.test(e.path))
-        .map((e) => e.path);
-    } catch (err) {
-      if (err.status !== 404) throw err;
-      // 404 = dépôt privé vide… ou INVISIBLE pour ce jeton (GitHub cache l'existence des dépôts privés
-      // non autorisés — impossible de distinguer). On ne continue qu'avec l'accord EXPLICITE de l'admin.
-      if (!confirm(`Impossible de voir le dépôt privé des sauvegardes (${BACKUP_REPO}) avec ton jeton.\n\nSi ce dépôt existe, ton jeton n'y a pas accès : ajoute-le dans GitHub → Settings → Developer settings → Fine-grained tokens → Repository access, puis reviens — sinon le retrait serait INCOMPLET.\n\nContinuer quand même en ne nettoyant QUE le dépôt public ?`)) return;
-    }
-    if (!paths.length && !privPaths.length) { toast('Aucune archive (publique ou privée) — rien à nettoyer.'); return; }
-    st.textContent = `Lecture de ${paths.length + privPaths.length} archive(s)…`;
-    // loadFile pose aussi le sha en mémoire → précondition anti-écrasement de saveFilesAtomic.
-    const files = await Promise.all(paths.map(async (p) => ({ name: p, data: (await loadFile(p)).data })));
-    const privFiles = await Promise.all(privPaths.map(async (p) => {
-      const doc = await gh(`/repos/${BACKUP_REPO}/contents/${p}?ref=main&t=${Date.now()}`);
-      return { name: p, sha: doc.sha, data: JSON.parse(b64decode(doc.content)) };
-    }));
+    const inv = await rgpdInventaire(st, 'retrait');
+    if (!inv) return; // messages déjà affichés par l'inventaire
+    const { paths, privPaths, files, privFiles } = inv;
     // Collecte des UUID sur TOUTES les archives (publiques ET privées) AVANT tout scrub :
     // un joueur renommé peut n'être identifiable que par une seule d'entre elles.
     const uuids = new Set();
@@ -3470,6 +3585,133 @@ async function rgpdRemovePlayer() {
   }
 }
 if ($('#rgpd-go')) $('#rgpd-go').addEventListener('click', rgpdRemovePlayer);
+
+/* ── 🔐 Santé vie privée : 4 vérifications en lecture seule + lien joueur ──
+   Rien n'est modifié : c'est le tableau de bord de conformité de l'admin. */
+async function santePrivee() {
+  const btn = $('#sp-run'); if (!btn || btn.disabled) return;
+  const stx = $('#sp-status'); const out = $('#sp-report');
+  btn.disabled = true; stx.textContent = 'Vérifications…';
+  const lines = [];
+  const row = (ok, txt) => `<div style="margin-bottom:4px">${ok === true ? '✅' : (ok === false ? '⚠️' : 'ℹ️')} ${txt}</div>`;
+  try {
+    // 1) Joueurs en mode privé (compteur anonyme publié par la sonde — personne ne sait qui).
+    try {
+      const d = await fetchSrvStats();
+      const pc = (d && typeof d.privCount === 'number') ? d.privCount : 0;
+      lines.push(row(null, `<b>${pc}</b> joueur(s) en mode privé cette saison (compteur anonyme — impossible de savoir qui, c'est voulu).`));
+    } catch (_) { lines.push(row(false, 'Stats de la sonde indisponibles — compteur de joueurs privés inconnu pour l\'instant.')); }
+    // 2) Dernière sauvegarde bien arrivée dans le dépôt PRIVÉ.
+    try {
+      const cs = await gh(`/repos/${BACKUP_REPO}/commits?per_page=1&t=${Date.now()}`);
+      const ci = (Array.isArray(cs) && cs[0] && cs[0].commit) ? (cs[0].commit.committer || cs[0].commit.author) : null;
+      const when = ci && ci.date ? new Date(ci.date) : null;
+      const ageH = when ? Math.round((Date.now() - when.getTime()) / 36e5) : null;
+      lines.push(row(ageH !== null && ageH <= 48,
+        `Dernière écriture dans le dépôt privé des sauvegardes : ${when ? when.toLocaleString('fr-FR') : 'inconnue'}` +
+        (ageH !== null && ageH > 48 ? ' — plus de 2 jours (normal si le serveur était éteint ; sinon, vérifie le jeton et la ligne backupRepo de la config sonde).' : '.')));
+    } catch (err) {
+      lines.push(row(false, err && err.status === 404
+        ? `Dépôt privé <span class="mono">${esc(BACKUP_REPO)}</span> invisible pour ton jeton — ajoute-le (GitHub → Fine-grained tokens → Repository access).`
+        : 'Dépôt privé injoignable : ' + esc((err && err.message) || err)));
+    }
+    // 3) Rien d'indiscret côté PUBLIC (le dossier backups ne doit pas y réapparaître).
+    try {
+      const root = await gh(`/repos/${DATA_REPO}/contents/?ref=main&t=${Date.now()}`);
+      const hasBk = Array.isArray(root) && root.some((e) => e && e.name === 'backups');
+      lines.push(row(!hasBk, hasBk
+        ? 'Un dossier « backups » est RÉAPPARU sur le dépôt public — la sonde tourne probablement sans la ligne backupRepo (config à corriger, puis demande-moi un nettoyage).'
+        : 'Dépôt public : aucune sauvegarde quotidienne — seules les stats de saison et les archives voulues sont publiées.'));
+    } catch (e) { lines.push(row(false, 'Dépôt public injoignable : ' + esc((e && e.message) || e))); }
+    // 4) Historique public court (le rituel de purge fait son travail).
+    try {
+      const cs = await gh(`/repos/${DATA_REPO}/commits?per_page=30&t=${Date.now()}`);
+      const n = Array.isArray(cs) ? cs.length : 0;
+      lines.push(row(n < 30, n < 30
+        ? `Historique public court : ${n} version(s) — rien d'ancien à fouiller.`
+        : 'Historique public : 30 versions ou plus — pense au rituel de purge au prochain changement de saison (demande-le-moi, serveur éteint).'));
+    } catch (e) { lines.push(row(false, 'Historique public non vérifiable : ' + esc((e && e.message) || e))); }
+    lines.push(`<div style="margin-top:6px">📄 Ce que voient les joueurs : <a href="https://meytopia.github.io/meytopia-data/?donnees=1" target="_blank" rel="noopener">la page « Tes données »</a>.</div>`);
+    if (out) { out.innerHTML = lines.join(''); out.style.display = ''; }
+  } finally {
+    const b2 = $('#sp-run'); if (b2) b2.disabled = false;
+    const s2 = $('#sp-status'); if (s2) s2.textContent = '';
+  }
+}
+if ($('#sp-run')) $('#sp-run').addEventListener('click', santePrivee);
+
+/* ── 🗺️ Check-list de changement de saison : 5 étapes, chacune AUTO-VÉRIFIÉE quand c'est possible ──
+   Lecture seule : le guide dit où on en est, les actions restent sur leurs boutons respectifs. */
+async function seasonChecklist() {
+  const btn = $('#cl-run'); if (!btn || btn.disabled) return;
+  const stx = $('#cl-status'); const out = $('#cl-steps');
+  btn.disabled = true; stx.textContent = 'Vérifications…';
+  const rows = [];
+  const step = (n, done, titre, etat) => `<div style="margin-bottom:8px">${done === true ? '✅' : (done === false ? '🔲' : '❓')} <b>Étape ${n} — ${titre}</b><br><span style="color:var(--faint)">${etat}</span></div>`;
+  try {
+    // État de la sonde (sert aux étapes 1 et 4). Échec réseau ≠ serveur éteint : on affiche « ? ».
+    let live = null, liveErr = false;
+    try {
+      const r = await fetch(`https://raw.githubusercontent.com/${DATA_REPO}/stats/live.json?t=${Date.now()}`, { cache: 'no-store' });
+      if (r.ok) live = await r.json(); else if (r.status !== 404) liveErr = true;
+    } catch (_) { liveErr = true; }
+    const sondeActive = !!(live && live.updatedAt && (Date.now() - new Date(live.updatedAt).getTime() < 10 * 60 * 1000) && live.online);
+    rows.push(step(1, liveErr ? null : !sondeActive, 'Éteindre le serveur (panel OuiHeberg)',
+      liveErr ? 'Impossible de vérifier (problème réseau) — re-clique dans un instant.'
+        : (sondeActive ? 'Le serveur est ALLUMÉ (la sonde publie encore). Éteins-le avant les étapes 2 et 3.' : 'Serveur éteint — la sonde ne publie plus.')));
+    // Étape 2 : compteurs remis à zéro par le bouton 🏁 ci-dessus. « Vierge » ne se juge PAS sur le
+    // seul seen : les joueurs en /meyprivacy n'y figurent jamais — une saison où tout le monde est
+    // privé a seen vide MAIS des jours, un privCount et des totaux. On croise donc les quatre.
+    let season = null, players = null, vierge = null;
+    try {
+      const doc = await gh(`/repos/${DATA_REPO}/contents/stats-serveur.json?ref=stats&t=${Date.now()}`);
+      const cur = JSON.parse(b64decode(doc.content));
+      season = (cur.server && typeof cur.server.season === 'number') ? cur.server.season : null;
+      players = Object.keys(cur.seen || {}).length;
+      vierge = players === 0
+        && Object.keys(cur.days || {}).length === 0
+        && !(cur.privCount > 0)
+        && !(cur.agg && cur.agg.totalPlayMinutes > 0);
+    } catch (_) { /* players/vierge restent null → « ? » */ }
+    rows.push(step(2, vierge, 'Remettre les compteurs à zéro (bouton « 🏁 Nouvelle saison » ci-dessus)',
+      players === null ? 'Stats injoignables — re-clique dans un instant.'
+        : (vierge ? `Compteurs vierges — prêts pour la saison ${season === null ? '?' : season}.`
+          : (players === 0
+            ? `Saison ${season === null ? '?' : season} : aucun joueur public listé, mais la saison a encore de l'activité (jours enregistrés / joueurs privés / totaux) — remise à zéro PAS encore faite.`
+            : `Saison ${season === null ? '?' : season} : ${players} joueur(s) encore enregistré(s) — pas encore remis à zéro.`))));
+    // Étape 3 : purge de l'historique public (rituel de saison).
+    let nCommits = null;
+    try { const cs = await gh(`/repos/${DATA_REPO}/commits?per_page=30&t=${Date.now()}`); nCommits = Array.isArray(cs) ? cs.length : null; } catch (_) { /* « ? » */ }
+    rows.push(step(3, nCommits === null ? null : nCommits < 30, 'Purger l\'historique GitHub (demande-le-moi, serveur éteint)',
+      nCommits === null ? 'Historique non vérifiable — re-clique dans un instant.'
+        : (nCommits < 30 ? `Historique court (${nCommits} version(s)) : purge faite ou inutile.`
+          : 'Historique long (30 versions ou plus) : demande la purge avant d\'ouvrir la saison.')));
+    // Étape 4 : réinstallation + redémarrage (détectés par le retour de la sonde).
+    rows.push(step(4, liveErr ? null : sondeActive, 'Vider le panel, réinstaller le serveur neuf + la sonde (jar récent dans mods/, config avec le jeton et backupRepo), puis démarrer',
+      liveErr ? 'Impossible de vérifier (problème réseau).'
+        : (sondeActive ? 'La sonde publie à nouveau — serveur reparti.' : 'En attente : la sonde ne publie pas encore.')));
+    // Étape 5 : ouverture aux joueurs (verrou d'ouverture du launcher, onglet Maintenance).
+    let gateDone = null, gateTxt = 'launcher.json injoignable — re-clique dans un instant.';
+    try {
+      const lch = (state.files['launcher.json'] || await loadFile('launcher.json')).data;
+      const openAt = (lch && lch.gate && lch.gate.openAt) ? new Date(lch.gate.openAt) : null;
+      if (openAt && openAt.getTime() > Date.now()) {
+        gateDone = false;
+        gateTxt = `Verrou actif : ouverture programmée le ${openAt.toLocaleString('fr-FR')} — les joueurs voient le compte à rebours (onglet Maintenance pour changer).`;
+      } else {
+        gateDone = true;
+        gateTxt = openAt ? `Ouvert (date d'ouverture passée : ${openAt.toLocaleString('fr-FR')}).` : 'Aucun verrou : le launcher laisse jouer.';
+        if (!liveErr && !sondeActive) gateTxt += ' ⚠️ Le serveur est éteint : si la préparation va durer, programme le verrou (onglet Maintenance) pour que les joueurs voient un compte à rebours au lieu d\'une erreur.';
+      }
+    } catch (_) { /* texte par défaut */ }
+    rows.push(step(5, gateDone, 'Ouvrir aux joueurs (verrou d\'ouverture, onglet Maintenance)', gateTxt));
+    if (out) { out.innerHTML = rows.join(''); out.style.display = ''; }
+  } finally {
+    const b2 = $('#cl-run'); if (b2) b2.disabled = false;
+    const s2 = $('#cl-status'); if (s2) s2.textContent = '';
+  }
+}
+if ($('#cl-run')) $('#cl-run').addEventListener('click', seasonChecklist);
 
 // Bandeau d'alertes de supervision (TPS bas, MSPT élevé, downtime, crashs) pour le jour sélectionné.
 function renderAlerts() {
