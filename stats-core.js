@@ -18,6 +18,12 @@
     m = Math.round(m || 0);
     return m >= 1000 ? (m / 1000).toFixed(1) + ' km' : m + ' m';
   }
+  // Nombre en français : séparateur de milliers « 12 345 » (espace insécable) — lisibilité (#31).
+  function fmtNum(n) {
+    var v = Number(n);
+    if (!isFinite(v)) v = 0;
+    return Math.round(v).toLocaleString('fr-FR');
+  }
   function fmtDate(iso) {
     try {
       return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: PARIS });
@@ -116,11 +122,11 @@
     var seen = (data && data.seen) || {}, keys = pubKeys(data);
     var cats = [
       { emoji: '👑', label: 'Le plus assidu', get: function (s) { return s.minutes || 0; }, fmt: function (v) { return fmtPlayTime(v); } },
-      { emoji: '⚔️', label: 'Tueur de monstres', get: function (s) { return (s.mc && s.mc.mobKills) || 0; }, fmt: function (v) { return v + ' mobs'; } },
+      { emoji: '⚔️', label: 'Tueur de monstres', get: function (s) { return (s.mc && s.mc.mobKills) || 0; }, fmt: function (v) { return fmtNum(v) + ' mobs'; } },
       { emoji: '🥾', label: 'Grand voyageur', get: function (s) { return (s.mc && (s.mc.distTotM || s.mc.distM)) || 0; }, fmt: function (v) { return fmtDist(v); } },
-      { emoji: '💎', label: 'Mineur de diamant', get: function (s) { return (s.mc && s.mc.diamonds) || 0; }, fmt: function (v) { return v + ' 💎'; } },
-      { emoji: '🎣', label: 'Pêcheur', get: function (s) { return (s.mc && s.mc.fishCaught) || 0; }, fmt: function (v) { return v + ' poissons'; } },
-      { emoji: '🏆', label: 'Chasseur de succès', get: function (s) { return (s.mc && s.mc.adv) || 0; }, fmt: function (v) { return v + ' succès'; } }
+      { emoji: '💎', label: 'Mineur de diamant', get: function (s) { return (s.mc && s.mc.diamonds) || 0; }, fmt: function (v) { return fmtNum(v) + ' 💎'; } },
+      { emoji: '🎣', label: 'Pêcheur', get: function (s) { return (s.mc && s.mc.fishCaught) || 0; }, fmt: function (v) { return fmtNum(v) + ' poissons'; } },
+      { emoji: '🏆', label: 'Chasseur de succès', get: function (s) { return (s.mc && s.mc.adv) || 0; }, fmt: function (v) { return fmtNum(v) + ' succès'; } }
     ];
     var out = [];
     cats.forEach(function (cat) {
@@ -197,7 +203,7 @@
 
   root.StatsCore = {
     PARIS: PARIS, escapeHtml: escapeHtml, fmtPlayTime: fmtPlayTime, fmtDist: fmtDist,
-    fmtDate: fmtDate, fmtAgo: fmtAgo, daysPresent: daysPresent, rankOf: rankOf,
+    fmtNum: fmtNum, fmtDate: fmtDate, fmtAgo: fmtAgo, daysPresent: daysPresent, rankOf: rankOf,
     playtimeRank: playtimeRank, players: players, avatarUrl: avatarUrl, isPrivate: isPrivate,
     pubKeys: pubKeys, collective: collective, milestones: milestones, champions: champions,
     UP_MERGE_GAP_SEC: UP_MERGE_GAP_SEC, mergeUp: mergeUp, deriveIntervalsDay: deriveIntervalsDay,

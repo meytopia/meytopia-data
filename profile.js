@@ -7,21 +7,29 @@
   var liveEl = document.getElementById('live');
 
   var METRICS = [
-    { key: 'mobKills', emoji: '⚔️', label: 'Monstres tués', fmt: function (v) { return v; } },
+    { key: 'mobKills', emoji: '⚔️', label: 'Monstres tués', fmt: function (v) { return SC.fmtNum(v); } },
     { key: 'distTotM', emoji: '🥾', label: 'Distance parcourue', fmt: function (v) { return SC.fmtDist(v); } },
-    { key: 'diamonds', emoji: '💎', label: 'Diamants minés', fmt: function (v) { return v; } },
-    { key: 'fishCaught', emoji: '🎣', label: 'Poissons pêchés', fmt: function (v) { return v; } },
-    { key: 'adv', emoji: '🏆', label: 'Succès', fmt: function (v) { return v; } },
-    { key: 'playerKills', emoji: '🗡️', label: 'Duels gagnés', fmt: function (v) { return v; } },
-    { key: 'deaths', emoji: '💀', label: 'Morts', fmt: function (v) { return v; } },
+    { key: 'diamonds', emoji: '💎', label: 'Diamants minés', fmt: function (v) { return SC.fmtNum(v); } },
+    { key: 'fishCaught', emoji: '🎣', label: 'Poissons pêchés', fmt: function (v) { return SC.fmtNum(v); } },
+    { key: 'adv', emoji: '🏆', label: 'Succès', fmt: function (v) { return SC.fmtNum(v); } },
+    { key: 'playerKills', emoji: '🗡️', label: 'Duels gagnés', fmt: function (v) { return SC.fmtNum(v); } },
+    { key: 'deaths', emoji: '💀', label: 'Morts', fmt: function (v) { return SC.fmtNum(v); } },
     { key: 'noDeathMin', emoji: '🛡️', label: 'Temps de jeu sans mourir', title: 'depuis sa dernière mort', fmt: function (v) { return SC.fmtPlayTime(v); } },
     { key: 'elytraM', emoji: '🪽', label: 'Vol en élytre', fmt: function (v) { return SC.fmtDist(v); } }
   ];
 
+  // #34 : avatar de secours LOCAL (carré neutre) si le service d'avatars ne répond pas — au lieu de
+  // masquer l'image (qui laissait un trou et décalait la mise en page). data: est autorisé par la CSP.
+  var AVATAR_FALLBACK = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="#241A40"/><rect x="2" y="3" width="4" height="2" fill="#3a2e5a"/><rect x="2" y="6" width="4" height="1" fill="#1B1430"/></svg>');
   function wireImgFallback() {
-    // CSP script-src 'self' interdit onerror inline -> on masque les avatars cassés après rendu.
-    app.querySelectorAll('img').forEach(function (im) { im.addEventListener('error', function () { im.style.visibility = 'hidden'; }); });
+    // CSP script-src 'self' interdit onerror inline -> on branche le repli après rendu.
+    app.querySelectorAll('img').forEach(function (im) {
+      im.addEventListener('error', function () { im.src = AVATAR_FALLBACK; }, { once: true });
+    });
   }
+  // #32 : chaque vue met à jour le titre de l'onglet (partage/favoris plus clairs).
+  function setTitle(suffix) { document.title = suffix ? (suffix + ' — Meytopia') : 'Meytopia — le serveur'; }
   function getParam(n) {
     try { return new URLSearchParams(location.search).get(n); } catch (e) { return null; }
   }
@@ -63,6 +71,7 @@
     }
     var pr = SC.playtimeRank(data, name);
     var title = pr ? (pr.rank === 1 ? 'Vétéran nº1 du serveur' : (pr.rank + 'ᵉ joueur le plus assidu')) : 'Membre de Meytopia';
+    setTitle(name); // #32 : « Pseudo — Meytopia » dans l'onglet
     var head =
       '<div class="pcard">' +
       '<img src="' + SC.avatarUrl(s.uuid || name, 64) + '" alt="">' +
@@ -72,8 +81,8 @@
       '<div class="grid">' +
       stat(SC.fmtPlayTime(s.minutes || 0), 'temps de jeu (saison)') +
       (s.totalMin ? stat(SC.fmtPlayTime(s.totalMin), 'temps de jeu total') : '') +
-      stat(String(SC.daysPresent(data, name)), 'jours de présence') +
-      stat(String(s.sessions || 0), 'connexions au serveur') +
+      stat(SC.fmtNum(SC.daysPresent(data, name)), 'jours de présence') +
+      stat(SC.fmtNum(s.sessions || 0), 'connexions au serveur') +
       stat(s.first ? SC.fmtDate(s.first) : '—', 'première venue') +
       '</div>';
 
@@ -143,7 +152,7 @@
       if (ms.length) html += '<div class="milestones">' + ms.map(function (m) { return '<span class="ms">✅ ' + SC.escapeHtml(m) + '</span>'; }).join('') + '</div>';
     }
     var bits = [];
-    if (rec.peakPlayers && rec.peakPlayers.value) bits.push('👥 record ' + rec.peakPlayers.value + ' joueurs' + (rec.peakPlayers.day ? ' (' + SC.fmtDate(rec.peakPlayers.day) + ')' : ''));
+    if (rec.peakPlayers && rec.peakPlayers.value) bits.push('👥 record ' + SC.fmtNum(rec.peakPlayers.value) + ' joueurs' + (rec.peakPlayers.day ? ' (' + SC.fmtDate(rec.peakPlayers.day) + ')' : ''));
     if (rec.longestSession && rec.longestSession.minutes) bits.push('🏃 plus longue session ' + SC.fmtPlayTime(rec.longestSession.minutes) + (rec.longestSession.player ? ' — ' + SC.escapeHtml(rec.longestSession.player) : ''));
     if (bits.length) html += '<div class="section">🏆 Records' + (season ? ' · Saison ' + season : '') + '</div><div class="muted" style="margin-bottom:6px">' + bits.join(' &nbsp;·&nbsp; ') + '</div>';
     // 7 — Mur des champions
@@ -169,7 +178,7 @@
         var fmtV = function (m, v) {
           if (m === 'totalPlayMinutes') return SC.fmtPlayTime(v);
           if (m === 'distTotM' || m === 'elytraM') return SC.fmtDist(v);
-          return String(v);
+          return SC.fmtNum(v); // #31 : nombres groupés comme le reste de la page (plus de « 10000 » à côté de « 10 000 »)
         };
         return '<div class="chal' + (done ? ' done' : '') + '"><div class="chal-head"><span>' + SC.escapeHtml(c.title || 'Défi') + '</span><span>' + SC.escapeHtml(fmtV(c.metric, Math.min(cur, c.target))) + ' / ' + SC.escapeHtml(fmtV(c.metric, c.target)) + (done ? ' ✓' : '') + '</span></div><div class="chal-bar"><div class="chal-fill" data-pct="' + pct + '"></div></div></div>';
       }).join('');
@@ -177,6 +186,7 @@
     return html;
   }
   function renderDirectory(data, live, challenges) {
+    setTitle(''); // #32 : « Meytopia — le serveur » (accueil/annuaire)
     var list = SC.players(data);
     var onlineNames = {};
     if (live && live.online && Array.isArray(live.players)) live.players.forEach(function (p) { if (p && p.name) onlineNames[p.name] = true; });
@@ -215,9 +225,9 @@
     var to = srv.lastStopAt ? SC.fmtDate(srv.lastStopAt) : null;
     var period = isCurrent ? (from ? 'en cours depuis le ' + from : 'en cours') : (from && to ? 'du ' + from + ' au ' + to : (to ? 'terminée le ' + to : ''));
     var bits = [];
-    bits.push(pub.length + ' joueur' + (pub.length > 1 ? 's' : ''));
+    bits.push(SC.fmtNum(pub.length) + ' joueur' + (pub.length > 1 ? 's' : ''));
     if (minutes) bits.push(SC.fmtPlayTime(minutes) + ' de jeu cumulé');
-    if (rec.peakPlayers && rec.peakPlayers.value) bits.push('record ' + rec.peakPlayers.value + ' en simultané');
+    if (rec.peakPlayers && rec.peakPlayers.value) bits.push('record ' + SC.fmtNum(rec.peakPlayers.value) + ' en simultané');
     if (rec.longestSession && rec.longestSession.minutes) bits.push('plus longue session ' + SC.fmtPlayTime(rec.longestSession.minutes) + (rec.longestSession.player ? ' (' + SC.escapeHtml(rec.longestSession.player) + ')' : ''));
     var top = null;
     pub.forEach(function (n) { var m = (d.seen[n] && d.seen[n].minutes) || 0; if (m > 0 && (!top || m > top.m)) top = { n: n, m: m }; });
@@ -227,6 +237,7 @@
       '<div class="muted">' + (bits.length ? bits.join(' &nbsp;·&nbsp; ') : 'Aucune donnée conservée') + '</div></div>';
   }
   function renderSeasons(current) {
+    setTitle("L'histoire des saisons"); // #32
     var season = (current.server && typeof current.server.season === 'number') ? current.server.season : 1;
     var nums = [];
     for (var i = season - 1; i >= 1; i--) nums.push(i);
@@ -250,6 +261,7 @@
      visible, combien de temps, et comment se retirer (/meyprivacy + retrait des archives).
      Page STATIQUE : ne dépend d'aucune donnée — elle s'affiche même si les stats sont en panne. */
   function renderDonnees() {
+    setTitle('Tes données'); // #32
     function bloc(titre, corps) {
       return '<div class="section">' + titre + '</div><div class="muted" style="margin-bottom:6px">' + corps + '</div>';
     }
@@ -281,19 +293,58 @@
     app.innerHTML = html;
   }
 
-  Promise.all([fetchJson('stats-serveur.json'), fetchJson('live.json'), fetchUrl(MAIN_BASE + 'challenges.json')]).then(function (res) {
-    var data = res[0], live = res[1], challenges = res[2];
-    renderLive(live);
-    // « Tes données » est une page statique : on l'affiche AVANT le garde stats,
-    // pour qu'elle reste lisible même si les fichiers de stats sont indisponibles.
+  // ── Données mises en cache (une seule fois par visite) ──
+  // #33 : la page « Tes données » est STATIQUE — on ne télécharge alors AUCUN fichier de stats.
+  // Les autres vues partagent le même relevé : naviguer entre l'annuaire, un profil et les saisons
+  // (#35, sans rechargement) ne refait pas d'aller-retour réseau.
+  var cache = { loaded: false, data: null, live: null, challenges: null };
+  function ensureStats() {
+    if (cache.loaded) return Promise.resolve(cache);
+    return Promise.all([fetchJson('stats-serveur.json'), fetchJson('live.json'), fetchUrl(MAIN_BASE + 'challenges.json')])
+      .then(function (res) {
+        cache.data = res[0]; cache.live = res[1]; cache.challenges = res[2];
+        // On ne mémorise le relevé QUE s'il est exploitable : sans cette garde, une panne réseau
+        // passagère au 1er chargement figerait cache.loaded=true avec data=null, et — comme la
+        // navigation ne recharge plus la page (SPA) — TOUTE la session resterait sur « indisponible »
+        // même serveur revenu. En cas d'échec, on laisse loaded=false → réessai à la navigation suivante.
+        if (cache.data && cache.data.seen) cache.loaded = true;
+        return cache;
+      });
+  }
+
+  // Affiche la vue correspondant à l'URL courante (?p / ?saisons / ?donnees / annuaire).
+  function route() {
+    // « Tes données » : statique, aucune requête (elle s'affiche même stats en panne).
     if (getParam('donnees') != null) { renderDonnees(); return; }
-    if (!data || !data.seen) {
-      app.innerHTML = '<div class="empty">Statistiques indisponibles pour le moment.</div>';
-      return;
-    }
-    var p = getParam('p');
-    if (getParam('saisons') != null) renderSeasons(data);
-    else if (p) renderProfile(data, p);
-    else renderDirectory(data, live, challenges);
+    ensureStats().then(function (c) {
+      renderLive(c.live);
+      if (!c.data || !c.data.seen) {
+        setTitle('');
+        app.innerHTML = '<div class="empty">Statistiques indisponibles pour le moment.</div>';
+        return;
+      }
+      var p = getParam('p');
+      if (getParam('saisons') != null) renderSeasons(c.data);
+      else if (p) renderProfile(c.data, p);
+      else renderDirectory(c.data, c.live, c.challenges);
+    });
+  }
+
+  // #35 : navigation interne sans rechargement — on capture les clics sur les liens « ?… » et on
+  // change l'URL via l'historique, puis on ré-affiche. Retour/avance du navigateur gérés par popstate.
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="?"]') : null;
+    if (!a) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // laisse « ouvrir dans un nouvel onglet »
+    var href = a.getAttribute('href');
+    if (!href || href.charAt(0) !== '?') return;
+    e.preventDefault();
+    // « ? » seul = annuaire : on retire la query pour une URL propre.
+    history.pushState(null, '', href === '?' ? location.pathname : href);
+    window.scrollTo(0, 0);
+    route();
   });
+  window.addEventListener('popstate', route);
+
+  route();
 })();

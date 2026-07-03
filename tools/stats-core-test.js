@@ -37,6 +37,13 @@ eq('fmtPlayTime 120', SC.fmtPlayTime(120), '2 h 00');
 eq('fmtPlayTime 45', SC.fmtPlayTime(45), '45 min');
 eq('fmtDist 3000', SC.fmtDist(3000), '3.0 km');
 eq('fmtDist 500', SC.fmtDist(500), '500 m');
+// #31 : nombres en français (séparateur de milliers). NB : toLocaleString('fr-FR') utilise l'espace
+// insécable U+202F comme séparateur — on compare donc au rendu réel de l'environnement, pas à un ' '.
+eq('fmtNum 12345', SC.fmtNum(12345), (12345).toLocaleString('fr-FR'));
+eq('fmtNum 0', SC.fmtNum(0), '0');
+eq('fmtNum arrondit', SC.fmtNum(3.7), '4');
+eq('fmtNum non-nombre → 0', SC.fmtNum(undefined), '0');
+eq('fmtNum sépare bien les milliers (longueur > 4)', SC.fmtNum(12345).length > 5, true);
 eq('escapeHtml échappe < & "', SC.escapeHtml('<a href="x">&'), '&lt;a href=&quot;x&quot;&gt;&amp;');
 
 // Présence / rangs
