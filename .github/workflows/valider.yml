@@ -19,7 +19,31 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node valider.js
-      - run: node tools/stats-core-test.js
-      - run: node tools/regie-test.js
-      - run: node tools/retro-test.js
+      # if: always() : les 4 suites tournent TOUTES meme si l'une casse — toutes les erreurs
+      # en un seul passage, au lieu de corriger-pousser-decouvrir la suivante.
+      - id: valider
+        run: node valider.js
+      - id: statscore
+        if: always()
+        run: node tools/stats-core-test.js
+      - id: regie
+        if: always()
+        run: node tools/regie-test.js
+      - id: retro
+        if: always()
+        run: node tools/retro-test.js
+      - name: Recapitulatif en francais
+        if: always()
+        run: |
+          {
+            echo "## Recapitulatif du garde-fou"
+            echo ""
+            echo "| Suite | Resultat |"
+            echo "|---|---|"
+            echo "| Fichiers JSON (valider.js) | ${{ steps.valider.outcome == 'success' && 'OK' || 'ECHEC' }} |"
+            echo "| Coeur des stats | ${{ steps.statscore.outcome == 'success' && 'OK' || 'ECHEC' }} |"
+            echo "| Regie | ${{ steps.regie.outcome == 'success' && 'OK' || 'ECHEC' }} |"
+            echo "| Retro du lundi | ${{ steps.retro.outcome == 'success' && 'OK' || 'ECHEC' }} |"
+            echo ""
+            echo "ECHEC ? Ouvre l'etape rouge ci-dessus : le detail y est en francais (fichier + erreur)."
+          } >> "$GITHUB_STEP_SUMMARY"

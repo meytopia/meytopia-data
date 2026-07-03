@@ -36,9 +36,78 @@ async function discord(content) {
   } catch (e) { console.log('Discord injoignable (non bloquant) :', e.message); }
 }
 
+async function openIssues() {
+  const list = await gh(`/repos/${REPO}/issues?state=open&labels=${encodeURIComponent(LABEL)}&per_page=10`);
+  return Array.isArray(list) ? list : [];
+}
+// Filtré par TITRE : le label est partagé avec l'alerte « site pas à jour » (garde Pages) —
+// sans ce filtre, l'une serait prise pour l'autre.
 async function openAlert() {
-  const list = await gh(`/repos/${REPO}/issues?state=open&labels=${encodeURIComponent(LABEL)}&per_page=5`);
-  return Array.isArray(list) && list.length ? list[0] : null;
+  return (await openIssues()).find((i) => i.title === TITLE) || null;
+}
+
+/* ── Garde GitHub Pages : le site (régie + pages publiques) doit suivre main ──
+   Pages a déjà raté 4 déploiements en 24 h EN SILENCE (échec ou build coincé) : la page servait
+   une vieille version sans que personne ne le sache. À chaque passage (10 min), on vérifie le
+   dernier build ; raté/coincé/en retard → on RELANCE un build (le remède qui marche à chaque
+   fois). Si ça dure malgré les relances (> 45 min de retard), une issue prévient l'admin.
+   Best-effort : ce garde ne doit JAMAIS empêcher la surveillance de panne serveur de tourner. */
+const PAGES_TITLE = '🔴 Site pas à jour (GitHub Pages en panne)';
+async function checkPages() {
+  try {
+    const build = await gh(`/repos/${REPO}/pages/builds/latest`).catch(() => null);
+    if (!build || !build.status) { console.log('Pages : état illisible — passage sans action.'); return; }
+    const head = await gh(`/repos/${REPO}/commits/main`);
+    const headAgeMin = Math.round((Date.now() - new Date(head.commit.committer.date).getTime()) / 60000);
+    const buildAgeMin = Math.round((Date.now() - new Date(build.created_at).getTime()) / 60000);
+    // 'queued' = en file (c'est AUSSI l'état d'un build coincé, et celui que renvoie notre relance) :
+    // à traiter comme 'building', jamais comme sain.
+    const enCours = build.status === 'building' || build.status === 'queued';
+    const aJour = build.status === 'built' && build.commit === head.sha;
+    const enRetard = build.status === 'built' && build.commit !== head.sha && headAgeMin > 15;
+    const enPanne = build.status === 'errored' || (enCours && buildAgeMin > 10) || enRetard;
+    const pagesIssue = (await openIssues()).find((i) => i.title === PAGES_TITLE) || null;
+    // L'issue ne se ferme QUE quand le site sert VRAIMENT la dernière version — pas sur un simple
+    // build en cours (qui peut encore échouer) : sinon flip-flop « reparti »/« cassé » et faux espoirs.
+    if (aJour) {
+      if (pagesIssue) {
+        await gh(`/repos/${REPO}/issues/${pagesIssue.number}/comments`, { method: 'POST', body: JSON.stringify({ body: '✅ Le site est reparti et sert la dernière version. Fin de l\'alerte.' }) });
+        await gh(`/repos/${REPO}/issues/${pagesIssue.number}`, { method: 'PATCH', body: JSON.stringify({ state: 'closed' }) });
+      }
+      console.log('Pages : OK (à jour).');
+      return;
+    }
+    if (!enPanne) {
+      console.log(`Pages : en cours (${build.status}, il y a ${buildAgeMin} min) — on laisse finir.`);
+      return;
+    }
+    console.log(`Pages : problème (status=${build.status}, build il y a ${buildAgeMin} min, dernier commit il y a ${headAgeMin} min) → relance d'un build.`);
+    await gh(`/repos/${REPO}/pages/builds`, { method: 'POST' }).catch((e) => console.log('Relance refusée (non bloquant) :', e.message));
+    // Durée RÉELLE de la panne : depuis combien de temps main n'est-il pas servi ? Le dernier build
+    // ne suffit pas (chaque relance remettrait le chrono à zéro) : on regarde le dernier build RÉUSSI.
+    let dureDepuisMin = headAgeMin;
+    try {
+      const builds = await gh(`/repos/${REPO}/pages/builds?per_page=10`);
+      const ok = Array.isArray(builds) ? builds.find((b) => b && b.status === 'built') : null;
+      if (ok && ok.commit === head.sha) dureDepuisMin = 0; // la dernière version est en fait déjà servie
+    } catch (e) { /* estimation par headAgeMin conservée */ }
+    // Toujours cassé depuis > 45 min malgré les relances des passages précédents → on prévient (une seule fois).
+    if (!pagesIssue && dureDepuisMin > 45) {
+      const body = [
+        'La publication du site (GitHub Pages) échoue ou reste coincée depuis plus de 45 minutes,',
+        'malgré les relances automatiques toutes les 10 minutes.',
+        '',
+        '**Conséquence** : la régie et les pages publiques servent une ANCIENNE version — les dernières publications ne sont pas visibles.',
+        '**Rien à faire côté Meytopia** : c\'est la machinerie GitHub qui patine (vérifier https://www.githubstatus.com).',
+        'Cette issue se fermera toute seule dès que le site sera reparti.',
+      ].join('\n');
+      const issue = await gh(`/repos/${REPO}/issues`, { method: 'POST', body: JSON.stringify({ title: PAGES_TITLE, body, labels: [LABEL] }) });
+      await discord(`🟠 **Meytopia** — le site (régie/pages publiques) n'arrive plus à se mettre à jour depuis ${dureDepuisMin} min (panne GitHub Pages). Relances automatiques en cours. ${issue.html_url}`);
+      console.log('Alerte site créée : #' + issue.number);
+    }
+  } catch (e) {
+    console.log('Garde Pages en échec (non bloquant) :', e.message);
+  }
 }
 
 function fmtParis(iso) {
@@ -47,6 +116,10 @@ function fmtParis(iso) {
 }
 
 (async () => {
+  // 0) Garde Pages (site à jour) — AVANT la lecture de live.json : même si la sonde n'a jamais
+  //    publié, le site doit être surveillé. Best-effort, jamais bloquant.
+  await checkPages();
+
   // 1) Lire live.json (cache-buster : raw.githubusercontent cache ~5 min)
   let live = null;
   try {
