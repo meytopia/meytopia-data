@@ -318,6 +318,8 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
           <option value="settings">⚙ Réglages</option>
           <option value="challenges">🎯 Défis</option>
           <option value="pilote">🖥 Pilote (machine serveur)</option>
+          <option value="mods">🧩 Mods du pack</option>
+          <option value="saison">🏁 Saisons &amp; RGPD</option>
           <option value="autre">Autres</option>
         </select>
         <input type="search" id="jr-search" placeholder="Rechercher…" style="max-width:200px">
@@ -1153,6 +1155,7 @@ function validate(name, d) {
         if (c && c.id != null) { if (ids.has(c.id)) errs.push('défi : identifiant en double : ' + c.id); else ids.add(c.id); }
         if (c && c.from != null && !isDate(c.from)) errs.push(`défi ${i + 1} : date de début invalide`);
         if (c && c.to != null && !isDate(c.to)) errs.push(`défi ${i + 1} : date de fin invalide`);
+        if (c && isDate(c.from) && isDate(c.to) && new Date(c.to).getTime() <= new Date(c.from).getTime()) errs.push(`défi ${i + 1} : la fin est avant le début (il ne s'afficherait jamais)`);
         if (c && c.grant != null) {
           if (typeof c.grant !== 'object' || Array.isArray(c.grant)) errs.push(`défi ${i + 1} : grant doit être un objet`);
           else {
@@ -1438,10 +1441,10 @@ if ($('#gf-item-search')) {
 function gfRenderResults(q) {
   // Même rendu que la recherche des défis (icône + nom + identifiant), dans SA boîte à elle.
   const box = $('#gf-item-results'); if (!box) return;
-  q = (q || '').trim().toLowerCase();
+  q = normFr((q || '').trim());
   if (!q) { box.hidden = true; box.innerHTML = ''; return; }
   const res = [];
-  for (const it of ITEMS) { if (it.id.toLowerCase().includes(q) || it.label.toLowerCase().includes(q)) { res.push(it); if (res.length >= 40) break; } }
+  for (const it of ITEMS) { if ((it.k || normFr(it.id + ' ' + it.label)).includes(q)) { res.push(it); if (res.length >= 40) break; } }
   box.hidden = false;
   box.innerHTML = res.length
     ? res.map((it) => `<div class="item-row" data-gf-item-id="${esc(it.id)}">${itemIcoHtml(it.id)}<span class="lbl">${esc(it.label)}</span><span class="mono faint">${esc(it.id)}</span></div>`).join('')
@@ -1580,10 +1583,62 @@ if ($('#cf-metric')) $('#cf-metric').addEventListener('change', cfUpdateMetricDe
 let ITEMS = [];          // [{id, label, ns}]
 let itemsLoaded = false;
 let cfGrantItems = [];   // [{id, count}] sélection de la récompense en cours
+// Dictionnaire FRANÇAIS des objets vanilla courants : la recherche promettait « pomme, diamant »
+// mais ne trouvait que les noms anglais — désormais « diamant » trouve, et les noms affichés
+// (puces, cadeaux en jeu) sont en français quand on les connaît. Objets moddés : nom anglais dérivé.
+const FR_ITEMS = {
+  apple: 'Pomme', golden_apple: 'Pomme dorée', enchanted_golden_apple: 'Pomme dorée enchantée',
+  bread: 'Pain', cooked_beef: 'Steak grillé', beef: 'Bœuf cru', cooked_porkchop: 'Côtelette de porc cuite',
+  porkchop: 'Côtelette de porc', cooked_chicken: 'Poulet rôti', chicken: 'Poulet cru', cooked_mutton: 'Mouton cuit',
+  cooked_rabbit: 'Lapin cuit', cooked_cod: 'Morue cuite', cod: 'Morue', cooked_salmon: 'Saumon cuit', salmon: 'Saumon',
+  carrot: 'Carotte', golden_carrot: 'Carotte dorée', potato: 'Pomme de terre', baked_potato: 'Pomme de terre cuite',
+  beetroot: 'Betterave', melon_slice: 'Tranche de pastèque', pumpkin_pie: 'Tarte à la citrouille', cake: 'Gâteau',
+  cookie: 'Cookie', honey_bottle: 'Fiole de miel', milk_bucket: 'Seau de lait', sweet_berries: 'Baies sucrées',
+  glow_berries: 'Baies lumineuses', dried_kelp: 'Algue séchée', mushroom_stew: 'Ragoût de champignons',
+  diamond: 'Diamant', emerald: 'Émeraude', gold_ingot: "Lingot d'or", iron_ingot: 'Lingot de fer',
+  copper_ingot: 'Lingot de cuivre', netherite_ingot: 'Lingot de netherite', netherite_scrap: 'Débris de netherite',
+  coal: 'Charbon', charcoal: 'Charbon de bois', lapis_lazuli: 'Lapis-lazuli', redstone: 'Redstone', quartz: 'Quartz',
+  amethyst_shard: "Éclat d'améthyste", diamond_block: 'Bloc de diamant', emerald_block: "Bloc d'émeraude",
+  gold_block: "Bloc d'or", iron_block: 'Bloc de fer', netherite_block: 'Bloc de netherite',
+  diamond_sword: 'Épée en diamant', netherite_sword: 'Épée en netherite', iron_sword: 'Épée en fer',
+  golden_sword: 'Épée en or', stone_sword: 'Épée en pierre', wooden_sword: 'Épée en bois',
+  diamond_pickaxe: 'Pioche en diamant', netherite_pickaxe: 'Pioche en netherite', iron_pickaxe: 'Pioche en fer',
+  diamond_axe: 'Hache en diamant', netherite_axe: 'Hache en netherite', iron_axe: 'Hache en fer',
+  diamond_shovel: 'Pelle en diamant', netherite_shovel: 'Pelle en netherite', diamond_hoe: 'Houe en diamant',
+  bow: 'Arc', crossbow: 'Arbalète', arrow: 'Flèche', spectral_arrow: 'Flèche spectrale', trident: 'Trident',
+  shield: 'Bouclier', fishing_rod: 'Canne à pêche', flint_and_steel: 'Briquet', shears: 'Cisailles',
+  diamond_helmet: 'Casque en diamant', diamond_chestplate: 'Plastron en diamant', diamond_leggings: 'Jambières en diamant',
+  diamond_boots: 'Bottes en diamant', netherite_helmet: 'Casque en netherite', netherite_chestplate: 'Plastron en netherite',
+  netherite_leggings: 'Jambières en netherite', netherite_boots: 'Bottes en netherite', iron_helmet: 'Casque en fer',
+  iron_chestplate: 'Plastron en fer', iron_leggings: 'Jambières en fer', iron_boots: 'Bottes en fer', elytra: 'Élytres',
+  turtle_helmet: 'Carapace de tortue', experience_bottle: "Fiole d'expérience", ender_pearl: "Perle de l'Ender",
+  ender_eye: "Œil de l'Ender", blaze_rod: 'Bâton de Blaze', ghast_tear: 'Larme de Ghast', slime_ball: 'Boule de Slime',
+  gunpowder: 'Poudre à canon', string: 'Ficelle', bone: 'Os', spider_eye: "Œil d'araignée", rotten_flesh: 'Chair putréfiée',
+  nether_star: 'Étoile du Nether', dragon_egg: 'Œuf de dragon', totem_of_undying: "Totem d'immortalité",
+  golden_apple_: '', heart_of_the_sea: 'Cœur de la mer', nautilus_shell: 'Coquille de nautile', echo_shard: "Éclat d'écho",
+  obsidian: 'Obsidienne', crying_obsidian: 'Obsidienne pleureuse', ancient_debris: 'Débris antiques',
+  torch: 'Torche', lantern: 'Lanterne', soul_lantern: 'Lanterne des âmes', campfire: 'Feu de camp',
+  crafting_table: 'Table de fabrication', furnace: 'Fourneau', blast_furnace: 'Haut fourneau', smoker: 'Fumoir',
+  anvil: 'Enclume', enchanting_table: "Table d'enchantement", bookshelf: 'Bibliothèque', book: 'Livre',
+  ender_chest: "Coffre de l'Ender", chest: 'Coffre', barrel: 'Tonneau', shulker_box: 'Boîte de Shulker',
+  beacon: 'Balise', conduit: 'Conduit', respawn_anchor: 'Ancre de réapparition', lodestone: 'Magnétite',
+  name_tag: 'Étiquette', saddle: 'Selle', lead: 'Laisse', compass: 'Boussole', recovery_compass: 'Boussole de récupération',
+  clock: 'Horloge', map: 'Carte vierge', spyglass: 'Longue-vue', bucket: 'Seau', water_bucket: "Seau d'eau",
+  lava_bucket: 'Seau de lave', golden_apple2: '', firework_rocket: "Fusée de feu d'artifice",
+  tnt: 'TNT', oak_log: 'Bûche de chêne', oak_planks: 'Planches de chêne', cobblestone: 'Pierres', stone: 'Pierre',
+  dirt: 'Terre', sand: 'Sable', glass: 'Verre', wheat: 'Blé', wheat_seeds: 'Graines de blé', sugar_cane: 'Canne à sucre',
+  sugar: 'Sucre', egg: 'Œuf', feather: 'Plume', leather: 'Cuir', paper: 'Papier', stick: 'Bâton', flint: 'Silex',
+  music_disc_cat: 'Disque Cat', music_disc_13: 'Disque 13', music_disc_pigstep: 'Disque Pigstep',
+  music_disc_otherside: 'Disque Otherside', goat_horn: 'Corne de chèvre', bell: 'Cloche',
+};
+delete FR_ITEMS.golden_apple_; delete FR_ITEMS.golden_apple2; // scories d'édition : jamais affichées
+// Normalisation pour la RECHERCHE : minuscules + sans accents (« épée » = « epee », « pomme » trouve « Pomme dorée »).
+function normFr(s) { return String(s || '').toLowerCase().replace(/œ/g, 'oe').replace(/æ/g, 'ae').normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 function prettyItem(id) {
   const s = String(id), c = s.indexOf(':');
   const ns = c >= 0 ? s.slice(0, c) : 'minecraft';
   const path = c >= 0 ? s.slice(c + 1) : s;
+  if (ns === 'minecraft' && FR_ITEMS[path]) return FR_ITEMS[path];
   let label = path.replace(/[_/]+/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
   if (ns !== 'minecraft') label += ' (' + ns + ')';
   return label;
@@ -1613,7 +1668,7 @@ async function loadItemsCatalog() {
     await loadFile('items.json');
     const d = state.files['items.json'] && state.files['items.json'].data;
     const arr = d && Array.isArray(d.items) ? d.items : [];
-    ITEMS = arr.map((id) => ({ id: String(id), label: prettyItem(id), ns: String(id).split(':')[0] }));
+    ITEMS = arr.map((id) => { const label = prettyItem(id); return { id: String(id), label, ns: String(id).split(':')[0], k: normFr(String(id) + ' ' + label) }; });
     if (src) src.textContent = ITEMS.length ? ITEMS.length + ' objets disponibles (mods inclus).' : 'Catalogue vide — utilise « ajouter par identifiant ».';
   } catch (e) {
     ITEMS = []; itemsLoaded = false; // on pourra réessayer
@@ -1622,10 +1677,10 @@ async function loadItemsCatalog() {
 }
 function renderItemResults(q) {
   const box = $('#cf-item-results'); if (!box) return;
-  q = (q || '').trim().toLowerCase();
+  q = normFr((q || '').trim());
   if (!q) { box.hidden = true; box.innerHTML = ''; return; }
   const res = [];
-  for (const it of ITEMS) { if (it.id.toLowerCase().includes(q) || it.label.toLowerCase().includes(q)) { res.push(it); if (res.length >= 40) break; } }
+  for (const it of ITEMS) { if ((it.k || normFr(it.id + ' ' + it.label)).includes(q)) { res.push(it); if (res.length >= 40) break; } }
   box.hidden = false;
   box.innerHTML = res.length
     ? res.map((it) => `<div class="item-row" data-item-id="${esc(it.id)}">${itemIcoHtml(it.id)}<span class="lbl">${esc(it.label)}</span><span class="mono faint">${esc(it.id)}</span></div>`).join('')
@@ -1693,25 +1748,61 @@ function renderChallengeList() {
   const cs = d.challenges;
   if (!cs.length) { box.className = 'empty'; box.textContent = 'Aucun défi pour l’instant — ajoute-en un avec le formulaire ci-dessous.'; return; }
   box.className = '';
+  // Cible LISIBLE : « 600 000 » à la française, minutes converties en heures, mètres en km.
+  const fmtCible = (m, v) => {
+    const num = Number(v) || 0;
+    if (m === 'totalPlayMinutes') return num >= 60 ? Math.round(num / 60).toLocaleString('fr-FR') + ' h de jeu cumulé' : num + ' min';
+    if (m === 'distTotM' || m === 'elytraM') return num >= 1000 ? (num / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + ' km' : num + ' m';
+    return num.toLocaleString('fr-FR');
+  };
   box.innerHTML = cs.map((c, i) => {
     const gs = grantSummary(c.grant);
     const rew = (typeof c.reward === 'string' && c.reward.trim()) ? c.reward.trim() : '';
     return `<div class="list-item">
       <div class="body">
         <div class="title">${esc(c.title || '(sans titre)')} <span class="badge">${esc(c.metric || '?')}</span></div>
-        <div class="meta2"><span>cible : <b>${esc(String(c.target))}</b></span>${rew ? `<span>🏷️ ${esc(rew)}</span>` : ''}${gs ? `<span>${esc(gs)}</span>` : ''}${(c.from || c.to) ? `<span>${c.from ? 'du ' + esc(String(c.from).slice(0, 10)) : ''} ${c.to ? 'au ' + esc(String(c.to).slice(0, 10)) : ''}</span>` : ''}</div>
+        <div class="meta2"><span>cible : <b>${esc(fmtCible(c.metric, c.target))}</b></span>${rew ? `<span>🏷️ ${esc(rew)}</span>` : ''}${gs ? `<span>${esc(gs)}</span>` : ''}${(c.from || c.to) ? `<span>${c.from ? 'du ' + esc(String(c.from).slice(0, 10)) : ''} ${c.to ? 'au ' + esc(String(c.to).slice(0, 10)) : ''}</span>` : ''}</div>
       </div>
+      <button class="btn ghost" data-ch-ed="${i}" title="Recharger ce défi dans le formulaire pour le corriger">✏️ Modifier</button>
       <button class="btn ghost danger" data-ch-rm="${i}">Retirer</button>
     </div>`;
   }).join('');
 }
+// Édition d'un défi existant : on mémorise son ID (jamais un index — la liste peut être rechargée
+// ou réécrite entre ✏️ et 💾 : un index périmé écraserait le MAUVAIS défi, trouvé à l'audit).
+let cfEditId = null;
+function cfSetEditMode(id) {
+  cfEditId = id == null ? null : String(id);
+  const b = $('#cf-add');
+  if (b) b.textContent = cfEditId == null ? '+ Ajouter ce défi' : '💾 Enregistrer la modification';
+}
 if ($('#ch-list')) $('#ch-list').addEventListener('click', (ev) => {
-  const idx = ev.target && ev.target.dataset ? ev.target.dataset.chRm : null;
+  const ds = ev.target && ev.target.dataset ? ev.target.dataset : {};
+  // ✏️ Modifier : recharge le défi dans le formulaire guidé — fini l'édition à la main du JSON avancé.
+  if (ds.chEd != null) {
+    const d = chParse(); if (!d) return;
+    const i = parseInt(ds.chEd, 10); const c = d.challenges[i]; if (!c) return;
+    $('#cf-title').value = c.title || '';
+    $('#cf-metric').value = c.metric || 'totalPlayMinutes';
+    $('#cf-target').value = String(c.target || '');
+    $('#cf-reward').value = (typeof c.reward === 'string') ? c.reward : '';
+    $('#cf-from').value = c.from ? isoToLocalInput(c.from) : '';
+    $('#cf-to').value = c.to ? isoToLocalInput(c.to) : '';
+    cfGrantItems = (c.grant && Array.isArray(c.grant.items)) ? c.grant.items.map((x) => ({ id: String(x.id || ''), count: Math.max(1, Number(x.count) || 1) })) : [];
+    renderGrantChips();
+    cfUpdateMetricDesc();
+    if (c.id == null) { c.id = chSlug(c.title) + '-' + (c.metric || 'm') + '-' + Date.now().toString(36); chWrite(d); }
+    cfSetEditMode(c.id);
+    const f = $('#cf-title'); if (f) { f.scrollIntoView({ behavior: 'smooth', block: 'center' }); f.focus(); }
+    return;
+  }
+  const idx = ds.chRm;
   if (idx == null) return;
   const d = chParse(); if (!d) return;
   const i = parseInt(idx, 10); const c = d.challenges[i]; if (!c) return;
   if (!confirm(`Retirer le défi « ${c.title || ''} » ?\n\n(à publier ensuite avec « Publier les défis »)`)) return;
   d.challenges.splice(i, 1);
+  if (cfEditId != null && c.id != null && String(c.id) === cfEditId) cfSetEditMode(null); // le défi édité vient d'être retiré
   chWrite(d);
   toast('Défi retiré de la liste — clique « Publier les défis » pour valider.');
 });
@@ -1723,19 +1814,40 @@ if ($('#cf-add')) $('#cf-add').addEventListener('click', () => {
   const target = parseInt($('#cf-target').value, 10);
   if (!title) { toast('Donne un titre au défi.', true); return; }
   if (!(Number.isFinite(target) && target > 0)) { toast('La cible doit être un nombre supérieur à 0.', true); return; }
+  const from = localInputToIso($('#cf-from').value);
+  const to = localInputToIso($('#cf-to').value);
+  // Fin avant début = défi qui ne s'activera JAMAIS (même contrôle que l'événement d'accueil).
+  if (from && to && new Date(to).getTime() <= new Date(from).getTime()) {
+    toast('La date de FIN doit être après la date de DÉBUT — tel quel, ce défi ne s\'afficherait jamais.', true);
+    return;
+  }
+  // Retrouve le défi édité par son ID dans la liste ACTUELLE (jamais par un index mémorisé).
+  const editIdx = cfEditId != null ? d.challenges.findIndex((x) => x && x.id != null && String(x.id) === cfEditId) : -1;
+  if (cfEditId != null && editIdx < 0) {
+    toast('Le défi que tu modifiais n\'existe plus (liste rechargée entre-temps). Vérifie la liste puis re-clique ✏️ Modifier.', true);
+    cfSetEditMode(null);
+    return;
+  }
+  const editing = editIdx >= 0;
   // id STABLE et UNIQUE DANS LE TEMPS : suffixe horodaté (base36) pour qu'un défi retiré puis
   // recréé (même titre+métrique) n'hérite pas d'un id déjà « réclamé » côté mod (récompense jamais donnée).
-  const ch = { id: chSlug(title) + '-' + metric + '-' + Date.now().toString(36), title, metric, target };
+  // En MODIFICATION, on GARDE l'id d'origine (les récompenses déjà réclamées le restent).
+  const ch = { id: editing ? cfEditId : chSlug(title) + '-' + metric + '-' + Date.now().toString(36), title, metric, target };
   const reward = $('#cf-reward').value.trim(); if (reward) ch.reward = reward;
   if (cfGrantItems.length) ch.grant = { items: cfGrantItems.map((x) => ({ id: x.id, count: x.count })) };
-  const from = localInputToIso($('#cf-from').value); if (from) ch.from = from;
-  const to = localInputToIso($('#cf-to').value); if (to) ch.to = to;
-  const base = ch.id; let n = 2; while (d.challenges.some((x) => x.id === ch.id)) ch.id = base + '-' + (n++);
-  d.challenges.push(ch);
+  if (from) ch.from = from;
+  if (to) ch.to = to;
+  if (editing) {
+    d.challenges[editIdx] = ch;
+  } else {
+    const base = ch.id; let n = 2; while (d.challenges.some((x) => x.id === ch.id)) ch.id = base + '-' + (n++);
+    d.challenges.push(ch);
+  }
   chWrite(d);
   $('#cf-title').value = ''; $('#cf-target').value = ''; $('#cf-reward').value = ''; $('#cf-from').value = ''; $('#cf-to').value = '';
   cfGrantItems = []; renderGrantChips(); if ($('#cf-item-search')) $('#cf-item-search').value = '';
-  toast('Défi ajouté à la liste — clique « Publier les défis » pour l’envoyer.');
+  toast(editing ? 'Défi modifié — clique « Publier les défis » pour l’envoyer.' : 'Défi ajouté à la liste — clique « Publier les défis » pour l’envoyer.');
+  cfSetEditMode(null);
 });
 
 /* ── Anti-perte de travail : flag « modifié » + brouillon auto (news / changelog / défis) ── */
@@ -2255,9 +2367,22 @@ document.querySelectorAll('[data-save]').forEach((btn) => btn.addEventListener('
     renderAll(); toast('Réglages publiés.');
   }
   if (what === 'gate') {
+    // Mêmes garde-fous que la maintenance : le verrou bloque TOUTE la communauté — confirmation
+    // à la pose ET au retrait, alerte si la date est déjà passée, et aperçu de ce que verront
+    // les joueurs directement dans la confirmation.
     const when = localInputToIso($('#gt-when').value);
-    if (!when) { delete l.gate; }
-    else {
+    if (!when) {
+      if (l.gate && !confirm('Retirer le verrou d\'ouverture ?\n\nLes joueurs pourront lancer le jeu IMMÉDIATEMENT.')) return;
+      delete l.gate;
+    } else {
+      const dOpen = new Date(when);
+      if (dOpen.getTime() <= Date.now()) {
+        if (!confirm('⚠️ La date d\'ouverture saisie est DÉJÀ PASSÉE : le verrou sera sans effet (le jeu reste jouable).\n\nPublier quand même ?')) return;
+      } else {
+        const tt = $('#gt-title').value.trim();
+        const mm = $('#gt-msg').value.trim();
+        if (!confirm(`Verrouiller le jeu pour TOUTE la communauté jusqu'au ${dOpen.toLocaleString('fr-FR')} ?\n\nAperçu de ce que verront les joueurs (avec compte à rebours) :\n« ${tt || 'Ouverture du serveur'} »\n« ${mm || '(message par défaut du launcher)'} »`)) return;
+      }
       l.gate = l.gate || {};
       l.gate.openAt = when;
       const t = $('#gt-title').value.trim(); if (t) l.gate.title = t; else delete l.gate.title;
@@ -2317,8 +2442,10 @@ function renderBlocklist() {
   box.className = '';
   box.innerHTML = entries.map((e, i) => {
     const m = e.match || {};
-    let label = m.fileName || m.contains || (m.sha1 ? String(m.sha1).slice(0, 10) : '?');
-    if (m.sha1) { const f = files.find((x) => String(x.sha1).toLowerCase() === String(m.sha1).toLowerCase()); if (f) label = String(f.path).split('/').pop(); }
+    // Le NOM mémorisé à la création de la règle d'abord (le mod n'est plus dans le pack, donc
+    // introuvable dans le manifest) — sinon l'admin voit une empreinte illisible « 3f9c2ab1d0 ».
+    let label = e.name || m.fileName || m.contains || (m.sha1 ? String(m.sha1).slice(0, 10) : '?');
+    if (!e.name && m.sha1) { const f = files.find((x) => String(x.sha1).toLowerCase() === String(m.sha1).toLowerCase()); if (f) label = String(f.path).split('/').pop(); }
     const kind = m.fileName ? 'nom' : (m.contains ? 'contient' : (m.sha1 ? 'empreinte' : '?'));
     return `<div class="list-item"><input type="checkbox" class="mod-pick bl-pick" data-bl-i="${i}" style="margin-top:4px"><div class="body"><div class="title">${esc(label)}</div><div class="meta2"><span class="badge"${kind === 'empreinte' ? ' title="Reconnu par son empreinte : cette règle vise exactement ce fichier-là, même s’il est renommé."' : ''}>${kind}</span>${e.reason ? `<span>${esc(e.reason)}</span>` : ''}${Array.isArray(e.scope) ? `<span class="mono">${esc(e.scope.join(', '))}</span>` : ''}</div></div><button class="btn ghost" data-bl-rm="${i}">Débloquer</button></div>`;
   }).join('');
@@ -2745,7 +2872,7 @@ async function bulkRemoveMods() {
   man.data.files = man.data.files.filter((f) => !paths.includes(f.path));
   if (block) for (const f of removed) if (f.sha1) {
     const sameSha1 = (e) => e.match && e.match.sha1 && String(e.match.sha1).toLowerCase() === String(f.sha1).toLowerCase();
-    if (!bl.data.entries.some(sameSha1)) bl.data.entries.push({ match: { sha1: String(f.sha1) }, ...blScope(f.path), reason: 'Retiré du modpack' });
+    if (!bl.data.entries.some(sameSha1)) bl.data.entries.push({ match: { sha1: String(f.sha1) }, name: String(f.path).split("/").pop(), ...blScope(f.path), reason: 'Retiré du modpack' });
   }
   bumpPackVersion();
   const box = $('#mods-list'); if (box) box.style.pointerEvents = 'none'; // gèle la liste pendant l'écriture
@@ -2772,7 +2899,7 @@ async function bulkSetEnabled(enable) {
   for (const f of files) {
     if (enable) delete f.enabled; else f.enabled = false;
     const sameSha1 = (e) => e.match && e.match.sha1 && String(e.match.sha1).toLowerCase() === String(f.sha1 || '').toLowerCase();
-    if (!enable && f.sha1) { if (!bl.data.entries.some(sameSha1)) { bl.data.entries.push({ match: { sha1: String(f.sha1) }, ...blScope(f.path), reason: 'Mod désactivé' }); blChanged = true; } }
+    if (!enable && f.sha1) { if (!bl.data.entries.some(sameSha1)) { bl.data.entries.push({ match: { sha1: String(f.sha1) }, name: String(f.path).split("/").pop(), ...blScope(f.path), reason: 'Mod désactivé' }); blChanged = true; } }
     else if (enable && f.sha1) { const before = bl.data.entries.length; bl.data.entries = bl.data.entries.filter((e) => !(sameSha1(e) && e.reason === 'Mod désactivé')); if (bl.data.entries.length !== before) blChanged = true; }
   }
   bumpPackVersion();
@@ -2840,7 +2967,7 @@ async function setModEnabled(path, enable) {
   let blChanged = false;
   const sameSha1 = (e) => e.match && e.match.sha1 && String(e.match.sha1).toLowerCase() === String(file.sha1 || '').toLowerCase();
   if (!enable && file.sha1) {
-    if (!bl.data.entries.some(sameSha1)) { bl.data.entries.push({ match: { sha1: String(file.sha1) }, ...blScope(file.path), reason: 'Mod désactivé' }); blChanged = true; }
+    if (!bl.data.entries.some(sameSha1)) { bl.data.entries.push({ match: { sha1: String(file.sha1) }, name: String(file.path).split("/").pop(), ...blScope(file.path), reason: 'Mod désactivé' }); blChanged = true; }
   } else if (enable && file.sha1) {
     const before = bl.data.entries.length;
     bl.data.entries = bl.data.entries.filter((e) => !(sameSha1(e) && e.reason === 'Mod désactivé'));
@@ -2879,7 +3006,7 @@ if ($('#mods-list')) $('#mods-list').addEventListener('click', async (ev) => {
   bl.data.entries = Array.isArray(bl.data.entries) ? bl.data.entries : [];
   if (alsoBlock) {
     const sameSha1 = (e) => e.match && e.match.sha1 && String(e.match.sha1).toLowerCase() === String(file.sha1).toLowerCase();
-    if (!bl.data.entries.some(sameSha1)) bl.data.entries.push({ match: { sha1: String(file.sha1) }, ...blScope(file.path), reason: 'Retiré du modpack' });
+    if (!bl.data.entries.some(sameSha1)) bl.data.entries.push({ match: { sha1: String(file.sha1) }, name: String(file.path).split("/").pop(), ...blScope(file.path), reason: 'Retiré du modpack' });
   }
   const box = $('#mods-list'); if (box) box.style.pointerEvents = 'none'; // gèle la liste pendant l'écriture
   try {
@@ -3186,6 +3313,20 @@ function labelFor(message) {
   if (m.startsWith('admin: changelog ')) return '📋 Entrée changelog — ' + m.slice(17);
   if (m === 'admin: reglages') return '⚙ Réglages publiés';
   if (m === 'régie : défis communautaires') return '🎯 Défis communautaires mis à jour';
+  // Actions récentes (cadeaux, RGPD, saisons, verrou, mods) : en français comme les autres —
+  // avant, elles s'affichaient en message technique brut dans « Autres ».
+  if (m === 'admin: cadeaux du jour') return '🎁 Cadeaux du jour mis à jour';
+  if (m.startsWith("régie : droit à l'effacement")) return '🔒 Retrait RGPD d\'un joueur (archives nettoyées)';
+  if (m.startsWith('régie : archive saison ')) return '🏁 Saison archivée — saison ' + m.slice(23);
+  if (m.startsWith('régie : nouvelle saison ')) return '🏁 Nouvelle saison lancée — ' + m.slice(8);
+  if (m.startsWith('admin: ouverture serveur')) return '🚪 Verrou d\'ouverture ' + (m.includes('retirée') ? 'retiré (jeu ouvert)' : 'programmé (compte à rebours)');
+  if (m.startsWith('régie : retrait de ') || m.startsWith('régie : retrait mod ')) return '🧩 Mod(s) retiré(s) du pack — ' + m.slice(8);
+  if (m.startsWith('régie : activation') || m.startsWith('régie : désactivation')) return '🧩 ' + m.slice(8);
+  if (m.startsWith('régie : interdire ')) return '🚫 Mod interdit (blocklist) — ' + m.slice(18);
+  if (m.startsWith('régie : déblocage')) return '🔓 Mod débloqué — ' + m.slice(8);
+  if (m.startsWith('régie : version pack ')) return '📦 Version du pack — ' + m.slice(21);
+  if (m.startsWith('sonde(mod): archive saison ')) return '🏁 Saison archivée par la sonde — saison ' + m.slice(27);
+  if (m.startsWith('actu: la rétro du lundi')) return '📅 Rétro du lundi publiée (automatique)';
   if (m.startsWith('pilote: ')) return '🖥 Pilote — ' + m.slice(8);
   if (m.startsWith('Modpack ')) return '📦 ' + m + ' publié';
   if (m === 'Regie : audit de securite (CSP, gardes auth, fix affichage)') return '🛡 Mise à jour de la Régie';
@@ -3195,10 +3336,12 @@ function actionType(message) {
   const m = String(message || '').split('\n')[0];
   if (m.startsWith('admin: maintenance')) return 'maintenance';
   if (m.startsWith('admin: evenement')) return 'event';
-  if (m.startsWith('admin: actu')) return 'news';
+  if (m.startsWith('admin: actu') || m.startsWith('actu: la rétro')) return 'news';
   if (m.startsWith('admin: changelog') || m.startsWith('Modpack ')) return 'changelog';
-  if (m === 'admin: reglages') return 'settings';
-  if (m === 'régie : défis communautaires') return 'challenges';
+  if (m === 'admin: reglages' || m.startsWith('admin: ouverture serveur')) return 'settings';
+  if (m === 'régie : défis communautaires' || m === 'admin: cadeaux du jour') return 'challenges';
+  if (m.startsWith("régie : droit à l'effacement") || m.startsWith('régie : archive saison') || m.startsWith('régie : nouvelle saison') || m.startsWith('sonde(mod): archive saison')) return 'saison';
+  if (m.startsWith('régie : retrait') || m.startsWith('régie : activation') || m.startsWith('régie : désactivation') || m.startsWith('régie : interdire') || m.startsWith('régie : déblocage') || m.startsWith('régie : version pack')) return 'mods';
   if (m.startsWith('pilote:')) return 'pilote';
   return 'autre';
 }
@@ -3365,7 +3508,15 @@ let weeklyRecapText = '';
 let srvAutoTimer = null;
 function startSrvAuto() { stopSrvAuto(); srvAutoTimer = setInterval(() => { if (document.visibilityState === 'visible') loadServerStats(true); }, 120000); }
 function stopSrvAuto() { if (srvAutoTimer) { clearInterval(srvAutoTimer); srvAutoTimer = null; } }
-function setSrvAsOf() { const el = $('#ss-asof'); if (el) el.textContent = 'actualisé à ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }); }
+function setSrvAsOf() {
+  // La VRAIE fraîcheur : l'heure du dernier relevé de la sonde (pas l'heure du clic, qui pouvait
+  // maquiller en « frais » une copie de secours vieille de plusieurs jours) + badge mode cache.
+  const el = $('#ss-asof'); if (!el) return;
+  const releve = (srvData && srvData.updatedAt)
+    ? 'dernier relevé de la sonde : ' + new Date(srvData.updatedAt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })
+    : 'actualisé à ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  el.textContent = releve + (srvFromCache ? ' — ⚠️ données en cache (réseau indisponible), possiblement anciennes' : '');
+}
 function downloadText(text, name, mime) {
   const blob = new Blob([text], { type: mime || 'text/plain;charset=utf-8' });
   const a = document.createElement('a');
@@ -3410,16 +3561,18 @@ function sessionsOf(slotsArr) {
 // Stats serveur = données PUBLIQUES (branche stats). Lecture via URL raw (sans jeton ni quota API
 // GitHub) + cache localStorage en repli → un 403 (rate-limit partagé avec le reste de l'admin) ou
 // un réseau capricieux ne vide plus l'onglet. C'est ce que fait déjà le launcher.
+let srvFromCache = false; // vrai quand l'onglet affiche la copie de secours locale (réseau KO)
 async function fetchSrvStats() {
   try {
     const res = await fetch(`https://raw.githubusercontent.com/${DATA_REPO}/stats/stats-serveur.json`, { cache: 'no-cache' }); // conditionnel : 304 si inchangé (pas de re-téléchargement)
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const j = await res.json();
+    srvFromCache = false;
     try { localStorage.setItem('meytopia.regie.srvStats', JSON.stringify(j)); } catch (_) { /* quota plein */ }
     return j;
   } catch (e) {
     const c = localStorage.getItem('meytopia.regie.srvStats');
-    if (c) { try { return JSON.parse(c); } catch (_) { /* cache illisible */ } }
+    if (c) { try { const j = JSON.parse(c); srvFromCache = true; return j; } catch (_) { /* cache illisible */ } }
     throw e;
   }
 }
@@ -3435,7 +3588,9 @@ async function loadServerStats(force = false) {
     { const snn = $('#sn-num'); if (snn && !snn.value) { const s = (srvData.server && typeof srvData.server.season === 'number') ? srvData.server.season : 1; snn.value = String(s + 1); } }
     const days = Object.keys(srvData.days || {}).sort().reverse();
     const today = new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris' }).format(new Date());
-    srvDay = days.includes(today) ? today : (days[0] || today);
+    // Conserve le jour que l'admin examine (l'actualisation auto le ramenait de force à
+    // « aujourd'hui » en pleine lecture d'une journée passée) — comme srvCmpDay juste dessous.
+    srvDay = (srvDay && days.includes(srvDay)) ? srvDay : (days.includes(today) ? today : (days[0] || today));
     $('#ss-day').innerHTML = (days.length ? days : [today]).map((d) => `<option value="${d}">${dayLabel(d)}${d === today ? ' (aujourd\u2019hui)' : ''}</option>`).join('');
     $('#ss-day').value = srvDay;
     $('#ss-cmp').innerHTML = '<option value="">Comparer à… (aucun)</option>' + (days.length ? days : []).map((d) => `<option value="${d}">${dayLabel(d)}</option>`).join('');
@@ -4090,12 +4245,19 @@ function renderPerfChart(perf) {
 function renderSrvStrip() {
   const seen = srvData?.seen || {};
   $('#ss-unique').textContent = String(Object.keys(seen).length);
-  let recPeak = 0, recDay = null, bestDay = null, bestPeak = -1;
+  // Tuile RECORD : le record ENREGISTRÉ par la sonde (records.peakPlayers) — le max des seuls
+  // jours encore conservés pouvait être PLUS BAS que le vrai record de saison. Repli : ancien calcul.
+  const rp = srvData?.records?.peakPlayers;
+  let recPeak = (rp && typeof rp.value === 'number') ? rp.value : 0;
+  let recDay = (rp && typeof rp.day === 'string') ? rp.day : null;
+  // Tuile JOUR LE PLUS ACTIF : minutes de jeu CUMULÉES du jour (somme des joueurs présents par
+  // minute) — mesuré au PIC, les deux tuiles affichaient toujours le même jour.
+  let bestDay = null, bestSum = -1;
   for (const [d, obj] of Object.entries(srvData?.days || {})) {
-    const vals = (obj.slots || []).filter((v) => typeof v === 'number' && v >= 0);
-    const pk = vals.length ? Math.max(...vals) : 0;
-    if (pk > recPeak) { recPeak = pk; recDay = d; }
-    if (pk > bestPeak) { bestPeak = pk; bestDay = d; }
+    const vals = (obj.slots || []).filter((v) => typeof v === 'number' && v > 0);
+    const sum = vals.reduce((a, v) => a + v, 0);
+    if (sum > bestSum) { bestSum = sum; bestDay = d; }
+    if (!rp) { const pk = vals.length ? Math.max(...vals) : 0; if (pk > recPeak) { recPeak = pk; recDay = d; } }
   }
   $('#ss-record').textContent = String(recPeak);
   $('#ss-record-d').textContent = recDay ? 'record de joueurs en même temps — ' + dayLabel(recDay) : 'record de joueurs en même temps (saison)';

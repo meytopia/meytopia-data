@@ -188,6 +188,7 @@ function checkChallenges() {
     if (c && c.id != null) { if (ids.has(c.id)) err(f, `identifiant en double : ${c.id}`); else ids.add(c.id); }
     if (c && c.from != null && !isDate(c.from)) err(f, `${w} : date de début invalide`);
     if (c && c.to != null && !isDate(c.to)) err(f, `${w} : date de fin invalide`);
+    if (c && isDate(c.from) && isDate(c.to) && new Date(c.to).getTime() <= new Date(c.from).getTime()) err(f, `${w} : la fin est avant le début (le défi ne s'afficherait jamais)`);
     if (c && c.grant != null) {
       if (typeof c.grant !== 'object' || Array.isArray(c.grant)) { err(f, `${w} : grant doit être un objet`); }
       else {
