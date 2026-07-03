@@ -11,6 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { extractMarked } = require('./extract');
 
 const ROOT = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(ROOT, 'admin', 'index.html'), 'utf8');
@@ -33,14 +34,11 @@ console.log('régie (admin/index.html) — non-régression');
   check(`syntaxe des ${n} script(s) inline`, n > 0 && bad === 0);
 }
 
-// 2) validate() extrait (des helpers isStr… jusqu'à la fin de la fonction)
+// 2) validate() extrait par MARQUEURS explicites (/* TEST-DEBUT:validate */ … /* TEST-FIN:validate */
+//    dans admin/index.html) : robuste, plus de dépendance à un littéral « return errs; » fragile.
 function extractValidate() {
-  const start = html.indexOf('const isStr = (v) => typeof v ===');
-  const ridx = html.indexOf('return errs;', start);
-  const end = html.indexOf('}', ridx);
-  if (start < 0 || ridx < 0) throw new Error('extraction validate() impossible — ancres déplacées ?');
   const mod = { exports: {} };
-  new Function('module', html.slice(start, end + 1) + '\nmodule.exports = validate;')(mod);
+  new Function('module', extractMarked(html, 'validate') + '\nmodule.exports = validate;')(mod);
   return mod.exports;
 }
 const validate = extractValidate();

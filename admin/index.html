@@ -1116,6 +1116,7 @@ function pubDone() {
 function pubHide() { $('#pub').classList.remove('show', 'done'); }
 
 /* ════════════════ Validation (miroir de valider.js) ════════════════ */
+/* TEST-DEBUT:validate */
 const isStr = (v) => typeof v === 'string' && v.trim().length > 0;
 const isHttps = (v) => isStr(v) && /^https:\/\//.test(v);
 const isHex = (v) => isStr(v) && /^#[0-9A-Fa-f]{6}$/.test(v);
@@ -1269,6 +1270,7 @@ function validate(name, d) {
   }
   return errs;
 }
+/* TEST-FIN:validate */
 
 /* ════════════════ Connexion ════════════════ */
 function storedToken() { return localStorage.getItem('meytopia.regie.token') || sessionStorage.getItem('meytopia.regie.token'); }
