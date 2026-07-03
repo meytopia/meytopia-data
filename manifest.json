@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
+  "version": "1.5.1",
   "generatedAt": "2026-06-30T14:31:57.943Z",
   "files": [
     {
@@ -340,16 +340,6 @@
       "mod": {
         "id": "ftbteams",
         "name": "FTB Teams"
-      }
-    },
-    {
-      "path": "mods/ftb-ultimine-neoforge-2101.1.15.jar",
-      "sha1": "c96a7cc0b52bf919660ea61c1536cebd9d5773b3",
-      "size": 177109,
-      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.2.0/mods_ftb-ultimine-neoforge-2101.1.15.jar",
-      "mod": {
-        "id": "ftbultimine",
-        "name": "FTB Ultimine"
       }
     },
     {
