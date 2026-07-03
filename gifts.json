@@ -1,10 +1,5 @@
 {
   "enabled": false,
   "goldenChance": 0.05,
-  "items": [
-    { "id": "minecraft:cooked_beef", "count": 5, "label": "Steaks grillés" },
-    { "id": "minecraft:bread", "count": 8, "label": "Pains" },
-    { "id": "minecraft:experience_bottle", "count": 3, "label": "Fioles d'expérience" },
-    { "id": "minecraft:golden_apple", "count": 1, "label": "Pomme dorée", "golden": true }
-  ]
+  "items": []
 }
