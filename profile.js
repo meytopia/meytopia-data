@@ -79,8 +79,7 @@
       '</div>';
     var tiles =
       '<div class="grid">' +
-      stat(SC.fmtPlayTime(s.minutes || 0), 'temps de jeu (saison)') +
-      (s.totalMin ? stat(SC.fmtPlayTime(s.totalMin), 'temps de jeu total') : '') +
+      stat(SC.fmtPlayTime(s.minutes || 0), 'temps de jeu') +
       stat(SC.fmtNum(SC.daysPresent(data, name)), 'jours de présence') +
       stat(SC.fmtNum(s.sessions || 0), 'connexions au serveur') +
       stat(s.first ? SC.fmtDate(s.first) : '—', 'première venue') +
@@ -195,7 +194,7 @@
       return '<a href="?p=' + encodeURIComponent(p.name) + '">' +
         '<img src="' + SC.avatarUrl(p.uuid || p.name, 32) + '" alt="">' +
         '<div style="min-width:0"><div class="n">' + SC.escapeHtml(p.name) + '</div>' +
-        '<div class="t">' + on + SC.fmtPlayTime(p.minutes) + ' de jeu cette saison</div></div></a>';
+        '<div class="t">' + on + SC.fmtPlayTime(p.minutes) + ' de jeu</div></div></a>';
     }).join('');
     var dir = list.length ? '<div class="section">Les joueurs de Meytopia</div><div class="dir">' + cards + '</div>'
       : '<div class="empty">Aucun joueur enregistré pour l’instant.</div>';

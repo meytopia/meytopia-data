@@ -486,7 +486,7 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
       <div id="ch-list" class="empty">Chargement…</div>
       <div class="card" style="background:var(--bg-2)">
         <h2 style="font-size:15px;margin:0 0 8px">Nouveau défi</h2>
-        <div class="field"><label for="cf-title">Titre</label><input type="text" id="cf-title" placeholder="ex. Tueurs de monstres de la saison"></div>
+        <div class="field"><label for="cf-title">Titre</label><input type="text" id="cf-title" placeholder="ex. Tueurs de monstres"></div>
         <div class="cols">
           <div class="field"><label for="cf-metric">Objectif mesuré</label>
             <select id="cf-metric">
@@ -679,8 +679,8 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
     <div id="ss-records" class="muted" style="margin:0 0 12px;font-size:13px"></div>
     <div class="card">
       <div class="ss-strip">
-        <div class="ss-stat"><div class="ss-num" id="ss-unique">—</div><div class="ss-lab">joueurs uniques (saison)</div></div>
-        <div class="ss-stat"><div class="ss-num" id="ss-record">—</div><div class="ss-lab" id="ss-record-d">record de joueurs en même temps (saison)</div></div>
+        <div class="ss-stat"><div class="ss-num" id="ss-unique">—</div><div class="ss-lab">joueurs uniques</div></div>
+        <div class="ss-stat"><div class="ss-num" id="ss-record">—</div><div class="ss-lab" id="ss-record-d">record de joueurs en même temps</div></div>
         <div class="ss-stat"><div class="ss-num" id="ss-bestday">—</div><div class="ss-lab">jour le plus actif</div></div>
         <div class="ss-stat"><div class="ss-num" id="ss-new7">—</div><div class="ss-lab">nouveaux joueurs (7 j)</div></div>
       </div>
@@ -690,7 +690,7 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
         <select id="ss-day" style="max-width:230px"></select>
         <select id="ss-cmp" style="max-width:230px"><option value="">Comparer à… (aucun)</option></select>
         <button class="btn ghost" id="ss-refresh">↻ Actualiser</button>
-        <select id="ss-export" class="ss-export-sel"><option value="">⬇ Exporter…</option><option value="csv-day">CSV — jour sélectionné</option><option value="csv-season">CSV — saison entière</option><option value="json">JSON brut (sauvegarde)</option></select>
+        <select id="ss-export" class="ss-export-sel"><option value="">⬇ Exporter…</option><option value="csv-day">CSV — jour sélectionné</option><option value="csv-season">CSV — tout l’historique</option><option value="json">JSON brut (sauvegarde)</option></select>
         <button class="btn ghost" id="ss-notif" title="Recevoir une alerte navigateur quand le serveur tombe ou crashe (régie ouverte)">🔔 Alertes</button>
         <span id="ss-asof" class="hint" style="margin-left:auto"></span>
       </div>
@@ -718,7 +718,7 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
         <div class="ss-stat"><div class="ss-num" id="ss-tpsmin">—</div><div class="ss-lab">TPS le plus bas</div></div>
         <div class="ss-stat"><div class="ss-num" id="ss-msptavg">—</div><div class="ss-lab">MSPT moyen (ms)</div></div>
         <div class="ss-stat"><div class="ss-num" id="ss-msptmax">—</div><div class="ss-lab">MSPT max (pire tick)</div></div>
-        <div class="ss-stat"><div class="ss-num" id="ss-crashes">—</div><div class="ss-lab" id="ss-crashes-d">crashs (saison)</div></div>
+        <div class="ss-stat"><div class="ss-num" id="ss-crashes">—</div><div class="ss-lab" id="ss-crashes-d">crashs</div></div>
       </div>
       <div id="ss-crash-info" class="hint"></div>
       <div id="ss-perf-zone" style="display:none;margin-top:12px">
@@ -773,8 +773,8 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
       <div id="ss-ret-note" style="color:var(--faint);font-size:12px;margin-top:10px"></div>
     </div>
     <div class="card">
-      <div style="font-weight:600;margin-bottom:4px">Top des joueurs les plus assidus (saison)</div>
-      <div style="color:var(--faint);font-size:12px;margin-bottom:10px">Classement par temps de jeu total depuis le début de la saison.</div>
+      <div style="font-weight:600;margin-bottom:4px">Top des joueurs les plus assidus</div>
+      <div style="color:var(--faint);font-size:12px;margin-bottom:10px">Classement par temps de jeu.</div>
       <div id="ss-leaderboard"></div>
     </div>
     <div class="card">
@@ -1544,7 +1544,7 @@ const CH_TEMPLATES = {
   mobKills: { title: 'Tueurs de monstres', metric: 'mobKills', target: 10000, reward: '' },
   diamonds: { title: 'Chasse aux diamants', metric: 'diamonds', target: 1000, reward: '' },
   fishCaught: { title: 'Pêche miraculeuse', metric: 'fishCaught', target: 500, reward: '' },
-  totalPlayMinutes: { title: 'Marathon de la saison', metric: 'totalPlayMinutes', target: 6000, reward: '' },
+  totalPlayMinutes: { title: 'Marathon du serveur', metric: 'totalPlayMinutes', target: 6000, reward: '' },
   uniquePlayers: { title: 'Toute la communauté', metric: 'uniquePlayers', target: 30, reward: '' },
   peak: { title: 'Record d\'affluence', metric: 'peak', target: 20, reward: '' },
 };
@@ -3963,7 +3963,7 @@ async function santePrivee() {
     try {
       const d = await fetchSrvStats();
       const pc = (d && typeof d.privCount === 'number') ? d.privCount : 0;
-      lines.push(row(null, `<b>${pc}</b> joueur(s) en mode privé cette saison (compteur anonyme — impossible de savoir qui, c'est voulu).`));
+      lines.push(row(null, `<b>${pc}</b> joueur(s) en mode privé (compteur anonyme — impossible de savoir qui, c'est voulu).`));
     } catch (_) { lines.push(row(false, 'Stats de la sonde indisponibles — compteur de joueurs privés inconnu pour l\'instant.')); }
     // 2) Dernière sauvegarde bien arrivée dans le dépôt PRIVÉ.
     try {
@@ -4201,7 +4201,7 @@ function renderServerHealth() {
 
   const srv = (srvData && srvData.server) ? srvData.server : {};
   $('#ss-crashes').textContent = (typeof srv.crashes === 'number') ? String(srv.crashes) : '0';
-  // L'étiquette de la tuile reste « crashs (saison) » : l'explication et la date vivent sur leur propre ligne.
+  // L'étiquette de la tuile reste « crashs » : l'explication et la date vivent sur leur propre ligne.
   const crashInfo = $('#ss-crash-info');
   if (crashInfo) crashInfo.textContent = 'Crash = arrêt brutal du serveur.'
     + (srv.lastStopAt ? ' Dernier arrêt normal (sans crash) : ' + fmtDate(srv.lastStopAt) + '.' : '');
@@ -4262,7 +4262,7 @@ function renderSrvStrip() {
     if (!rp) { const pk = vals.length ? Math.max(...vals) : 0; if (pk > recPeak) { recPeak = pk; recDay = d; } }
   }
   $('#ss-record').textContent = String(recPeak);
-  $('#ss-record-d').textContent = recDay ? 'record de joueurs en même temps — ' + dayLabel(recDay) : 'record de joueurs en même temps (saison)';
+  $('#ss-record-d').textContent = recDay ? 'record de joueurs en même temps — ' + dayLabel(recDay) : 'record de joueurs en même temps';
   $('#ss-bestday').textContent = bestDay ? dayLabel(bestDay) : '—';
   const weekAgo = Date.now() - 7 * 86400000;
   $('#ss-new7').textContent = String(Object.values(seen).filter((s) => new Date(s.first).getTime() >= weekAgo).length);
@@ -4352,7 +4352,7 @@ function renderSrvDay() {
           <div class="body">
             <div class="title">${esc(r.n)} — ${fmtMin(r.dayMin)} ce jour</div>
             <div class="meta2"><span>Sessions : ${esc(sesTxt)}</span></div>
-            <div class="meta2"><span>total saison : ${fmtMin(s.minutes || 0)}</span>${s.totalMin ? `<span>temps de jeu total : ${fmtMin(s.totalMin)}</span>` : ''}<span>première fois : ${s.first ? fmtDate(s.first) : '—'}</span><span>dernière fois : ${s.last ? fmtDate(s.last) : '—'}</span></div>
+            <div class="meta2"><span>temps de jeu : ${fmtMin(s.minutes || 0)}</span>${s.totalMin ? `<span>temps de jeu total : ${fmtMin(s.totalMin)}</span>` : ''}<span>première fois : ${s.first ? fmtDate(s.first) : '—'}</span><span>dernière fois : ${s.last ? fmtDate(s.last) : '—'}</span></div>
           </div>
         </div>`;
       }).join('')
@@ -4449,7 +4449,7 @@ function renderRetention() {
     : 'Aucun joueur enregistré pour l\u2019instant.';
 }
 
-// ── Classement des plus assidus (saison) ──
+// ── Classement des plus assidus ──
 function renderLeaderboard() {
   const seen = srvData?.seen || {};
   const rows = Object.entries(seen).map(([n, s]) => [n, s.minutes || 0]).filter((r) => r[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 15);
@@ -4540,7 +4540,7 @@ function showPlayerProfile(name) {
   const rows = [];
   const priv = srvData.priv || {};
   if (s.uuid && priv[s.uuid] === true) rows.push(['Confidentialité', '🔒 privé (caché du public — /meyprivacy)']);
-  rows.push(['Temps de jeu (saison)', fmtMin(s.minutes || 0)]);
+  rows.push(['Temps de jeu', fmtMin(s.minutes || 0)]);
   if (s.totalMin) rows.push(['Temps de jeu total', fmtMin(s.totalMin)]);
   rows.push(['Sessions', String(s.sessions || 0)]);
   rows.push(['Jours de présence', String(daysPresent)]);
@@ -4584,7 +4584,7 @@ function doExportCsvSeason() {
     const cr = Array.isArray(obj.cr) ? obj.cr.length : 0;
     lines.push([day, m.peak, m.upMin, m.players, tpsAvg, msptMax, cr].join(';'));
   }
-  downloadText(lines.join('\n'), 'stats-meytopia-saison.csv', 'text/csv;charset=utf-8');
+  downloadText(lines.join('\n'), 'stats-meytopia-historique.csv', 'text/csv;charset=utf-8');
 }
 async function doExportJson() {
   try {
@@ -4626,7 +4626,7 @@ function doExportCsvDay() {
   const seen = srvData.seen || {};
   const lines = ['\uFEFFJour;' + day, '', 'Heure;Joueurs en ligne'];
   slots.forEach((v, i) => { if (v !== null && v !== undefined) lines.push(slotTime(i) + ';' + (v >= 0 ? v : 'hors ligne')); });
-  lines.push('', 'Joueur;Minutes (jour);Sessions;Total saison (min);Premiere fois;Derniere fois');
+  lines.push('', 'Joueur;Minutes (jour);Sessions;Total (min);Premiere fois;Derniere fois');
   const names = new Set([...(presence ? Object.keys(presence) : []), ...Object.keys(legacy)]);
   for (const n of names) {
     const slotsN = presence ? (presence[n] || []) : [];
