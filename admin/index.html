@@ -131,6 +131,10 @@ tr.total td{border-top:2px solid var(--line-2)}
 .grant-chip{display:inline-flex;align-items:center;gap:4px;background:var(--card-2);border:1px solid var(--line-2);border-radius:999px;padding:3px 6px 3px 10px;font-size:12px}
 /* cadeau doré (rare) : puce distinguée */
 .gf-gold-chip{border-color:#fbbf24;background:rgba(251,191,36,.12)}
+/* quantité cliquable dans les puces (cadeaux + récompenses de défis) : petit champ intégré,
+   plus fort que la règle globale input[type=number] (qui mettrait pleine largeur) */
+.grant-chip .chip-n{width:52px;min-width:0;padding:2px 4px;text-align:center;border-radius:6px;font-size:12px}
+.grant-chip .chip-n::-webkit-inner-spin-button,.grant-chip .chip-n::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .grant-chip>b{min-width:16px;text-align:center}
 .grant-chip button{border:none;background:var(--bg-2);color:var(--text);width:20px;height:20px;border-radius:50%;cursor:pointer;line-height:1;font-size:13px}
 .grant-chip button:hover{background:var(--violet);color:#fff}
@@ -1397,7 +1401,7 @@ function renderGfChips() {
   const box = $('#gf-chips'); if (!box) return;
   box.innerHTML = gfItems.length ? gfItems.map((it, i) =>
     `<span class="grant-chip${it.golden ? ' gf-gold-chip' : ''}" title="${esc(it.id)}${it.golden ? ' — cadeau DORÉ (rare)' : ''}">${itemIcoHtml(it.id)} ${esc(it.label || prettyItem(it.id))}${it.golden ? ' ✨' : ''} ` +
-    `<button type="button" data-gf-dec="${i}" title="Moins">−</button><b>${it.count}</b><button type="button" data-gf-inc="${i}" title="Plus">+</button>` +
+    `<button type="button" data-gf-dec="${i}" title="Moins">−</button><input type="number" class="chip-n" data-gf-n="${i}" value="${it.count}" min="1" max="64" title="Clique et tape la quantité (1 à 64)"><button type="button" data-gf-inc="${i}" title="Plus">+</button>` +
     `<button type="button" data-gf-gold="${i}" title="${it.golden ? 'Repasser en cadeau normal' : 'Passer en cadeau doré (rare)'}">✨</button>` +
     `<button type="button" data-gf-rm="${i}" class="x" title="Retirer">✕</button></span>`).join('')
     : '<div class="hint">Aucun cadeau pour l\'instant — cherche un objet ci-dessus et clique pour l\'ajouter.</div>';
@@ -1471,6 +1475,22 @@ if ($('#gf-chips')) $('#gf-chips').addEventListener('click', (ev) => {
   else touched = false;
   if (touched) { dirty.add('form-gifts'); renderGfChips(); }
 });
+// Quantité tapée directement dans la puce : appliquée à la sortie du champ (« change »), pour ne
+// pas re-rendre à chaque frappe (le champ perdrait le focus). Saisie hors bornes → ramenée à 1-64.
+if ($('#gf-chips')) {
+  $('#gf-chips').addEventListener('input', (ev) => { if (ev.target && ev.target.dataset && ev.target.dataset.gfN != null) dirty.add('form-gifts'); });
+  $('#gf-chips').addEventListener('change', (ev) => {
+    const t = ev.target; if (!t || !t.dataset || t.dataset.gfN == null) return;
+    const it = gfItems[+t.dataset.gfN]; if (!it) return;
+    const v = parseInt(t.value, 10);
+    it.count = Number.isInteger(v) ? Math.max(1, Math.min(64, v)) : it.count;
+    dirty.add('form-gifts');
+    // PAS de re-rendu ici : il détruirait le bouton visé par un clic en cours (mousedown → blur →
+    // change → innerHTML remplacé → clic jamais émis) et ferait perdre le focus aux flèches ↑/↓.
+    // On réécrit juste la valeur bornée dans le champ (70 → 64, saisie invalide → ancienne valeur).
+    t.value = String(it.count);
+  });
+}
 if ($('#gf-enabled')) $('#gf-enabled').addEventListener('change', () => dirty.add('form-gifts'));
 if ($('#gf-golden')) $('#gf-golden').addEventListener('input', () => dirty.add('form-gifts'));
 if ($('#gf-save')) $('#gf-save').addEventListener('click', async () => {
@@ -1620,7 +1640,7 @@ function addGrantItem(id, n) {
 }
 function renderGrantChips() {
   const box = $('#cf-grant-chips'); if (!box) return;
-  box.innerHTML = cfGrantItems.map((it, i) => `<span class="grant-chip" title="${esc(it.id)}">${itemIcoHtml(it.id)} ${esc(prettyItem(it.id))} <button type="button" data-gi-dec="${i}">−</button><b>${it.count}</b><button type="button" data-gi-inc="${i}">+</button><button type="button" data-gi-rm="${i}" class="x">✕</button></span>`).join('');
+  box.innerHTML = cfGrantItems.map((it, i) => `<span class="grant-chip" title="${esc(it.id)}">${itemIcoHtml(it.id)} ${esc(prettyItem(it.id))} <button type="button" data-gi-dec="${i}">−</button><input type="number" class="chip-n" data-gi-n="${i}" value="${it.count}" min="1" max="6400" title="Clique et tape la quantité (1 à 6400)"><button type="button" data-gi-inc="${i}">+</button><button type="button" data-gi-rm="${i}" class="x">✕</button></span>`).join('');
 }
 if ($('#cf-item-search')) $('#cf-item-search').addEventListener('input', (e) => renderItemResults(e.target.value));
 if ($('#cf-item-search')) $('#cf-item-search').addEventListener('focus', (e) => { loadItemsCatalog().then(() => renderItemResults(e.target.value)); });
@@ -1636,6 +1656,17 @@ if ($('#cf-grant-chips')) $('#cf-grant-chips').addEventListener('click', (ev) =>
   if (t.dataset.giInc != null) { cfGrantItems[+t.dataset.giInc].count++; renderGrantChips(); }
   else if (t.dataset.giDec != null) { const it = cfGrantItems[+t.dataset.giDec]; it.count = Math.max(1, it.count - 1); renderGrantChips(); }
   else if (t.dataset.giRm != null) { cfGrantItems.splice(+t.dataset.giRm, 1); renderGrantChips(); }
+});
+// Quantité tapée directement dans la puce (récompense de défi) : appliquée au « change »,
+// ramenée à 1-6400 (la borne que la sonde applique de toute façon au moment du give).
+if ($('#cf-grant-chips')) $('#cf-grant-chips').addEventListener('change', (ev) => {
+  const t = ev.target; if (!t || !t.dataset || t.dataset.giN == null) return;
+  const it = cfGrantItems[+t.dataset.giN]; if (!it) return;
+  const v = parseInt(t.value, 10);
+  it.count = Number.isInteger(v) ? Math.max(1, Math.min(6400, v)) : it.count;
+  // PAS de re-rendu (même raison que les cadeaux : clic suivant avalé, focus perdu aux flèches) —
+  // la valeur bornée est simplement réécrite dans le champ.
+  t.value = String(it.count);
 });
 if ($('#cf-item-manual-add')) $('#cf-item-manual-add').addEventListener('click', () => {
   const id = $('#cf-item-manual').value.trim(), n = $('#cf-item-manual-n').value;
