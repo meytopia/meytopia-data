@@ -1,18 +1,6 @@
 {
   "entries": [
     {
-      "id": "launcher-0.31.0",
-      "target": "launcher",
-      "version": "0.31.0",
-      "date": "2026-07-04",
-      "title": "Le temps de jeu affiché est enfin le vrai (et le même partout)",
-      "changes": [
-        "Le « temps de jeu » affiché est maintenant ton VRAI temps de jeu Minecraft (celui de ton compte), au lieu du temps mesuré par la sonde qui pouvait être plus bas et repartait à zéro quand on la redémarrait",
-        "Résultat : la tuile « temps de jeu », le classement « Temps en jeu », ta place et « de jeu cumulé » montrent tous le même chiffre pour un même joueur — fini les nombres qui se contredisent",
-        "La carte « plus long allumage du serveur » a été retirée (elle n’apportait rien)"
-      ]
-    },
-    {
       "id": "launcher-0.30.0",
       "target": "launcher",
       "version": "0.30.0",
