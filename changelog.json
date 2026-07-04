@@ -1,18 +1,6 @@
 {
   "entries": [
     {
-      "id": "launcher-0.30.0",
-      "target": "launcher",
-      "version": "0.30.0",
-      "date": "2026-07-03",
-      "title": "Un seul temps de jeu, fini les doublons « saison »",
-      "changes": [
-        "« Mes stats » affiche UN seul temps de jeu (plus de doublon « saison » / « total » qui pouvait montrer deux chiffres différents)",
-        "Les mentions « cette saison » disparaissent des statistiques : comme tout repart de zéro à chaque saison, elles n’apportaient rien — et pouvaient afficher un chiffre faussé en cas de souci de la sonde",
-        "Rien ne change pour « Ta saison en chiffres » (la rétro) ni pour l’histoire des saisons : elles parlent de saisons terminées et restent exactes"
-      ]
-    },
-    {
       "id": "launcher-0.29.0",
       "target": "launcher",
       "version": "0.29.0",
