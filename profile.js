@@ -79,7 +79,7 @@
       '</div>';
     var tiles =
       '<div class="grid">' +
-      stat(SC.fmtPlayTime(s.minutes || 0), 'temps de jeu') +
+      stat(SC.fmtPlayTime(SC.playtime(s)), 'temps de jeu') +
       stat(SC.fmtNum(SC.daysPresent(data, name)), 'jours de présence') +
       stat(SC.fmtNum(s.sessions || 0), 'connexions au serveur') +
       stat(s.first ? SC.fmtDate(s.first) : '—', 'première venue') +
@@ -117,13 +117,16 @@
   }
 
   function aggChallenge(data, metric) {
+    // Temps de jeu = VRAI temps Minecraft (comme « de jeu cumulé »), sur les joueurs visibles — pas
+    // les minutes sonde, sinon la barre du défi contredirait le cumulé affiché.
+    if (metric === 'totalPlayMinutes') return SC.pubKeys(data).reduce(function (a, n) { return a + SC.playtime((data && data.seen) ? data.seen[n] : null); }, 0);
     // Total communautaire anonyme publié par la sonde (inclut les joueurs privés) → barre = déclenchement réel.
     if (data && data.agg && typeof data.agg[metric] === 'number') return data.agg[metric];
     var seen = (data && data.seen) ? data.seen : {};
     var keys = Object.keys(seen).filter(function (n) { return !SC.isPrivate(data, seen[n] && seen[n].uuid); }); // exclut les joueurs privés
     function sumMc(k) { return keys.reduce(function (a, n) { var s = seen[n]; return a + ((s && s.mc && typeof s.mc[k] === 'number') ? s.mc[k] : 0); }, 0); }
     switch (metric) {
-      case 'totalPlayMinutes': return keys.reduce(function (a, n) { return a + ((seen[n] && seen[n].minutes) || 0); }, 0);
+      case 'totalPlayMinutes': return keys.reduce(function (a, n) { return a + SC.playtime(seen[n]); }, 0);
       case 'uniquePlayers': return keys.length;
       case 'peak': return (data && data.records && data.records.peakPlayers && data.records.peakPlayers.value) || 0;
       // toute autre métrique = somme de seen[].mc[metric] — même règle générique que le mod (aggMetric).
@@ -194,7 +197,7 @@
       return '<a href="?p=' + encodeURIComponent(p.name) + '">' +
         '<img src="' + SC.avatarUrl(p.uuid || p.name, 32) + '" alt="">' +
         '<div style="min-width:0"><div class="n">' + SC.escapeHtml(p.name) + '</div>' +
-        '<div class="t">' + on + SC.fmtPlayTime(p.minutes) + ' de jeu</div></div></a>';
+        '<div class="t">' + on + SC.fmtPlayTime(p.playMin) + ' de jeu</div></div></a>';
     }).join('');
     var dir = list.length ? '<div class="section">Les joueurs de Meytopia</div><div class="dir">' + cards + '</div>'
       : '<div class="empty">Aucun joueur enregistré pour l’instant.</div>';
@@ -219,7 +222,7 @@
     var rec = (d && d.records) || {};
     var pub = SC.pubKeys(d);
     var minutes = 0;
-    pub.forEach(function (n) { minutes += (d.seen[n] && d.seen[n].minutes) || 0; });
+    pub.forEach(function (n) { minutes += SC.playtime(d.seen[n]); });
     var from = srv.firstStartAt ? SC.fmtDate(srv.firstStartAt) : null;
     var to = srv.lastStopAt ? SC.fmtDate(srv.lastStopAt) : null;
     var period = isCurrent ? (from ? 'en cours depuis le ' + from : 'en cours') : (from && to ? 'du ' + from + ' au ' + to : (to ? 'terminée le ' + to : ''));
@@ -229,7 +232,7 @@
     if (rec.peakPlayers && rec.peakPlayers.value) bits.push('record ' + SC.fmtNum(rec.peakPlayers.value) + ' en simultané');
     if (rec.longestSession && rec.longestSession.minutes) bits.push('plus longue session ' + SC.fmtPlayTime(rec.longestSession.minutes) + (rec.longestSession.player ? ' (' + SC.escapeHtml(rec.longestSession.player) + ')' : ''));
     var top = null;
-    pub.forEach(function (n) { var m = (d.seen[n] && d.seen[n].minutes) || 0; if (m > 0 && (!top || m > top.m)) top = { n: n, m: m }; });
+    pub.forEach(function (n) { var m = SC.playtime(d.seen[n]); if (m > 0 && (!top || m > top.m)) top = { n: n, m: m }; });
     if (top) bits.push('👑 joueur le plus présent : ' + SC.escapeHtml(top.n) + ' (' + SC.fmtPlayTime(top.m) + ' de jeu)');
     return '<div class="chal' + (isCurrent ? ' done' : '') + '">' +
       '<div class="chal-head"><span>' + (isCurrent ? '⚔️ ' : '🏁 ') + SC.escapeHtml(title) + '</span><span>' + SC.escapeHtml(period) + '</span></div>' +

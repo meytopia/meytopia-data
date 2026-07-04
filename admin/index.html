@@ -4352,7 +4352,7 @@ function renderSrvDay() {
           <div class="body">
             <div class="title">${esc(r.n)} — ${fmtMin(r.dayMin)} ce jour</div>
             <div class="meta2"><span>Sessions : ${esc(sesTxt)}</span></div>
-            <div class="meta2"><span>temps de jeu : ${fmtMin(s.minutes || 0)}</span>${s.totalMin ? `<span>temps de jeu total : ${fmtMin(s.totalMin)}</span>` : ''}<span>première fois : ${s.first ? fmtDate(s.first) : '—'}</span><span>dernière fois : ${s.last ? fmtDate(s.last) : '—'}</span></div>
+            <div class="meta2"><span>temps de jeu : ${fmtMin(plMin(s))}</span><span>première fois : ${s.first ? fmtDate(s.first) : '—'}</span><span>dernière fois : ${s.last ? fmtDate(s.last) : '—'}</span></div>
           </div>
         </div>`;
       }).join('')
@@ -4450,9 +4450,10 @@ function renderRetention() {
 }
 
 // ── Classement des plus assidus ──
+function plMin(s) { if (!s) return 0; if (typeof s.totalMin === 'number' && s.totalMin > 0) return s.totalMin; if (s.mc && typeof s.mc.playMin === 'number' && s.mc.playMin > 0) return s.mc.playMin; return s.minutes || 0; }
 function renderLeaderboard() {
   const seen = srvData?.seen || {};
-  const rows = Object.entries(seen).map(([n, s]) => [n, s.minutes || 0]).filter((r) => r[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 15);
+  const rows = Object.entries(seen).map(([n, s]) => [n, plMin(s)]).filter((r) => r[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 15);
   if (!rows.length) { $('#ss-leaderboard').innerHTML = '<div class="empty">Personne n\u2019a encore de temps de jeu.</div>'; return; }
   const max = rows[0][1] || 1;
   const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1);
@@ -4486,7 +4487,7 @@ function renderWeekly() {
   }
   const newThisWeek = Object.values(seen).filter((s) => new Date(s.first).getTime() >= now - 7 * DAY).length;
   const hours = Math.round(totalMin / 60);
-  const top3 = Object.entries(seen).map(([n, s]) => [n, s.minutes || 0]).filter((r) => r[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  const top3 = Object.entries(seen).map(([n, s]) => [n, plMin(s)]).filter((r) => r[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 3);
   weeklyRecapText = [
     'Meytopia — 7 derniers jours',
     'Joueurs actifs : ' + activePlayers.size,
@@ -4540,8 +4541,7 @@ function showPlayerProfile(name) {
   const rows = [];
   const priv = srvData.priv || {};
   if (s.uuid && priv[s.uuid] === true) rows.push(['Confidentialité', '🔒 privé (caché du public — /meyprivacy)']);
-  rows.push(['Temps de jeu', fmtMin(s.minutes || 0)]);
-  if (s.totalMin) rows.push(['Temps de jeu total', fmtMin(s.totalMin)]);
+  rows.push(['Temps de jeu', fmtMin(plMin(s))]);
   rows.push(['Sessions', String(s.sessions || 0)]);
   rows.push(['Jours de présence', String(daysPresent)]);
   rows.push(['Première fois', s.first ? fmtDate(s.first) : '—']);
@@ -4633,7 +4633,7 @@ function doExportCsvDay() {
     const dayMin = presence ? slotsN.length : (legacy[n] || 0);
     const ses = presence ? sessionsOf(slotsN).map((x) => `${x.from}->${x.to}`).join(' | ') : '';
     const s = seen[n] || {};
-    lines.push([n, dayMin, ses, s.minutes || 0, s.first || '', s.last || ''].join(';'));
+    lines.push([n, dayMin, ses, plMin(s), s.first || '', s.last || ''].join(';'));
   }
   downloadText(lines.join('\n'), `stats-meytopia-${day}.csv`, 'text/csv;charset=utf-8');
 }

@@ -24,6 +24,15 @@
     if (!isFinite(v)) v = 0;
     return Math.round(v).toLocaleString('fr-FR');
   }
+  // « Temps de jeu » RÉEL = play_time Minecraft (lu par UUID, publié en totalMin par la sonde ≥ 2.20 ;
+  // = mc.playMin). Robuste aux coupures et au reset de la sonde. Repli sur minutes pour les vieilles
+  // archives. À utiliser PARTOUT où on affiche/classe un « temps de jeu » (jamais s.minutes seul).
+  function playtime(s) {
+    if (!s) return 0;
+    if (typeof s.totalMin === 'number' && s.totalMin > 0) return s.totalMin;
+    if (s.mc && typeof s.mc.playMin === 'number' && s.mc.playMin > 0) return s.mc.playMin;
+    return s.minutes || 0;
+  }
   function fmtDate(iso) {
     try {
       return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: PARIS });
@@ -76,7 +85,7 @@
   // Rang du joueur par temps de jeu total (joueurs privés exclus).
   function playtimeRank(data, name) {
     var seen = (data && data.seen) || {};
-    var arr = pubKeys(data).map(function (n) { return { n: n, m: (seen[n] && seen[n].minutes) || 0 }; })
+    var arr = pubKeys(data).map(function (n) { return { n: n, m: playtime(seen[n]) }; })
       .sort(function (a, b) { return b.m - a.m; });
     var idx = arr.findIndex(function (x) { return x.n === name; });
     return idx < 0 ? null : { rank: idx + 1, total: arr.length };
@@ -87,8 +96,8 @@
     var seen = (data && data.seen) || {};
     return pubKeys(data).map(function (n) {
       var s = seen[n] || {};
-      return { name: n, uuid: s.uuid || null, minutes: s.minutes || 0, first: s.first || null, last: s.last || null };
-    }).sort(function (a, b) { return b.minutes - a.minutes; });
+      return { name: n, uuid: s.uuid || null, minutes: s.minutes || 0, playMin: playtime(s), first: s.first || null, last: s.last || null };
+    }).sort(function (a, b) { return b.playMin - a.playMin; });
   }
 
   function avatarUrl(uuidOrName, size) {
@@ -101,7 +110,7 @@
     var c = { mobs: 0, distM: 0, diamonds: 0, fish: 0, minutes: 0, players: keys.length };
     keys.forEach(function (n) {
       var s = seen[n] || {}, mc = s.mc || {};
-      c.minutes += s.minutes || 0;
+      c.minutes += playtime(s);
       c.mobs += mc.mobKills || 0;
       c.distM += (typeof mc.distTotM === 'number' ? mc.distTotM : (mc.distM || 0));
       c.diamonds += mc.diamonds || 0;
@@ -121,7 +130,7 @@
   function champions(data) {
     var seen = (data && data.seen) || {}, keys = pubKeys(data);
     var cats = [
-      { emoji: '👑', label: 'Le plus assidu', get: function (s) { return s.minutes || 0; }, fmt: function (v) { return fmtPlayTime(v); } },
+      { emoji: '👑', label: 'Le plus assidu', get: function (s) { return playtime(s); }, fmt: function (v) { return fmtPlayTime(v); } },
       { emoji: '⚔️', label: 'Tueur de monstres', get: function (s) { return (s.mc && s.mc.mobKills) || 0; }, fmt: function (v) { return fmtNum(v) + ' mobs'; } },
       { emoji: '🥾', label: 'Grand voyageur', get: function (s) { return (s.mc && (s.mc.distTotM || s.mc.distM)) || 0; }, fmt: function (v) { return fmtDist(v); } },
       { emoji: '💎', label: 'Mineur de diamant', get: function (s) { return (s.mc && s.mc.diamonds) || 0; }, fmt: function (v) { return fmtNum(v) + ' 💎'; } },
@@ -203,7 +212,7 @@
 
   root.StatsCore = {
     PARIS: PARIS, escapeHtml: escapeHtml, fmtPlayTime: fmtPlayTime, fmtDist: fmtDist,
-    fmtNum: fmtNum, fmtDate: fmtDate, fmtAgo: fmtAgo, daysPresent: daysPresent, rankOf: rankOf,
+    fmtNum: fmtNum, playtime: playtime, fmtDate: fmtDate, fmtAgo: fmtAgo, daysPresent: daysPresent, rankOf: rankOf,
     playtimeRank: playtimeRank, players: players, avatarUrl: avatarUrl, isPrivate: isPrivate,
     pubKeys: pubKeys, collective: collective, milestones: milestones, champions: champions,
     UP_MERGE_GAP_SEC: UP_MERGE_GAP_SEC, mergeUp: mergeUp, deriveIntervalsDay: deriveIntervalsDay,
