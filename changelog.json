@@ -1,19 +1,6 @@
 {
   "entries": [
     {
-      "id": "launcher-0.23.0",
-      "target": "launcher",
-      "version": "0.23.0",
-      "date": "2026-07-02",
-      "title": "Mises à jour du catalogue en 1 clic + tout est expliqué",
-      "changes": [
-        "Tes mods optionnels te préviennent quand une nouvelle version existe : badge « mise à jour disponible » + bouton « Mettre à jour » (l’ancienne version est retirée proprement, jamais de doublon)",
-        "Le launcher refuse gentiment de modifier tes mods pendant que Minecraft tourne (« Ferme d’abord Minecraft »)",
-        "Partout, des explications simples : la vitesse du serveur en mots plutôt qu’en chiffres techniques, chaque badge et chaque statistique expliqués",
-        "Les défis communautaires peuvent maintenant porter sur la distance parcourue, les succès, le vol en élytre et les duels"
-      ]
-    },
-    {
       "id": "launcher-0.22.0",
       "target": "launcher",
       "version": "0.22.0",
