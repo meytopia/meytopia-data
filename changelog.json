@@ -1,3 +1,15 @@
 {
-  "entries": []
+  "entries": [
+    {
+      "id": "launcher-0.32.0",
+      "target": "launcher",
+      "version": "0.32.0",
+      "date": "2026-07-04",
+      "title": "Connexion au serveur plus fiable (réseaux capricieux)",
+      "changes": [
+        "Sur certains réseaux (box, école, entreprise, VPN) qui empêchent le launcher de lire l’adresse technique du serveur, le launcher gardait parfois une adresse qui ne se connectait à rien — corrigé : il garde toujours « meytopia.fr » et laisse Minecraft trouver le serveur, ce qui marche dans ce cas",
+        "Ta liste de serveurs multijoueur perso est protégée : si le fichier est momentanément illisible, le launcher ne l’écrase plus (avant, il pouvait effacer tes autres serveurs)"
+      ]
+    }
+  ]
 }
