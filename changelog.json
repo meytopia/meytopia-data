@@ -1,24 +1,6 @@
 {
   "entries": [
     {
-      "id": "launcher-0.28.0",
-      "target": "launcher",
-      "version": "0.28.0",
-      "date": "2026-07-03",
-      "title": "Plus clair, plus solide : Communauté, comptes et téléchargements",
-      "changes": [
-        "La semaine de la Communauté affiche les jours en toutes lettres (lun., mar.…) avec le détail au survol en français",
-        "Chaque défi communautaire indique le temps qu’il reste (« se termine dans 3 jours »)",
-        "Quand les infos en direct datent un peu, le launcher le dit honnêtement (« dernier relevé il y a X min ») au lieu de faire disparaître le bloc",
-        "Les avatars réservent leur place et affichent un petit carré neutre si l’image ne charge pas — fini les sauts d’affichage",
-        "Si ta session Microsoft a expiré, un bouton « Reconnecter » te reconnecte en un clic (plus besoin de retirer puis rajouter le compte)",
-        "Pendant la vérification des fichiers, le bouton JOUER affiche l’avancement (« Vérification 45/230 », puis « Téléchargement… ») au lieu de rester figé",
-        "Les erreurs de lancement sont expliquées en français avec le geste à faire (disque plein, fichier bloqué par l’antivirus, souci de connexion…)",
-        "Un téléchargement coupé par une coupure de réseau reprend là où il s’était arrêté au lieu de tout recommencer",
-        "La page Communauté est plus fluide (calculs mutualisés) et le launcher vérifie ses mises à jour au bon moment"
-      ]
-    },
-    {
       "id": "launcher-0.23.0",
       "target": "launcher",
       "version": "0.23.0",
