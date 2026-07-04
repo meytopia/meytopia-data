@@ -1,17 +1,3 @@
 {
-  "entries": [
-    {
-      "id": "launcher-0.22.0",
-      "target": "launcher",
-      "version": "0.22.0",
-      "date": "2026-07-02",
-      "title": "Page Communauté refaite : des chiffres enfin cohérents",
-      "changes": [
-        "Les statistiques du serveur, jalons et classements affichent désormais les totaux réels (depuis le début de Meytopia) — fini les chiffres qui se contredisent",
-        "Les jalons collectifs sont de vraies célébrations 🎉 avec le prochain cap à atteindre et sa barre de progression",
-        "Nouveau : « Les titres de la saison » (marathonien, fidèle, noctambule…), ta ligne « toi » dans les classements, ta contribution dans les défis, la météo de la semaine 📈",
-        "Records enrichis (plus long allumage du serveur) et messages plus justes (état inconnu ≠ serveur éteint)"
-      ]
-    }
-  ]
+  "entries": []
 }
