@@ -607,7 +607,8 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
         <h2 style="margin:0">Composer le pack</h2>
         <a href="#" id="pk-help" style="color:var(--violet);text-decoration:none;font-size:13px">aide &amp; pré-requis</a>
       </div>
-      <p class="hint" style="margin-bottom:10px">Ajoute, met à jour ou remplace des mods par <b>lien</b> (direct ou CurseForge), <b>plusieurs d'un coup (un par ligne)</b> — et aussi des <b>packs de textures/shaders</b> (.zip, lien direct) : le launcher les installe ET les active tout seul chez les joueurs — GitHub assemble et publie tout seul, sans PC. Laisse <b>Simulation</b> coché pour un essai sans rien publier.</p>
+      <p class="hint" style="margin-bottom:10px">Ajoute des <b>mods</b>, <b>packs de textures</b> et <b>shaders</b> par <b>lien</b> (un par ligne) — le launcher installe ET active les textures/shaders tout seuls chez les joueurs. GitHub assemble et publie sans PC ; laisse <b>Simulation</b> coché pour un essai.</p>
+      <p class="hint" style="margin:-4px 0 10px;color:var(--warning,#fbbf24)">⚠️ <b>CurseForge</b> : colle le lien de la page du fichier (n'importe quel type — mods, textures, shaders) — nécessite la clé API (secret <span class="mono">CURSEFORGE_API_KEY</span>). Un « <b>lien direct</b> » doit pointer sur le <b>fichier</b> lui-même (Modrinth par ex., finissant par <span class="mono">.zip</span>/<span class="mono">.jar</span>) — pas une page web. Un lien qui renvoie une page est désormais <b>refusé</b> (fini les faux fichiers).</p>
       <div class="cols">
         <div class="field"><label for="pk-mode">Opération</label>
           <select id="pk-mode"><option value="add">➕ Ajouter au pack</option><option value="update">⬆️ Mettre à jour (remplace un mod)</option><option value="replace">🔁 Remplacer tout le pack</option></select></div>

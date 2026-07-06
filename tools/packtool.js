@@ -38,12 +38,26 @@ function bump(version, kind) {
 function assetName(p) { return String(p).split('/').join('_'); }
 function assetUrl(tag, p) { return `https://github.com/${REPO}/releases/download/${tag}/${assetName(p)}`; }
 function parseCurseforge(item) {
-  let slug = item.slug || null, fileId = item.fileId || null, projectId = item.projectId || null;
+  let slug = item.slug || null, fileId = item.fileId || null, projectId = item.projectId || null, category = item.category || null;
   if (item.url) {
-    const m = String(item.url).match(/curseforge\.com\/minecraft\/mc-mods\/([^/]+)\/(?:files|download)\/(\d+)/);
-    if (m) { slug = slug || m[1]; fileId = fileId || m[2]; }
+    // Toute catégorie CurseForge (mc-mods, texture-packs, shaders, customization…), /files/<id> ou /download/<id>.
+    const m = String(item.url).match(/curseforge\.com\/minecraft\/([^/]+)\/([^/]+)\/(?:files|download)\/(\d+)/i);
+    if (m) { category = category || m[1]; slug = slug || m[2]; fileId = fileId || m[3]; }
   }
-  return { slug, fileId, projectId };
+  return { slug, fileId, projectId, category };
+}
+// Dossier déduit de la catégorie CurseForge (défaut : mod).
+function typeFromCategory(cat) {
+  const c = String(cat || '').toLowerCase();
+  if (c === 'texture-packs') return 'resourcepack';
+  if (c === 'shaders') return 'shaderpack';
+  return 'mod';
+}
+// .jar/.zip = archive ZIP → signature « PK ». Sinon (page HTML d'erreur renvoyée par CurseForge sur un
+// lien direct, par ex.), on REFUSE : jamais de fichier bidon publié.
+function looksLikeZip(buf) {
+  return Buffer.isBuffer(buf) && buf.length >= 4 && buf[0] === 0x50 && buf[1] === 0x4b
+    && (buf[2] === 0x03 || buf[2] === 0x05 || buf[2] === 0x07);
 }
 function forgeCdnUrl(fileId, fileName) {
   const s = String(fileId);
@@ -84,25 +98,28 @@ function readModInfo(buf) {
   } catch { return null; }
 }
 async function resolveItem(item) {
-  if (item.source === 'curseforge') {
-    const { slug, fileId, projectId } = parseCurseforge(item);
-    if (!fileId) throw new Error('CurseForge : fileId introuvable (URL .../files/<id> attendue)');
-    if (!CF_KEY) throw new Error('CurseForge : secret CURSEFORGE_API_KEY manquant');
-    let modId = projectId;
-    if (!modId && slug) {
-      const r = await httpGetJson(`https://api.curseforge.com/v1/mods/search?gameId=432&slug=${encodeURIComponent(slug)}`, { 'x-api-key': CF_KEY, Accept: 'application/json' });
+  // Une URL curseforge.com n'est JAMAIS un fichier direct téléchargeable (page web protégée / 403) : on
+  // passe TOUJOURS par l'API CurseForge — que le "source" soit "curseforge" OU un lien direct collé.
+  const isCf = item.source === 'curseforge' || /curseforge\.com\/minecraft\//i.test(item.url || '');
+  if (isCf) {
+    const cf = parseCurseforge(item);
+    if (!cf.fileId) throw new Error('CurseForge : numéro de fichier introuvable dans l\'URL (attendu .../download/<numéro> ou .../files/<numéro>)');
+    if (!CF_KEY) throw new Error('CurseForge : clé API manquante (secret CURSEFORGE_API_KEY). Ajoute-la au dépôt, ou colle un lien de téléchargement DIRECT (Modrinth, finissant par .zip/.jar).');
+    let modId = cf.projectId;
+    if (!modId && cf.slug) {
+      const r = await httpGetJson(`https://api.curseforge.com/v1/mods/search?gameId=432&slug=${encodeURIComponent(cf.slug)}`, { 'x-api-key': CF_KEY, Accept: 'application/json' });
       modId = r.data && r.data[0] && r.data[0].id;
     }
-    if (!modId) throw new Error('CurseForge : projet introuvable (slug ' + slug + ')');
-    const fr = await httpGetJson(`https://api.curseforge.com/v1/mods/${modId}/files/${fileId}`, { 'x-api-key': CF_KEY, Accept: 'application/json' });
+    if (!modId) throw new Error('CurseForge : projet introuvable (slug ' + cf.slug + ')');
+    const fr = await httpGetJson(`https://api.curseforge.com/v1/mods/${modId}/files/${cf.fileId}`, { 'x-api-key': CF_KEY, Accept: 'application/json' });
     const file = fr.data;
     const dl = file.downloadUrl || forgeCdnUrl(file.id, file.fileName);
-    return { url: dl, fileName: file.fileName };
+    return { url: dl, fileName: file.fileName, type: item.type || typeFromCategory(cf.category) };
   }
-  // source 'url' (lien direct)
+  // Lien direct (Modrinth, CDN, site auteur) : l'URL https doit pointer sur le FICHIER lui-même.
   if (!/^https:\/\//.test(item.url || '')) throw new Error('lien direct : URL https requise');
   const fileName = (item.path ? String(item.path).split('/').pop() : decodeURIComponent(String(item.url).split('/').pop().split('?')[0]));
-  return { url: item.url, fileName };
+  return { url: item.url, fileName, type: item.type || 'mod' };
 }
 
 let statusWritten = null;
@@ -135,10 +152,14 @@ async function runOptional(items) {
     const r = await resolveItem(item); // gère CurseForge (clé API) ET lien direct
     log('↓', r.fileName, '←', r.url.slice(0, 80));
     const buf = await downloadBuffer(r.url);
-    const type = (item.type && TYPE_DIRS[item.type]) ? item.type : 'mod';
-    const p = TYPE_DIRS[type] + '/' + r.fileName;
+    if (!looksLikeZip(buf)) throw new Error(`« ${r.fileName} » n'est pas un .zip/.jar valide (le lien renvoie une page web). CurseForge : ajoute la clé API, ou colle un lien direct (Modrinth).`);
+    const type = (item.type && TYPE_DIRS[item.type]) ? item.type : (r.type || 'mod');
+    const oext = type === 'mod' ? '.jar' : '.zip';
+    let ofn = String(r.fileName || '').trim() || ('fichier' + oext);
+    if (!new RegExp('\\' + oext + '$', 'i').test(ofn)) ofn = ofn.replace(/\.(jar|zip)$/i, '') + oext;
+    const p = TYPE_DIRS[type] + '/' + ofn;
     const info = readModInfo(buf);
-    const name = item.name || (info && info.name) || r.fileName;
+    const name = item.name || (info && info.name) || ofn;
     let id = item.id || (slugify(name) + '-' + type), base = id, k = 2;
     while (opt.items.some((x) => x.id === id && !(x.file && x.file.path === p))) id = base + '-' + (k++);
     opt.items = opt.items.filter((x) => !(x.file && x.file.path === p)); // remplace un doublon (même fichier)
@@ -185,9 +206,17 @@ async function main() {
   // Dossier de destination selon le type d'item : mod (.jar) → mods/, resourcepack/shaderpack
   // (.zip) → leur dossier — le launcher les installe pareil ET les active tout seul (0.33.0+).
   const MAIN_DIRS = { mod: 'mods', resourcepack: 'resourcepacks', shaderpack: 'shaderpacks' };
+  const EXT = { mod: '.jar', resourcepack: '.zip', shaderpack: '.zip' };
   const addFile = (fileName, buf, item) => {
-    const dir = MAIN_DIRS[(item && item.type) || 'mod'] || 'mods';
-    const p = (item && item.path) || (dir + '/' + fileName);
+    const type = (item && item.type) || 'mod';
+    const dir = MAIN_DIRS[type] || 'mods';
+    // Garde-fou : on ne publie QUE de vraies archives (.jar/.zip = ZIP). Un lien qui renvoie une page web
+    // (CurseForge bloque les liens directs → HTML) est REFUSÉ, jamais publié en douce.
+    if (!looksLikeZip(buf)) throw new Error(`« ${fileName} » n'est pas un .zip/.jar valide (le lien renvoie une page web, pas le fichier). CurseForge : ajoute la clé API, ou colle un lien de téléchargement DIRECT (Modrinth).`);
+    // Bonne extension garantie (un nom sans extension, ex. un numéro CurseForge, casserait le mod/pack côté joueur).
+    let nm = String(fileName || '').trim() || ('fichier' + EXT[type]);
+    if (!new RegExp('\\' + EXT[type] + '$', 'i').test(nm)) nm = nm.replace(/\.(jar|zip)$/i, '') + EXT[type];
+    const p = (item && item.path) || (dir + '/' + nm);
     if (seenPaths.has(p)) { log('… doublon ignoré :', p); return; }
     seenPaths.add(p);
     const info = dir === 'mods' ? readModInfo(buf) : null; // pas de méta de mod dans un .zip de textures
@@ -241,7 +270,7 @@ async function main() {
       const r = await resolveItem(item);
       log('↓', r.fileName, '←', r.url.slice(0, 80));
       const buf = await downloadBuffer(r.url);
-      addFile(r.fileName, buf, item);
+      addFile(r.fileName, buf, { ...item, type: r.type });
     }
   }
 
@@ -303,4 +332,4 @@ async function main() {
 
 main().catch((e) => die(e.message || String(e)));
 
-module.exports = { bump, assetName, assetUrl, parseCurseforge, forgeCdnUrl, applyMode };
+module.exports = { bump, assetName, assetUrl, parseCurseforge, typeFromCategory, looksLikeZip, forgeCdnUrl, applyMode };

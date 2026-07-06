@@ -32,6 +32,9 @@ jobs:
       - id: retro
         if: always()
         run: node tools/retro-test.js
+      - id: packtool
+        if: always()
+        run: node tools/packtool-test.js
       - name: Recapitulatif en francais
         if: always()
         run: |
