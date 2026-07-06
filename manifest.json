@@ -1,6 +1,6 @@
 {
-  "version": "1.5.1",
-  "generatedAt": "2026-06-30T14:31:57.943Z",
+  "version": "1.5.2",
+  "generatedAt": "2026-07-06T08:34:51.957Z",
   "files": [
     {
       "path": "mods/addonslib-neoforge-1.21.1-1.10.jar",
@@ -811,6 +811,12 @@
         "id": "zeta",
         "name": "Zeta"
       }
+    },
+    {
+      "path": "shaderpacks/complementary-unbound",
+      "sha1": "af2972c29b0de7099d840ffa4533c59551264e7d",
+      "size": 256306,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.2/shaderpacks_complementary-unbound"
     }
   ]
 }
