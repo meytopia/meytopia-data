@@ -45,6 +45,46 @@
         "mods"
       ],
       "reason": "Retiré du modpack"
+    },
+    {
+      "match": {
+        "sha1": "af2972c29b0de7099d840ffa4533c59551264e7d"
+      },
+      "name": "complementary-unbound",
+      "scope": [
+        "shaderpacks"
+      ],
+      "reason": "Retiré du modpack"
+    },
+    {
+      "match": {
+        "sha1": "a82b96f7f9a394fe68af0be7dec75cb77c44f4d6"
+      },
+      "name": "fast-better-grass",
+      "scope": [
+        "resourcepacks"
+      ],
+      "reason": "Retiré du modpack"
+    },
+    {
+      "match": {
+        "sha1": "b3e4829030d5b1c08086c649f6e6f8ee4af457cf"
+      },
+      "name": "motschens-better-leaves",
+      "scope": [
+        "resourcepacks"
+      ],
+      "reason": "Retiré du modpack"
+    },
+    {
+      "match": {
+        "sha1": "c3a9d4bdd57121149a48e564f699519fe51beddd"
+      },
+      "name": "fresh-animations",
+      "scope": [
+        "resourcepacks"
+      ],
+      "reason": "Retiré du modpack"
     }
   ]
 }
