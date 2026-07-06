@@ -1,6 +1,6 @@
 {
-  "version": "1.5.2",
-  "generatedAt": "2026-07-06T08:34:51.957Z",
+  "version": "1.5.3",
+  "generatedAt": "2026-07-06T08:36:09.711Z",
   "files": [
     {
       "path": "mods/addonslib-neoforge-1.21.1-1.10.jar",
@@ -817,6 +817,24 @@
       "sha1": "af2972c29b0de7099d840ffa4533c59551264e7d",
       "size": 256306,
       "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.2/shaderpacks_complementary-unbound"
+    },
+    {
+      "path": "resourcepacks/fast-better-grass",
+      "sha1": "a82b96f7f9a394fe68af0be7dec75cb77c44f4d6",
+      "size": 272573,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.3/resourcepacks_fast-better-grass"
+    },
+    {
+      "path": "resourcepacks/motschens-better-leaves",
+      "sha1": "b3e4829030d5b1c08086c649f6e6f8ee4af457cf",
+      "size": 304164,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.3/resourcepacks_motschens-better-leaves"
+    },
+    {
+      "path": "resourcepacks/fresh-animations",
+      "sha1": "c3a9d4bdd57121149a48e564f699519fe51beddd",
+      "size": 311917,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.3/resourcepacks_fresh-animations"
     }
   ]
 }

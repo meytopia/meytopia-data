@@ -1,14 +1,16 @@
 {
   "state": "ok",
-  "message": "Pack publié : 1.5.2",
-  "at": "2026-07-06T08:34:51.958Z",
+  "message": "Pack publié : 1.5.3",
+  "at": "2026-07-06T08:36:09.712Z",
   "summary": {
     "mode": "add",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "added": [
-      "shaderpacks/complementary-unbound"
+      "resourcepacks/fast-better-grass",
+      "resourcepacks/motschens-better-leaves",
+      "resourcepacks/fresh-animations"
     ],
     "removedApprox": 0,
-    "total": 82
+    "total": 85
   }
 }
