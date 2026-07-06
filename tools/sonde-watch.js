@@ -116,6 +116,18 @@ function fmtParis(iso) {
 }
 
 (async () => {
+  // Mode TEST du webhook (lancement manuel avec la case cochée) : on envoie un message d'essai et on
+  // s'arrête là. Verdict CLAIR dans les logs Actions — pas de « catch » silencieux, contrairement aux
+  // vraies alertes (non bloquantes). Sert à vérifier que le secret DISCORD_WEBHOOK est bon.
+  if (process.env.TEST_DISCORD === 'true') {
+    if (!WEBHOOK) { console.log('❌ TEST : le secret DISCORD_WEBHOOK est vide ou absent. Vérifie son nom EXACT dans Settings → Secrets → Actions.'); process.exit(1); }
+    try {
+      const r = await fetch(WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: '🔔 **Meytopia** — test du webhook Discord réussi ! Si tu vois ce message, les alertes de panne du serveur arriveront bien ici. 🎉' }) });
+      if (r.ok) { console.log('✅ TEST : message envoyé (HTTP ' + r.status + '). Regarde ton salon Discord.'); return; }
+      console.log('❌ TEST : Discord a refusé (HTTP ' + r.status + '). L\'URL du webhook est peut-être invalide ou supprimée — recrée le webhook et recolle l\'URL dans le secret.'); process.exit(1);
+    } catch (e) { console.log('❌ TEST : impossible de joindre Discord : ' + e.message); process.exit(1); }
+  }
+
   // 0) Garde Pages (site à jour) — AVANT la lecture de live.json : même si la sonde n'a jamais
   //    publié, le site doit être surveillé. Best-effort, jamais bloquant.
   await checkPages();
