@@ -1,5 +1,5 @@
 {
-  "version": "1.5.9",
+  "version": "1.5.10",
   "generatedAt": "2026-07-06T11:20:00.039Z",
   "files": [
     {
@@ -813,10 +813,10 @@
       }
     },
     {
-      "path": "resourcepacks/Fast Better Grass.zip",
+      "path": "resourcepacks/Fast.Better.Grass.zip",
       "sha1": "3a344f8e36a2e748f11dce1c246b5c6ce91141f1",
       "size": 10928,
-      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.9/resourcepacks_Fast Better Grass.zip"
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.9/resourcepacks_Fast.Better.Grass.zip"
     },
     {
       "path": "resourcepacks/Better-Leaves-9.5.zip",

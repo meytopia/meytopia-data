@@ -16,7 +16,7 @@
   },
   "discordInvite": "https://discord.gg/zaXjrpcGat",
   "modpack": {
-    "version": "1.5.9",
+    "version": "1.5.10",
     "mcVersion": "1.21.1",
     "loader": {
       "type": "neoforge",

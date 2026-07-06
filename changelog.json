@@ -1,6 +1,16 @@
 {
   "entries": [
     {
+      "id": "modpack-1.5.10",
+      "target": "modpack",
+      "version": "1.5.10",
+      "date": "2026-07-06",
+      "title": "Modpack 1.5.10",
+      "changes": [
+        "Correction du nom d un pack de textures (espaces) qui empêchait son téléchargement"
+      ]
+    },
+    {
       "id": "modpack-1.5.9",
       "target": "modpack",
       "version": "1.5.9",
