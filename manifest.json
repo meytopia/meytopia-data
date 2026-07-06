@@ -1,6 +1,6 @@
 {
-  "version": "1.5.6",
-  "generatedAt": "2026-07-06T09:35:40.833Z",
+  "version": "1.5.7",
+  "generatedAt": "2026-07-06T09:43:56.186Z",
   "files": [
     {
       "path": "mods/addonslib-neoforge-1.21.1-1.10.jar",
@@ -811,6 +811,30 @@
         "id": "zeta",
         "name": "Zeta"
       }
+    },
+    {
+      "path": "shaderpacks/8123288",
+      "sha1": "36f82f5322c5d856e835023d794b04b4bd6680d8",
+      "size": 140091,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.7/shaderpacks_8123288"
+    },
+    {
+      "path": "resourcepacks/8259877",
+      "sha1": "b40d7cf27efa2e657c6ec1cd6b05b188f4b75dee",
+      "size": 134624,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.7/resourcepacks_8259877"
+    },
+    {
+      "path": "resourcepacks/7854681",
+      "sha1": "6a31c53a0240412d40d4cf3024f5079463ee1402",
+      "size": 147903,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.7/resourcepacks_7854681"
+    },
+    {
+      "path": "resourcepacks/7556678",
+      "sha1": "ce0b5ff0208758085649b8ae6f04e874317d843d",
+      "size": 145368,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.7/resourcepacks_7556678"
     }
   ]
 }
