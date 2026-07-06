@@ -1,14 +1,15 @@
 {
   "state": "ok",
-  "message": "Pack publié : 1.5.3",
-  "at": "2026-07-06T08:36:09.712Z",
+  "message": "Pack publié : 1.5.5",
+  "at": "2026-07-06T09:35:40.834Z",
   "summary": {
     "mode": "add",
-    "version": "1.5.3",
+    "version": "1.5.5",
     "added": [
-      "resourcepacks/fast-better-grass",
-      "resourcepacks/motschens-better-leaves",
-      "resourcepacks/fresh-animations"
+      "resourcepacks/8259877",
+      "resourcepacks/7556678",
+      "resourcepacks/7854681",
+      "shaderpacks/8123288"
     ],
     "removedApprox": 0,
     "total": 85
