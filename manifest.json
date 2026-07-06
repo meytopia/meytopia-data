@@ -1,6 +1,6 @@
 {
-  "version": "1.5.8",
-  "generatedAt": "2026-07-06T09:43:56.186Z",
+  "version": "1.5.9",
+  "generatedAt": "2026-07-06T11:20:00.039Z",
   "files": [
     {
       "path": "mods/addonslib-neoforge-1.21.1-1.10.jar",
@@ -811,6 +811,30 @@
         "id": "zeta",
         "name": "Zeta"
       }
+    },
+    {
+      "path": "resourcepacks/Fast Better Grass.zip",
+      "sha1": "3a344f8e36a2e748f11dce1c246b5c6ce91141f1",
+      "size": 10928,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.9/resourcepacks_Fast Better Grass.zip"
+    },
+    {
+      "path": "resourcepacks/Better-Leaves-9.5.zip",
+      "sha1": "78b7e6cbb1661716423429d2c46ab08266cdf1f8",
+      "size": 1923769,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.9/resourcepacks_Better-Leaves-9.5.zip"
+    },
+    {
+      "path": "resourcepacks/FreshAnimations_v1.10.4.zip",
+      "sha1": "73db740a6868e043c5e615c036fca2c912615b6e",
+      "size": 850941,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.9/resourcepacks_FreshAnimations_v1.10.4.zip"
+    },
+    {
+      "path": "shaderpacks/ComplementaryUnbound_r5.8.1.zip",
+      "sha1": "af656a33be2cbd217ea08986ad2cdd76f6bbfe1c",
+      "size": 546928,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.9/shaderpacks_ComplementaryUnbound_r5.8.1.zip"
     }
   ]
 }
