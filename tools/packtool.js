@@ -78,6 +78,33 @@ async function httpGetJson(url, headers) {
   if (!res.ok) throw new Error(`GET ${url} → ${res.status}`);
   return res.json();
 }
+async function httpPostJson(url, body, headers) {
+  const res = await fetch(url, { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, headers || {}), body: JSON.stringify(body) });
+  if (!res.ok) throw new Error(`POST ${url} → ${res.status}`);
+  return res.json();
+}
+/**
+ * Récupère l'objet fichier CurseForge. On demande d'abord le fichier DIRECTEMENT par son numéro
+ * (POST /v1/mods/files) : pas besoin de retrouver le bon projet, donc pas de 404 quand la recherche
+ * par slug tombe sur un autre projet (cas rencontré en prod). Repli : retrouver le projet par slug.
+ */
+async function curseforgeFile(cf, key) {
+  const headers = { 'x-api-key': key, Accept: 'application/json' };
+  const id = Number(cf.fileId);
+  try {
+    const fj = await httpPostJson('https://api.curseforge.com/v1/mods/files', { fileIds: [id] }, headers);
+    if (fj && Array.isArray(fj.data) && fj.data[0]) return fj.data[0];
+  } catch (e) { /* on tente la voie « par projet » ci-dessous */ }
+  let modId = cf.projectId;
+  if (!modId && cf.slug) {
+    const r = await httpGetJson(`https://api.curseforge.com/v1/mods/search?gameId=432&slug=${encodeURIComponent(cf.slug)}`, headers);
+    modId = r.data && r.data[0] && r.data[0].id;
+  }
+  if (!modId) throw new Error('CurseForge : fichier ' + cf.fileId + ' introuvable (numéro invalide, ou fichier retiré de CurseForge).');
+  const fr = await httpGetJson(`https://api.curseforge.com/v1/mods/${modId}/files/${cf.fileId}`, headers);
+  if (!fr || !fr.data) throw new Error('CurseForge : fichier ' + cf.fileId + ' introuvable sous le projet ' + modId + '.');
+  return fr.data;
+}
 async function downloadBuffer(url) {
   const res = await fetch(url, { redirect: 'follow' });
   if (!res.ok) throw new Error(`téléchargement ${res.status} : ${url}`);
@@ -105,14 +132,7 @@ async function resolveItem(item) {
     const cf = parseCurseforge(item);
     if (!cf.fileId) throw new Error('CurseForge : numéro de fichier introuvable dans l\'URL (attendu .../download/<numéro> ou .../files/<numéro>)');
     if (!CF_KEY) throw new Error('CurseForge : clé API manquante (secret CURSEFORGE_API_KEY). Ajoute-la au dépôt, ou colle un lien de téléchargement DIRECT (Modrinth, finissant par .zip/.jar).');
-    let modId = cf.projectId;
-    if (!modId && cf.slug) {
-      const r = await httpGetJson(`https://api.curseforge.com/v1/mods/search?gameId=432&slug=${encodeURIComponent(cf.slug)}`, { 'x-api-key': CF_KEY, Accept: 'application/json' });
-      modId = r.data && r.data[0] && r.data[0].id;
-    }
-    if (!modId) throw new Error('CurseForge : projet introuvable (slug ' + cf.slug + ')');
-    const fr = await httpGetJson(`https://api.curseforge.com/v1/mods/${modId}/files/${cf.fileId}`, { 'x-api-key': CF_KEY, Accept: 'application/json' });
-    const file = fr.data;
+    const file = await curseforgeFile(cf, CF_KEY);
     const dl = file.downloadUrl || forgeCdnUrl(file.id, file.fileName);
     return { url: dl, fileName: file.fileName, type: item.type || typeFromCategory(cf.category) };
   }
@@ -332,4 +352,4 @@ async function main() {
 
 main().catch((e) => die(e.message || String(e)));
 
-module.exports = { bump, assetName, assetUrl, parseCurseforge, typeFromCategory, looksLikeZip, forgeCdnUrl, applyMode };
+module.exports = { bump, assetName, assetUrl, parseCurseforge, typeFromCategory, looksLikeZip, forgeCdnUrl, applyMode, curseforgeFile };

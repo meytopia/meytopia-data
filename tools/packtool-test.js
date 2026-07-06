@@ -51,5 +51,50 @@ ok('non-buffer REFUSÉ', !pt.looksLikeZip('PK\x03\x04'));
   eq('removePaths honoré', rmRes.map((f) => f.path), ['mods/a.jar', 'resourcepacks/old.zip']);
 }
 
-if (fails === 0) { console.log('\n✔ packtool : tous les tests passent.'); process.exit(0); }
-console.error('\n✖ packtool : ' + fails + ' test(s) en échec.'); process.exit(1);
+// curseforgeFile : résolution du fichier par NUMÉRO direct (POST /v1/mods/files), repli par projet.
+// On bouchonne global.fetch pour ne pas toucher le réseau.
+(async () => {
+  const realFetch = global.fetch;
+  const mk = (obj) => ({ ok: true, status: 200, json: async () => obj });
+  const err404 = { ok: false, status: 404, json: async () => ({}) };
+
+  // 1) Le numéro direct suffit → PAS de recherche par slug (pas de 404 possible).
+  let calls = [];
+  global.fetch = async (url, opts) => {
+    calls.push((opts && opts.method) || 'GET');
+    if (url === 'https://api.curseforge.com/v1/mods/files') return mk({ data: [{ id: 7670377, fileName: 'Cool-Pack-1.2.zip', downloadUrl: 'https://edge.forgecdn.net/files/7670/377/Cool-Pack-1.2.zip' }] });
+    throw new Error('ne devrait pas être appelé : ' + url);
+  };
+  let f = await pt.curseforgeFile({ fileId: '7670377', slug: 'peu-importe' }, 'KEY');
+  eq('CF par numéro direct → bon fichier', [f.fileName, f.id], ['Cool-Pack-1.2.zip', 7670377]);
+  ok('CF par numéro direct → une seule requête (POST), pas de recherche slug', calls.join() === 'POST');
+
+  // 2) POST échoue (404) → repli : recherche projet par slug PUIS fichier.
+  calls = [];
+  global.fetch = async (url, opts) => {
+    const m = (opts && opts.method) || 'GET';
+    calls.push(m + ' ' + url);
+    if (url === 'https://api.curseforge.com/v1/mods/files') return err404;
+    if (url.includes('/mods/search?')) return mk({ data: [{ id: 424242 }] });
+    if (url === 'https://api.curseforge.com/v1/mods/424242/files/7670377') return mk({ data: { id: 7670377, fileName: 'Repli-2.0.zip', downloadUrl: 'https://edge.forgecdn.net/files/x/Repli-2.0.zip' } });
+    throw new Error('URL inattendue : ' + url);
+  };
+  f = await pt.curseforgeFile({ fileId: '7670377', slug: 'mon-mod' }, 'KEY');
+  eq('CF repli slug→projet→fichier', f.fileName, 'Repli-2.0.zip');
+  ok('CF repli : a bien cherché le projet par slug', calls.some((c) => c.includes('/mods/search?')));
+
+  // 3) POST renvoie une liste vide → repli aussi.
+  global.fetch = async (url, opts) => {
+    if (url === 'https://api.curseforge.com/v1/mods/files') return mk({ data: [] });
+    if (url.includes('/mods/search?')) return mk({ data: [{ id: 999 }] });
+    if (url.endsWith('/mods/999/files/111')) return mk({ data: { id: 111, fileName: 'Vide-Repli.zip' } });
+    throw new Error('URL inattendue : ' + url);
+  };
+  f = await pt.curseforgeFile({ fileId: '111', slug: 's' }, 'KEY');
+  eq('CF POST vide → repli projet', f.fileName, 'Vide-Repli.zip');
+
+  global.fetch = realFetch;
+
+  if (fails === 0) { console.log('\n✔ packtool : tous les tests passent.'); process.exit(0); }
+  console.error('\n✖ packtool : ' + fails + ' test(s) en échec.'); process.exit(1);
+})();
