@@ -8,12 +8,16 @@
    Discord : optionnel (secret DISCORD_WEBHOOK) — sans lui, l'issue seule fait foi. */
 'use strict';
 
+const net = require('net');
+const dns = require('dns').promises;
+const fs = require('fs');
+
 const REPO = process.env.GITHUB_REPOSITORY || 'meytopia/meytopia-data';
 const TOKEN = process.env.GITHUB_TOKEN;
 const WEBHOOK = process.env.DISCORD_WEBHOOK || '';
-const STALE_MIN = 15; // la sonde bat toutes les 3 min → 5 battements manqués = panne présumée
 const LABEL = 'sonde-alerte';
-const TITLE = '🔴 Serveur injoignable (sonde muette)';
+const TITLE = '🔴 Serveur injoignable';
+const REMINDERS = [5, 15, 30, 60]; // rappels échelonnés (minutes) tant que le serveur reste injoignable
 
 async function gh(pathname, opts = {}) {
   const res = await fetch('https://api.github.com' + pathname, {
@@ -115,7 +119,56 @@ function fmtParis(iso) {
   catch { return iso; }
 }
 
-(async () => {
+/* ── Ping DIRECT du serveur (indépendant de la sonde) : protocole « Server List Ping » de Minecraft.
+   Le serveur répond → en ligne. Refus / timeout / gel → hors ligne. net + dns natifs, zéro dépendance. ── */
+function mcStatusPing(host, port, timeoutMs) {
+  return new Promise((resolve) => {
+    const socket = net.connect({ host, port });
+    let done = false;
+    const finish = (ok) => { if (done) return; done = true; try { socket.destroy(); } catch { /* ignore */ } resolve(ok); };
+    socket.setTimeout(timeoutMs);
+    socket.on('timeout', () => finish(false));
+    socket.on('error', () => finish(false));
+    socket.on('connect', () => {
+      try {
+        const varint = (num) => { const out = []; let n = num >>> 0; do { let t = n & 0x7f; n >>>= 7; if (n) t |= 0x80; out.push(t); } while (n); return Buffer.from(out); };
+        const hb = Buffer.from(host, 'utf8');
+        const data = Buffer.concat([varint(0), varint(47), varint(hb.length), hb, Buffer.from([(port >> 8) & 0xff, port & 0xff]), varint(1)]);
+        socket.write(Buffer.concat([varint(data.length), data])); // handshake (prochain état = status)
+        socket.write(Buffer.concat([varint(1), varint(0)]));       // status request
+      } catch { finish(false); }
+    });
+    socket.on('data', () => finish(true)); // le serveur nous répond → il est vivant
+  });
+}
+async function serverReachable(host, port) {
+  let target = host, tport = port || 25565;
+  // meytopia.fr est SRV-only : on résout le SRV pour trouver l'hôte:port réel du serveur.
+  try { const srv = await dns.resolveSrv(`_minecraft._tcp.${host}`); if (srv && srv[0]) { target = srv[0].name; tport = srv[0].port; } }
+  catch { /* pas de SRV : on tente host:port direct */ }
+  // 3 essais (une seule réussite suffit) → pas de fausse alerte sur un aléa réseau du runner GitHub.
+  for (let i = 0; i < 3; i++) {
+    if (await mcStatusPing(target, tport, 5000)) return true;
+    if (i < 2) await new Promise((r) => setTimeout(r, 1500));
+  }
+  return false;
+}
+function serverConfig() {
+  try { const l = JSON.parse(fs.readFileSync('launcher.json', 'utf8')); if (l && l.server && l.server.host) return { host: l.server.host, port: l.server.port || 25565 }; }
+  catch { /* défaut ci-dessous */ }
+  return { host: 'meytopia.fr', port: 25598 };
+}
+// État d'escalade rangé (invisible) dans le corps de l'issue d'alerte : quand la panne a commencé + paliers déjà notifiés.
+const MARK_RE = /<!--\s*watch:\s*downSince=(\S+)\s+notified=([\d,]*)\s*-->/;
+function parseState(body) { const m = MARK_RE.exec(body || ''); return m ? { downSince: m[1], notified: m[2] ? m[2].split(',').map(Number) : [] } : null; }
+function marker(downSince, notified) { return `<!-- watch: downSince=${downSince} notified=${notified.join(',')} -->`; }
+// Quels paliers de rappel sont dus MAINTENANT (dépassés et pas encore notifiés) ?
+function dueReminders(downSinceIso, notified, nowMs) {
+  const elapsed = Math.round((nowMs - new Date(downSinceIso).getTime()) / 60000);
+  return { elapsed, due: REMINDERS.filter((t) => elapsed >= t && !(notified || []).includes(t)) };
+}
+
+async function main() {
   // Mode TEST du webhook (lancement manuel avec la case cochée) : on envoie un message d'essai et on
   // s'arrête là. Verdict CLAIR dans les logs Actions — pas de « catch » silencieux, contrairement aux
   // vraies alertes (non bloquantes). Sert à vérifier que le secret DISCORD_WEBHOOK est bon.
@@ -132,53 +185,63 @@ function fmtParis(iso) {
   //    publié, le site doit être surveillé. Best-effort, jamais bloquant.
   await checkPages();
 
-  // 1) Lire live.json (cache-buster : raw.githubusercontent cache ~5 min)
-  let live = null;
+  // 1) Ping DIRECT du serveur = source de vérité (ne dépend plus de la sonde). En plus, on lit
+  //    live.json UNIQUEMENT pour savoir si un arrêt PROPRE a été signalé (libellé « éteint » vs « crash »).
+  const { host, port } = serverConfig();
+  const reachable = await serverReachable(host, port);
+  let cleanStop = false;
   try {
     const res = await fetch(`https://raw.githubusercontent.com/${REPO}/stats/live.json?t=${Date.now()}`, { cache: 'no-store' });
-    if (res.ok) live = await res.json();
-  } catch (e) { /* réseau/branche absente → traité ci-dessous */ }
+    if (res.ok) { const live = await res.json(); cleanStop = !!(live && live.online === false); }
+  } catch { /* live.json optionnel ici */ }
 
-  if (!live || !live.updatedAt) {
-    console.log('live.json indisponible ou sans updatedAt — la sonde n\'a peut-être jamais publié. Aucune action.');
-    return;
-  }
-
-  const ageMin = Math.round((Date.now() - new Date(live.updatedAt).getTime()) / 60000);
   const alert = await openAlert();
-  console.log(`live.json : online=${live.online} · dernier battement il y a ${ageMin} min · alerte ouverte : ${alert ? '#' + alert.number : 'aucune'}`);
+  console.log(`Ping ${host}:${port} → ${reachable ? 'EN LIGNE' : 'INJOIGNABLE'} · arrêt propre signalé : ${cleanStop} · alerte ouverte : ${alert ? '#' + alert.number : 'aucune'}`);
 
-  // 2) Serveur éteint PROPREMENT → jamais d'alerte ; on solde une éventuelle panne passée.
-  if (live.online === false) {
+  // 2) Serveur EN LIGNE → on ferme une éventuelle alerte (« de retour »).
+  if (reachable) {
     if (alert) {
-      await gh(`/repos/${REPO}/issues/${alert.number}/comments`, { method: 'POST', body: JSON.stringify({ body: `✅ Le serveur a été arrêté proprement (dernier battement : ${fmtParis(live.updatedAt)}). Fin de l'alerte.` }) });
+      await gh(`/repos/${REPO}/issues/${alert.number}/comments`, { method: 'POST', body: JSON.stringify({ body: '✅ Le serveur répond à nouveau. Fin de l\'alerte.' }) });
       await gh(`/repos/${REPO}/issues/${alert.number}`, { method: 'PATCH', body: JSON.stringify({ state: 'closed' }) });
-      await discord(`✅ **Meytopia** — fin d'alerte : le serveur a été arrêté proprement.`);
+      await discord('✅ **Meytopia est de retour !** Le serveur répond à nouveau.');
     }
+    console.log('Serveur en ligne — rien à signaler.');
     return;
   }
 
-  // 3) Sonde fraîche → tout va bien ; on ferme une éventuelle alerte (« rétabli »).
-  if (ageMin <= STALE_MIN) {
-    if (alert) {
-      await gh(`/repos/${REPO}/issues/${alert.number}/comments`, { method: 'POST', body: JSON.stringify({ body: `✅ Rétabli : la sonde publie à nouveau (dernier battement : ${fmtParis(live.updatedAt)}).` }) });
-      await gh(`/repos/${REPO}/issues/${alert.number}`, { method: 'PATCH', body: JSON.stringify({ state: 'closed' }) });
-      await discord(`✅ **Meytopia est de retour !** Le serveur répond à nouveau.`);
-    }
+  // 3) Serveur INJOIGNABLE, PREMIÈRE détection → alerte immédiate (« dès qu'il est off »).
+  if (!alert) {
+    const nowIso = new Date().toISOString();
+    const body = [
+      `Le serveur **${host}** ne répond plus (test de connexion direct).`,
+      cleanStop ? 'La sonde signalait un **arrêt propre** — c\'est peut-être volontaire (maintenance).' : 'Aucun arrêt propre signalé → **crash / coupure présumé**.',
+      '',
+      'Je te préviens à nouveau si ça dure : **5 min, 15 min, 30 min, 1 h**.',
+      'Cette issue se ferme toute seule dès que le serveur répond.',
+      '',
+      marker(nowIso, []),
+    ].join('\n');
+    const issue = await gh(`/repos/${REPO}/issues`, { method: 'POST', body: JSON.stringify({ title: TITLE, body, labels: [LABEL] }) });
+    await discord(`${cleanStop ? '🟠' : '🔴'} **Meytopia ne répond plus.** ${cleanStop ? '(arrêt propre — volontaire ?)' : '(crash / coupure présumé)'} — rappels à 5, 15, 30 min et 1 h si ça dure. ${issue.html_url}`);
+    console.log('Alerte créée : #' + issue.number);
     return;
   }
 
-  // 4) Panne présumée : dernier état « en ligne » mais plus aucun battement depuis > 15 min.
-  if (alert) { console.log('Panne déjà signalée (#' + alert.number + ') — pas de re-notification.'); return; }
-  const body = [
-    `La sonde n'a plus publié depuis **${ageMin} min** alors que le dernier état du serveur était **en ligne**.`,
-    ``,
-    `- Dernier battement : ${fmtParis(live.updatedAt)} (Europe/Paris)`,
-    `- Causes possibles : crash du serveur, gel (freeze), coupure réseau/hébergeur, panne GitHub côté sonde.`,
-    ``,
-    `Cette issue se fermera automatiquement dès que la sonde publiera à nouveau (ou après un arrêt propre).`,
-  ].join('\n');
-  const issue = await gh(`/repos/${REPO}/issues`, { method: 'POST', body: JSON.stringify({ title: TITLE, body, labels: [LABEL] }) });
-  await discord(`🔴 **Meytopia ne répond plus !** Aucun battement de la sonde depuis ${ageMin} min (dernier état : en ligne). Détails : ${issue.html_url}`);
-  console.log('Alerte créée : #' + issue.number);
-})().catch((e) => { console.error('sonde-watch en échec :', e.message); process.exit(1); });
+  // 4) Alerte DÉJÀ ouverte → rappel échelonné selon la durée d'indisponibilité (5/15/30 min, 1 h).
+  const st = parseState(alert.body) || { downSince: alert.created_at, notified: [] };
+  const { elapsed, due } = dueReminders(st.downSince, st.notified, Date.now());
+  if (!due.length) { console.log(`Toujours injoignable (~${elapsed} min) — aucun nouveau palier de rappel.`); return; }
+  const top = Math.max(...due);
+  const label = top >= 60 ? `${Math.round(top / 60)} h` : `${top} min`;
+  await discord(`⏰ **Meytopia** toujours injoignable depuis ~${label}. ${alert.html_url}`);
+  const notified = Array.from(new Set(st.notified.concat(due))).sort((a, b) => a - b);
+  const newBody = MARK_RE.test(alert.body || '') ? alert.body.replace(MARK_RE, marker(st.downSince, notified)) : ((alert.body || '') + '\n\n' + marker(st.downSince, notified));
+  await gh(`/repos/${REPO}/issues/${alert.number}`, { method: 'PATCH', body: JSON.stringify({ body: newBody }) });
+  await gh(`/repos/${REPO}/issues/${alert.number}/comments`, { method: 'POST', body: JSON.stringify({ body: `⏰ Toujours injoignable depuis ~${label}.` }) });
+  console.log(`Palier(s) ${due.join(', ')} min notifié(s).`);
+}
+
+if (require.main === module) {
+  main().catch((e) => { console.error('sonde-watch en échec :', e.message); process.exit(1); });
+}
+module.exports = { mcStatusPing, serverReachable, parseState, marker, dueReminders, MARK_RE, REMINDERS };

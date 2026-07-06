@@ -35,6 +35,9 @@ jobs:
       - id: packtool
         if: always()
         run: node tools/packtool-test.js
+      - id: sondewatch
+        if: always()
+        run: node tools/sonde-watch-test.js
       - name: Recapitulatif en francais
         if: always()
         run: |
