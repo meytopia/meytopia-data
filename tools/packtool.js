@@ -182,11 +182,15 @@ async function main() {
   const added = [];
   const uploads = [];
   const seenPaths = new Set();
+  // Dossier de destination selon le type d'item : mod (.jar) → mods/, resourcepack/shaderpack
+  // (.zip) → leur dossier — le launcher les installe pareil ET les active tout seul (0.33.0+).
+  const MAIN_DIRS = { mod: 'mods', resourcepack: 'resourcepacks', shaderpack: 'shaderpacks' };
   const addFile = (fileName, buf, item) => {
-    const p = (item && item.path) || ('mods/' + fileName);
+    const dir = MAIN_DIRS[(item && item.type) || 'mod'] || 'mods';
+    const p = (item && item.path) || (dir + '/' + fileName);
     if (seenPaths.has(p)) { log('… doublon ignoré :', p); return; }
     seenPaths.add(p);
-    const info = readModInfo(buf);
+    const info = dir === 'mods' ? readModInfo(buf) : null; // pas de méta de mod dans un .zip de textures
     const entry = { path: p, sha1: sha1(buf), size: buf.length, url: assetUrl(tag, p) };
     if (info) entry.mod = info;
     if (item && item.version) entry.version = String(item.version);
@@ -220,13 +224,19 @@ async function main() {
       let n = 0;
       for (const e of zip.getEntries()) {
         if (e.isDirectory) continue;
-        const base = e.entryName.split('/').pop();
-        if (!/\.jar$/i.test(base)) continue;
-        addFile(base, e.getData(), null);
-        n++;
+        const parts = e.entryName.split('/');
+        const base = parts.pop();
+        const folders = parts.map((s) => s.toLowerCase());
+        if (/\.jar$/i.test(base)) { addFile(base, e.getData(), null); n++; continue; }
+        // Dossiers resourcepacks/ et shaderpacks/ dans l'archive : les .zip y sont ajoutés au pack
+        // (installés ET activés automatiquement par le launcher chez les joueurs).
+        if (/\.zip$/i.test(base)) {
+          if (folders.includes('resourcepacks')) { addFile(base, e.getData(), { type: 'resourcepack' }); n++; }
+          else if (folders.includes('shaderpacks')) { addFile(base, e.getData(), { type: 'shaderpack' }); n++; }
+        }
       }
-      if (!n) throw new Error('archive .zip : aucun .jar trouvé dans ' + item.url);
-      log('  →', n, 'mods extraits de l\'archive');
+      if (!n) throw new Error('archive .zip : aucun fichier de pack trouvé (.jar, ou .zip sous resourcepacks/ / shaderpacks/) dans ' + item.url);
+      log('  →', n, 'fichier(s) extraits de l\'archive');
     } else {
       const r = await resolveItem(item);
       log('↓', r.fileName, '←', r.url.slice(0, 80));

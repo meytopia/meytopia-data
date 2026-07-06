@@ -61,7 +61,27 @@ En `dry_run`, le workflow télécharge/calcule tout et affiche le **plan** dans 
 ```
 
 Champs d'un item : `source` (`"url"` ou `"curseforge"`), `url`, et en option `path`
-(emplacement, défaut `mods/<nom du fichier>`), `version`, `replaces` (chemin du mod remplacé).
+(emplacement, défaut `mods/<nom du fichier>`), `version`, `replaces` (chemin du mod remplacé),
+et `type`.
+
+### Packs de textures et de shaders
+
+`type` accepte `"mod"` (défaut, `.jar` → `mods/`), `"resourcepack"` (`.zip` → `resourcepacks/`) ou
+`"shaderpack"` (`.zip` → `shaderpacks/`). Réservé aux **liens directs** (`source: "url"`) — CurseForge
+reste pour les mods. Exemple :
+
+```json
+{ "mode": "add", "items": [
+  { "source": "url", "type": "resourcepack", "url": "https://example.com/mes-textures.zip" },
+  { "source": "url", "type": "shaderpack",  "url": "https://example.com/complementary.zip" }
+] }
+```
+
+Le launcher (≥ 0.33.0) **installe ET active** ces packs automatiquement chez les joueurs (textures
+cochées, shader sélectionné dans Iris), **une seule fois** chacun — si le joueur les désactive
+ensuite, ils ne sont jamais re-forcés. Un shader nécessite un chargeur (Iris, déjà dans le pack).
+Depuis un **mods.zip** : un `.zip` rangé sous un dossier `resourcepacks/` ou `shaderpacks/` de
+l'archive est ajouté au pack comme tel (les `.jar` vont dans `mods/`).
 
 ## Sécurité
 

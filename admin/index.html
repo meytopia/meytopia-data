@@ -607,7 +607,7 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
         <h2 style="margin:0">Composer le pack</h2>
         <a href="#" id="pk-help" style="color:var(--violet);text-decoration:none;font-size:13px">aide &amp; pré-requis</a>
       </div>
-      <p class="hint" style="margin-bottom:10px">Ajoute, met à jour ou remplace des mods par <b>lien</b> (direct ou CurseForge), <b>plusieurs d'un coup (un par ligne)</b> — GitHub assemble et publie tout seul, sans PC. Laisse <b>Simulation</b> coché pour un essai sans rien publier.</p>
+      <p class="hint" style="margin-bottom:10px">Ajoute, met à jour ou remplace des mods par <b>lien</b> (direct ou CurseForge), <b>plusieurs d'un coup (un par ligne)</b> — et aussi des <b>packs de textures/shaders</b> (.zip, lien direct) : le launcher les installe ET les active tout seul chez les joueurs — GitHub assemble et publie tout seul, sans PC. Laisse <b>Simulation</b> coché pour un essai sans rien publier.</p>
       <div class="cols">
         <div class="field"><label for="pk-mode">Opération</label>
           <select id="pk-mode"><option value="add">➕ Ajouter au pack</option><option value="update">⬆️ Mettre à jour (remplace un mod)</option><option value="replace">🔁 Remplacer tout le pack</option></select></div>
@@ -615,7 +615,8 @@ details code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);pad
       </div>
       <div class="card" style="background:var(--bg-2)">
         <div class="cols">
-          <div class="field"><label for="pk-src">Source</label><select id="pk-src"><option value="url">Lien direct (.jar)</option><option value="curseforge">CurseForge</option></select></div>
+          <div class="field"><label for="pk-src">Source</label><select id="pk-src"><option value="url">Lien direct</option><option value="curseforge">CurseForge</option></select></div>
+          <div class="field" id="pk-type-wrap"><label for="pk-type">Type</label><select id="pk-type"><option value="mod">🧩 Mod (.jar)</option><option value="resourcepack">🎨 Pack de textures (.zip)</option><option value="shaderpack">🌄 Pack de shaders (.zip)</option></select></div>
           <div class="field"><label for="pk-ver">Version (optionnel)</label><input type="text" id="pk-ver" class="mono" placeholder="1.2.3"></div>
         </div>
         <div class="field"><label for="pk-url">Lien(s) — <b>un par ligne</b> pour en ajouter plusieurs d'un coup</label><textarea id="pk-url" class="mono" rows="3" placeholder="https://… .jar&#10;https://www.curseforge.com/minecraft/mc-mods/<mod>/files/<id>&#10;… (un lien par ligne)"></textarea></div>
@@ -3052,7 +3053,7 @@ function pkUpdateModeUi() {
 function pkRenderList() {
   const box = $('#pk-list'); if (!box) return;
   box.innerHTML = pkItems.length
-    ? pkItems.map((it, i) => `<div class="list-item"><div class="body"><div class="title">${esc(it.source === 'curseforge' ? 'CurseForge' : 'Lien direct')}${it.version ? ' · v' + esc(it.version) : ''}</div><div class="meta2"><span class="mono" style="overflow-wrap:anywhere">${esc(it.url)}</span>${it.replaces ? `<span>remplace ${esc(String(it.replaces).split('/').pop())}</span>` : ''}</div></div><button class="btn ghost danger" data-pk-rm="${i}">✕</button></div>`).join('')
+    ? pkItems.map((it, i) => `<div class="list-item"><div class="body"><div class="title">${esc(it.source === 'curseforge' ? 'CurseForge' : 'Lien direct')}${it.type === 'resourcepack' ? ' · 🎨 textures' : it.type === 'shaderpack' ? ' · 🌄 shaders' : ''}${it.version ? ' · v' + esc(it.version) : ''}</div><div class="meta2"><span class="mono" style="overflow-wrap:anywhere">${esc(it.url)}</span>${it.replaces ? `<span>remplace ${esc(String(it.replaces).split('/').pop())}</span>` : ''}</div></div><button class="btn ghost danger" data-pk-rm="${i}">✕</button></div>`).join('')
     : '<div class="empty">Aucun mod dans la liste.</div>';
   const mode = $('#pk-mode') ? $('#pk-mode').value : 'add';
   const pub = $('#pk-publish');
@@ -3063,6 +3064,7 @@ if ($('#pk-help')) $('#pk-help').addEventListener('click', (e) => {
   alert('Composer le pack — pré-requis :\n\n• Jeton GitHub « classic » avec le scope « repo » (pour déclencher le build). Sinon le bouton Publier sera refusé.\n• Pour CurseForge : ajouter le secret CURSEFORGE_API_KEY au dépôt (les liens directs n’en ont pas besoin).\n• Laisse « Simulation » coché pour un essai : ça calcule tout sans rien publier.\n\nDétails : tools/PUBLIER-PACK.md');
 });
 if ($('#pk-mode')) $('#pk-mode').addEventListener('change', pkUpdateModeUi);
+if ($('#pk-src')) $('#pk-src').addEventListener('change', () => { const w = $('#pk-type-wrap'); if (w) w.hidden = $('#pk-src').value !== 'url'; });
 if ($('#pk-add-item')) $('#pk-add-item').addEventListener('click', () => {
   const lines = $('#pk-url').value.split('\n').map((s) => s.trim()).filter(Boolean);
   if (!lines.length) { toast('Colle au moins un lien https.', true); return; }
@@ -3073,6 +3075,9 @@ if ($('#pk-add-item')) $('#pk-add-item').addEventListener('click', () => {
   for (const url of lines) {
     if (!/^https:\/\//.test(url)) { bad++; continue; }
     const it = { source: src, url };
+    // Type (textures/shaders) : liens directs uniquement — CurseForge reste réservé aux mods.
+    const typ = $('#pk-type') ? $('#pk-type').value : 'mod';
+    if (src === 'url' && typ !== 'mod') it.type = typ;
     if (ver && lines.length === 1) it.version = ver; // la version ne s'applique qu'à un ajout unique
     if (mode === 'update') {
       const rep = $('#pk-replaces').value;
