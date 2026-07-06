@@ -39,6 +39,14 @@ ok('page HTML (<html) REFUSÉE', !pt.looksLikeZip(Buffer.from('<html>err</html>'
 ok('tampon trop court REFUSÉ', !pt.looksLikeZip(Buffer.from([0x50, 0x4b])));
 ok('non-buffer REFUSÉ', !pt.looksLikeZip('PK\x03\x04'));
 
+// safeName : espaces/caractères spéciaux → _ (correspondance URL↔asset GitHub)
+eq('safeName espaces → _', pt.safeName('Fast Better Grass.zip'), 'Fast_Better_Grass.zip');
+eq('safeName déjà propre inchangé', pt.safeName('Better-Leaves-9.5.zip'), 'Better-Leaves-9.5.zip');
+eq('safeName points conservés', pt.safeName('Fast.Better.Grass.zip'), 'Fast.Better.Grass.zip');
+eq('safeName accents/caractères → _', pt.safeName('Complémentaire (v2).zip'), 'Compl_mentaire_v2_.zip');
+eq('safeName vide → fichier', pt.safeName(''), 'fichier');
+ok('safeName underscores en trop nettoyés', !/^_|_$/.test(pt.safeName('  bord  ')));
+
 // applyMode : fusion inchangée (mods remplacés en mode replace ; textures/mods ajoutés)
 {
   const cur = [{ path: 'mods/a.jar' }, { path: 'mods/b.jar' }, { path: 'resourcepacks/old.zip' }];

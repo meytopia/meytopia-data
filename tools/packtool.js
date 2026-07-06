@@ -59,6 +59,13 @@ function looksLikeZip(buf) {
   return Buffer.isBuffer(buf) && buf.length >= 4 && buf[0] === 0x50 && buf[1] === 0x4b
     && (buf[2] === 0x03 || buf[2] === 0x05 || buf[2] === 0x07);
 }
+// Nom sûr pour une release GitHub : les assets refusent les ESPACES et caractères spéciaux (GitHub les
+// remplace en douce → l'URL du manifeste ne correspond plus à l'asset → 404 au téléchargement, vu en
+// prod avec « Fast Better Grass.zip »). On normalise NOUS-MÊMES pour garantir la correspondance.
+function safeName(name) {
+  const s = String(name || '').replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^[_.]+/, '').replace(/_+$/, '');
+  return s || 'fichier';
+}
 function forgeCdnUrl(fileId, fileName) {
   const s = String(fileId);
   return `https://edge.forgecdn.net/files/${s.slice(0, 4)}/${String(parseInt(s.slice(4), 10))}/${fileName}`;
@@ -175,7 +182,7 @@ async function runOptional(items) {
     if (!looksLikeZip(buf)) throw new Error(`« ${r.fileName} » n'est pas un .zip/.jar valide (le lien renvoie une page web). CurseForge : ajoute la clé API, ou colle un lien direct (Modrinth).`);
     const type = (item.type && TYPE_DIRS[item.type]) ? item.type : (r.type || 'mod');
     const oext = type === 'mod' ? '.jar' : '.zip';
-    let ofn = String(r.fileName || '').trim() || ('fichier' + oext);
+    let ofn = safeName(r.fileName);
     if (!new RegExp('\\' + oext + '$', 'i').test(ofn)) ofn = ofn.replace(/\.(jar|zip)$/i, '') + oext;
     const p = TYPE_DIRS[type] + '/' + ofn;
     const info = readModInfo(buf);
@@ -233,8 +240,9 @@ async function main() {
     // Garde-fou : on ne publie QUE de vraies archives (.jar/.zip = ZIP). Un lien qui renvoie une page web
     // (CurseForge bloque les liens directs → HTML) est REFUSÉ, jamais publié en douce.
     if (!looksLikeZip(buf)) throw new Error(`« ${fileName} » n'est pas un .zip/.jar valide (le lien renvoie une page web, pas le fichier). CurseForge : ajoute la clé API, ou colle un lien de téléchargement DIRECT (Modrinth).`);
-    // Bonne extension garantie (un nom sans extension, ex. un numéro CurseForge, casserait le mod/pack côté joueur).
-    let nm = String(fileName || '').trim() || ('fichier' + EXT[type]);
+    // Nom assaini (pas d'espace/caractère spécial → correspondance URL↔asset GitHub) + bonne extension
+    // garantie (un nom sans extension, ex. un numéro CurseForge, casserait le mod/pack côté joueur).
+    let nm = safeName(fileName);
     if (!new RegExp('\\' + EXT[type] + '$', 'i').test(nm)) nm = nm.replace(/\.(jar|zip)$/i, '') + EXT[type];
     const p = (item && item.path) || (dir + '/' + nm);
     if (seenPaths.has(p)) { log('… doublon ignoré :', p); return; }
@@ -352,4 +360,4 @@ async function main() {
 
 main().catch((e) => die(e.message || String(e)));
 
-module.exports = { bump, assetName, assetUrl, parseCurseforge, typeFromCategory, looksLikeZip, forgeCdnUrl, applyMode, curseforgeFile };
+module.exports = { bump, assetName, assetUrl, parseCurseforge, typeFromCategory, looksLikeZip, safeName, forgeCdnUrl, applyMode, curseforgeFile };
