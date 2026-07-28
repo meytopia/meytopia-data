@@ -1,15 +1,12 @@
 {
   "state": "ok",
-  "message": "Pack publié : 1.5.9",
-  "at": "2026-07-06T11:20:00.040Z",
+  "message": "Pack publié : 1.5.12",
+  "at": "2026-07-28T16:31:33.647Z",
   "summary": {
     "mode": "add",
-    "version": "1.5.9",
+    "version": "1.5.12",
     "added": [
-      "resourcepacks/Fast Better Grass.zip",
-      "resourcepacks/Better-Leaves-9.5.zip",
-      "resourcepacks/FreshAnimations_v1.10.4.zip",
-      "shaderpacks/ComplementaryUnbound_r5.8.1.zip"
+      "mods/waystones-neoforge-1.21.1-21.1.38.jar"
     ],
     "removedApprox": 0,
     "total": 85

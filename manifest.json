@@ -1,6 +1,6 @@
 {
-  "version": "1.5.11",
-  "generatedAt": "2026-07-06T11:20:00.039Z",
+  "version": "1.5.12",
+  "generatedAt": "2026-07-28T16:31:33.544Z",
   "files": [
     {
       "path": "mods/addonslib-neoforge-1.21.1-1.10.jar",
@@ -825,6 +825,16 @@
       "sha1": "af656a33be2cbd217ea08986ad2cdd76f6bbfe1c",
       "size": 546928,
       "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.9/shaderpacks_ComplementaryUnbound_r5.8.1.zip"
+    },
+    {
+      "path": "mods/waystones-neoforge-1.21.1-21.1.38.jar",
+      "sha1": "19e70d41c936ac6cda1da429d117376fba28c98e",
+      "size": 1207581,
+      "url": "https://github.com/meytopia/meytopia-data/releases/download/pack-1.5.12/mods_waystones-neoforge-1.21.1-21.1.38.jar",
+      "mod": {
+        "id": "waystones",
+        "name": "Waystones"
+      }
     }
   ]
 }
