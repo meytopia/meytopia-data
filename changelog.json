@@ -1,16 +1,6 @@
 {
   "entries": [
     {
-      "id": "modpack-1.5.12",
-      "target": "modpack",
-      "version": "1.5.12",
-      "date": "2026-07-28",
-      "title": "Modpack 1.5.12",
-      "changes": [
-        "Ajout/maj : Waystones"
-      ]
-    },
-    {
       "id": "modpack-1.5.10",
       "target": "modpack",
       "version": "1.5.10",
