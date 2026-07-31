@@ -1,16 +1,6 @@
 {
   "entries": [
     {
-      "id": "modpack-1.5.8",
-      "target": "modpack",
-      "version": "1.5.8",
-      "date": "2026-07-06",
-      "title": "Modpack 1.5.8",
-      "changes": [
-        "Retrait de 4 fichiers de packs invalides (liens CurseForge qui renvoyaient une page web au lieu du fichier) — seront réajoutés proprement"
-      ]
-    },
-    {
       "id": "modpack-1.5.7",
       "target": "modpack",
       "version": "1.5.7",
