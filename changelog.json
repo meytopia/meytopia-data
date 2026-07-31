@@ -1,16 +1,6 @@
 {
   "entries": [
     {
-      "id": "modpack-1.5.9",
-      "target": "modpack",
-      "version": "1.5.9",
-      "date": "2026-07-06",
-      "title": "Modpack 1.5.9",
-      "changes": [
-        "Ajout/maj : Fast Better Grass.zip, Better-Leaves-9.5.zip, FreshAnimations_v1.10.4.zip, ComplementaryUnbound_r5.8.1.zip"
-      ]
-    },
-    {
       "id": "modpack-1.5.8",
       "target": "modpack",
       "version": "1.5.8",
