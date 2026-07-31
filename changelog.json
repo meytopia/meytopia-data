@@ -1,16 +1,6 @@
 {
   "entries": [
     {
-      "id": "modpack-1.5.7",
-      "target": "modpack",
-      "version": "1.5.7",
-      "date": "2026-07-06",
-      "title": "Modpack 1.5.7",
-      "changes": [
-        "Ajout/maj : 8123288, 8259877, 7854681, 7556678"
-      ]
-    },
-    {
       "id": "modpack-1.5.3",
       "target": "modpack",
       "version": "1.5.3",
