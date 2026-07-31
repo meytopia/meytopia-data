@@ -27,5 +27,10 @@
   "theme": {
     "accent": "#ae9afe"
   },
-  "minLauncherVersion": "0.33.0"
+  "minLauncherVersion": "0.33.0",
+  "gate": {
+    "openAt": "2026-07-31T21:00:00+02:00",
+    "title": "Ouverture de meytopia",
+    "message": "Rendez-vous à 21h"
+  }
 }
