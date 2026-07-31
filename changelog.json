@@ -69,18 +69,6 @@
       "changes": [
         "Ajout/maj : fast-better-grass, motschens-better-leaves, fresh-animations"
       ]
-    },
-    {
-      "id": "launcher-0.33.0",
-      "target": "launcher",
-      "version": "0.33.0",
-      "date": "2026-07-06",
-      "title": "Textures et shaders du pack installés ET activés tout seuls",
-      "changes": [
-        "Si le pack contient un pack de textures ou de shaders, le launcher ne se contente plus de le télécharger : il l’active aussi automatiquement (textures cochées dans Minecraft, shader sélectionné dans Iris)",
-        "Ton choix reste roi : chaque pack n’est activé qu’UNE fois — si tu le désactives en jeu, le launcher ne te le re-force jamais",
-        "Tes réglages perso (autres packs de textures, options Iris) sont préservés tels quels"
-      ]
     }
   ]
 }
