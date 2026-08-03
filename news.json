@@ -1,3 +1,13 @@
 {
-  "news": []
+  "news": [
+    {
+      "id": "retro-2026-08-03",
+      "title": "📅 La rétro du lundi",
+      "body": "Cette semaine sur Meytopia : 127 h de jeu cumulées par 17 joueurs · 18 nouveaux venus découvrir Meytopia · record battu : 9 joueurs en même temps 🎆. Merci à tous, et bonne semaine !",
+      "date": "2026-08-03",
+      "tags": [
+        "retro"
+      ]
+    }
+  ]
 }
