@@ -14,8 +14,13 @@
     { key: 'adv', emoji: '🏆', label: 'Succès', fmt: function (v) { return SC.fmtNum(v); } },
     { key: 'playerKills', emoji: '🗡️', label: 'Duels gagnés', fmt: function (v) { return SC.fmtNum(v); } },
     { key: 'deaths', emoji: '💀', label: 'Morts', fmt: function (v) { return SC.fmtNum(v); } },
-    { key: 'noDeathMin', emoji: '🛡️', label: 'Temps de jeu sans mourir', title: 'depuis sa dernière mort', fmt: function (v) { return SC.fmtPlayTime(v); } },
-    { key: 'elytraM', emoji: '🪽', label: 'Vol en élytre', fmt: function (v) { return SC.fmtDist(v); } }
+    { key: 'noDeathMin', emoji: '🛡️', label: 'Temps de jeu sans mourir', title: 'depuis sa dernière mort — remis à zéro par Minecraft à chaque mort', fmt: function (v) { return SC.fmtPlayTime(v); } },
+    // Ne s'efface JAMAIS (contrairement à « sans mourir ») : temps de jeu ÷ (morts + 1).
+    { key: 'survieMoy', calc: SC.survieMoyenne, emoji: '🧬', label: 'Survie moyenne', title: 'temps de jeu divisé par le nombre de morts — ne repart jamais de zéro', fmt: function (v) { return SC.fmtPlayTime(v); } },
+    { key: 'elytraM', emoji: '🪽', label: 'Vol en élytre', fmt: function (v) { return SC.fmtDist(v); } },
+    { key: 'damageDealt', emoji: '💥', label: 'Dégâts infligés', title: 'en points de vie', fmt: function (v) { return SC.fmtNum(v); } },
+    { key: 'animalsBred', emoji: '🐄', label: 'Animaux élevés', fmt: function (v) { return SC.fmtNum(v); } },
+    { key: 'jumps', emoji: '🦘', label: 'Sauts', fmt: function (v) { return SC.fmtNum(v); } }
   ];
 
   // #34 : avatar de secours LOCAL (carré neutre) si le service d'avatars ne répond pas — au lieu de
@@ -87,7 +92,7 @@
 
     var rows = '';
     METRICS.forEach(function (m) {
-      var info = SC.rankOf(data, m.key, name);
+      var info = SC.rankOf(data, m.key, name, m.calc);
       if (!info) return;
       rows += '<div class="row"><span class="row-emoji">' + m.emoji + '</span>' +
         '<span class="row-lab"' + (m.title ? ' title="' + m.title + '"' : '') + '>' + m.label + '</span>' +

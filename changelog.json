@@ -1,3 +1,17 @@
 {
-  "entries": []
+  "entries": [
+    {
+      "id": "launcher-0.34.0",
+      "target": "launcher",
+      "version": "0.34.0",
+      "date": "2026-07-31",
+      "title": "De nouvelles statistiques (dont une qui ne s’efface jamais)",
+      "changes": [
+        "Nouvelle statistique « survie moyenne » : ton temps de jeu divisé par tes morts. Contrairement à « série sans mourir » (que Minecraft remet à zéro à chaque mort), celle-ci ne repart jamais de zéro — elle récompense ceux qui tiennent sur la durée",
+        "Trois statistiques qui existaient déjà sont enfin affichées : animaux élevés 🐄, dégâts infligés 💥 et sauts 🦘",
+        "Quatre nouveaux classements dans la page Communauté : survie moyenne, vol en élytre, dégâts infligés et éleveurs",
+        "Correction : ta place dans un classement ne peut plus afficher un pourcentage impossible (« parmi les 108 % ») quand tes stats sont en mode privé"
+      ]
+    }
+  ]
 }

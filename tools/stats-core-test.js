@@ -46,6 +46,26 @@ eq('fmtNum non-nombre → 0', SC.fmtNum(undefined), '0');
 eq('fmtNum sépare bien les milliers (longueur > 4)', SC.fmtNum(12345).length > 5, true);
 eq('escapeHtml échappe < & "', SC.escapeHtml('<a href="x">&'), '&lt;a href=&quot;x&quot;&gt;&amp;');
 
+// survieMoyenne : temps de jeu ÷ (morts + 1) — ne s'efface jamais (contrairement à noDeathMin)
+eq('survieMoyenne 120 min / 0 mort', SC.survieMoyenne({ playMin: 120, deaths: 0 }), 120);
+eq('survieMoyenne 120 min / 3 morts', SC.survieMoyenne({ playMin: 120, deaths: 3 }), 30);
+eq('survieMoyenne sans deaths → tout le temps', SC.survieMoyenne({ playMin: 60 }), 60);
+eq('survieMoyenne 0 min → null', SC.survieMoyenne({ playMin: 0, deaths: 5 }), null);
+eq('survieMoyenne mc absent → null', SC.survieMoyenne(null), null);
+eq('survieMoyenne deaths négatif → ignoré (pas de division bizarre)', SC.survieMoyenne({ playMin: 60, deaths: -2 }), 60);
+// rankOf avec une valeur CALCULÉE (4e argument) : classe sur la survie moyenne, pas sur une clé mc
+{
+  const d = { seen: {
+    Solide: { uuid: 'a', mc: { playMin: 300, deaths: 1 } },   // 150
+    Fragile: { uuid: 'b', mc: { playMin: 300, deaths: 29 } }, // 10
+    Neuf: { uuid: 'c', mc: { playMin: 0, deaths: 0 } },       // null → exclu
+  }, priv: {} };
+  eq('rankOf calculé : le plus résistant est n°1', SC.rankOf(d, 'survieMoy', 'Solide', SC.survieMoyenne), { rank: 1, total: 2, value: 150 });
+  eq('rankOf calculé : le fragile est n°2', SC.rankOf(d, 'survieMoy', 'Fragile', SC.survieMoyenne), { rank: 2, total: 2, value: 10 });
+  eq('rankOf calculé : joueur sans temps de jeu exclu', SC.rankOf(d, 'survieMoy', 'Neuf', SC.survieMoyenne), null);
+  eq('rankOf SANS calc inchangé (non-régression)', SC.rankOf(d, 'playMin', 'Solide'), { rank: 1, total: 2, value: 300 });
+}
+
 // Présence / rangs
 eq('daysPresent Alpha', SC.daysPresent(data, 'Alpha'), 1);
 eq('playtimeRank Alpha', SC.playtimeRank(data, 'Alpha'), { rank: 1, total: 1 });

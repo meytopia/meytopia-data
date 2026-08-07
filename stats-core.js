@@ -71,12 +71,26 @@
     return Object.keys(seen).filter(function (n) { return !isPrivate(data, seen[n] && seen[n].uuid); });
   }
 
+  // « Survie moyenne » : temps de jeu ÷ (morts + 1), en minutes. Complète « sans mourir » (= la stat
+  // vanilla time_since_death, que MINECRAFT remet à zéro à chaque mort) par une valeur qui, elle, ne
+  // s'efface jamais. +1 au dénominateur : un joueur jamais mort obtient tout son temps de jeu
+  // (et non une division par zéro). null si pas encore de temps de jeu exploitable.
+  function survieMoyenne(mc) {
+    if (!mc) return null;
+    var t = (typeof mc.playMin === 'number' && mc.playMin > 0) ? mc.playMin : 0;
+    if (t <= 0) return null;
+    var morts = (typeof mc.deaths === 'number' && mc.deaths > 0) ? mc.deaths : 0;
+    return Math.round(t / (morts + 1));
+  }
+
   // Rang du joueur pour une clé de seen[].mc (joueurs privés exclus). Renvoie {rank,total,value} ou null.
-  function rankOf(data, key, name) {
+  // `calc` (optionnel) = valeur DÉRIVÉE des stats (ex. survieMoyenne) au lieu d'une lecture directe.
+  function rankOf(data, key, name, calc) {
     var seen = (data && data.seen) || {};
     var arr = pubKeys(data).map(function (n) {
       var s = seen[n];
-      return { n: n, v: (s && s.mc && typeof s.mc[key] === 'number') ? s.mc[key] : null };
+      var v = calc ? calc(s && s.mc) : ((s && s.mc && typeof s.mc[key] === 'number') ? s.mc[key] : null);
+      return { n: n, v: v };
     }).filter(function (x) { return x.v != null && x.v > 0; }).sort(function (a, b) { return b.v - a.v; });
     var idx = arr.findIndex(function (x) { return x.n === name; });
     return idx < 0 ? null : { rank: idx + 1, total: arr.length, value: arr[idx].v };
@@ -212,7 +226,7 @@
 
   root.StatsCore = {
     PARIS: PARIS, escapeHtml: escapeHtml, fmtPlayTime: fmtPlayTime, fmtDist: fmtDist,
-    fmtNum: fmtNum, playtime: playtime, fmtDate: fmtDate, fmtAgo: fmtAgo, daysPresent: daysPresent, rankOf: rankOf,
+    fmtNum: fmtNum, playtime: playtime, survieMoyenne: survieMoyenne, fmtDate: fmtDate, fmtAgo: fmtAgo, daysPresent: daysPresent, rankOf: rankOf,
     playtimeRank: playtimeRank, players: players, avatarUrl: avatarUrl, isPrivate: isPrivate,
     pubKeys: pubKeys, collective: collective, milestones: milestones, champions: champions,
     UP_MERGE_GAP_SEC: UP_MERGE_GAP_SEC, mergeUp: mergeUp, deriveIntervalsDay: deriveIntervalsDay,
