@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "id": "launcher-0.35.0",
+      "target": "launcher",
+      "version": "0.35.0",
+      "date": "2026-08-21",
+      "title": "Nouveau logo Meytopia",
+      "changes": [
+        "Le nouveau blason Meytopia remplace l’ancien logo partout : dans le launcher, sur l’icône de la fenêtre, dans la barre des tâches et sur le raccourci du bureau",
+        "L’icône a été refaite en 7 tailles pour rester nette aussi bien en tout petit dans la barre des tâches qu’en grand sur le bureau"
+      ]
+    },
+    {
       "id": "launcher-0.34.0",
       "target": "launcher",
       "version": "0.34.0",
