@@ -1,6 +1,19 @@
 {
   "entries": [
     {
+      "id": "launcher-0.36.0",
+      "target": "launcher",
+      "version": "0.36.0",
+      "date": "2026-08-21",
+      "title": "Tes amis apparaissent enfin en ligne",
+      "changes": [
+        "Correction d’un vrai problème : un ami connecté au serveur restait affiché « Hors ligne » dans ta liste d’amis. Le launcher se fie maintenant à la même source que « Qui joue maintenant », qui elle fonctionne",
+        "Les notifications « un ami vient de se connecter » remarchent également — elles ne partaient jamais non plus",
+        "Le compteur de joueurs et la liste affichée ne peuvent plus se contredire",
+        "Moins de connexions inutiles en arrière-plan : le launcher est plus léger pour ton PC"
+      ]
+    },
+    {
       "id": "launcher-0.35.0",
       "target": "launcher",
       "version": "0.35.0",
