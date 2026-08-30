@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "id": "launcher-0.37.0",
+      "target": "launcher",
+      "version": "0.37.0",
+      "date": "2026-08-30",
+      "title": "Plus léger quand il tourne en arrière-plan",
+      "changes": [
+        "Le launcher consomme moins de mémoire et de processeur quand tu ne le regardes pas : les animations se mettent en pause et les images gardées en mémoire sont relâchées",
+        "Rien ne change à l’usage : tout revient instantanément quand tu rouvres la fenêtre, sans re-téléchargement (même hors connexion)"
+      ]
+    },
+    {
       "id": "launcher-0.36.0",
       "target": "launcher",
       "version": "0.36.0",
