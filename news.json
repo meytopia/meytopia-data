@@ -1,6 +1,15 @@
 {
   "news": [
     {
+      "id": "retro-2026-09-07",
+      "title": "📅 La rétro du lundi",
+      "body": "Cette semaine sur Meytopia : 112 h de jeu cumulées par 13 joueurs · 2 nouveaux venus découvrir Meytopia. Merci à tous, et bonne semaine !",
+      "date": "2026-09-07",
+      "tags": [
+        "retro"
+      ]
+    },
+    {
       "id": "retro-2026-08-31",
       "title": "📅 La rétro du lundi",
       "body": "Cette semaine sur Meytopia : 284 h de jeu cumulées par 15 joueurs · 8 nouveaux venus découvrir Meytopia. Merci à tous, et bonne semaine !",
